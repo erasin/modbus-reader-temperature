@@ -1,5 +1,7 @@
+use std::{thread, time::Duration};
+
 use mb::protocol::{Function, FunctionCode};
-use rand::{rngs::ThreadRng, Rng};
+use rand::Rng;
 
 use crate::Mock;
 
@@ -86,7 +88,7 @@ fn generate_response_voltage() -> Vec<u16> {
                 _ => rng.gen_range(100..500),
             };
 
-            (voltage, current)
+            (voltage as u16, current as u16)
         })
         .for_each(|(voltage, current)| {
             data.push(voltage);
