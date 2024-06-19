@@ -19,7 +19,7 @@ use crate::{
 /// let req = vec![0x01, 0x06, 0x00, 0x3C, 0x02, 0x59, 0x88, 0x9C];
 /// let res = vec![0x01, 0x06, 0x00, 0x3C, 0x02, 0x59, 0x88, 0x9C];
 /// ```
-pub fn request(slave: u8, mode: TempMode) -> Vec<u8> {
+pub fn request(slave: u8, mode: &TempMode) -> Vec<u8> {
     let mode = mode.params();
     let params = vec![mode.1, mode.2];
 
@@ -34,9 +34,9 @@ pub fn response(data: Vec<u8>) -> Result<Temperature> {
 /// 命令请求类型
 pub enum TempMode {
     /// 温度1: 获取温度 * 0.1
-    W1,
+    Temp1,
     /// 温度2: 获取温度 * 0.1
-    W2,
+    Temp2,
     /// 设定温度1: 温度 * 10.0
     S1(u16),
     /// 设定温度2: 温度 * 10.0
@@ -53,8 +53,8 @@ impl TempMode {
     /// 获取参数 (功能, 指令, 参数)
     pub fn params(&self) -> (FunctionCode, u16, u16) {
         match self {
-            TempMode::W1 => (FunctionCode::ReadHoldingRegisters, 10, 1),
-            TempMode::W2 => (FunctionCode::ReadHoldingRegisters, 14, 1),
+            TempMode::Temp1 => (FunctionCode::ReadHoldingRegisters, 10, 1),
+            TempMode::Temp2 => (FunctionCode::ReadHoldingRegisters, 14, 1),
             TempMode::S1(n) => (FunctionCode::WriteSingleRegister, 60, *n),
             TempMode::S2(n) => (FunctionCode::WriteSingleRegister, 61, *n),
             TempMode::Run(n) if *n < 3 => (FunctionCode::WriteSingleRegister, 63, *n), // 0 1 2
@@ -70,8 +70,8 @@ impl TempMode {
 /// 温度
 #[derive(Debug, Copy, Clone, PartialEq, PartialOrd)]
 pub struct Temperature {
-    dur: u64,
-    value: f32,
+    pub time: u64,
+    pub value: f32,
 }
 
 impl Temperature {
@@ -80,7 +80,10 @@ impl Temperature {
         let value = data.get(0).ok_or(Error::DataNull)?;
 
         let dur = current_timestamp();
-        let temp = Temperature { dur, value: *value };
+        let temp = Temperature {
+            time: dur,
+            value: *value,
+        };
         Ok(temp)
     }
 }

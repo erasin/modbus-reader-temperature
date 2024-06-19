@@ -11,6 +11,10 @@ impl VoltageMock {
     pub fn new(slave: u8) -> Self {
         VoltageMock { slave }
     }
+
+    pub fn from_request(request: &[u8]) -> Self {
+        VoltageMock::new(0x01)
+    }
 }
 
 impl Mock for VoltageMock {

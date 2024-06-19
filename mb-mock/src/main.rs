@@ -1,22 +1,20 @@
 use std::time::Duration;
 
-use mb_mock::{temperature::TempMock, Mock};
+use mb::{protocol::FunctionCode, relay::RelayMode, temperature::TempMode, utils::print_hex};
+use mb_mock::{relay::RelayMock, temperature::TempMock, voltage::VoltageMock, Mock};
 
 fn main() -> std::io::Result<()> {
     let port_name = "/dev/ttyUSB1";
     let baudrate = 9600;
-
     let timeout = Duration::from_millis(1000);
 
     // 打开串口
 
     let mut port = serialport::new(port_name, baudrate)
-        .timeout(Duration::from_millis(1000))
+        .timeout(timeout)
         .open()?;
 
     // ch340 发包限制 32为
-    // let mock = VoltageMock::new(0x01);
-    let mock = TempMock::new(0x02);
 
     loop {
         let mut buffer = [0; 1024];
@@ -24,11 +22,21 @@ fn main() -> std::io::Result<()> {
             Ok(n) => {
                 let buffer = &buffer[..n];
 
+                let mock: Box<dyn Mock> = match &buffer[0] {
+                    0x01 => Box::new(VoltageMock::from_request(&buffer)),
+                    0x02 => Box::new(TempMock::from_request(&buffer)),
+                    0x03 => Box::new(RelayMock::from_request(&buffer)),
+
+                    _ => Box::new(VoltageMock::from_request(&buffer)),
+                };
+
                 if buffer == mock.request().as_slice() {
                     print_hex("request", &buffer.to_vec());
                     let response = mock.response();
                     port.write_all(response.as_slice())?;
-                    print_hex("response", &&response);
+                    print_hex("response", &response);
+
+                    port.flush().unwrap();
                 } else {
                     println!("接收到未知请求: {:?}", buffer);
                 }
@@ -50,15 +58,3 @@ fn main() -> std::io::Result<()> {
 // [1, 4, 128,
 // 0, 2, 0, 15, 0, 89, 1, 156, 0, 29, 0, 18, 0, 23, 0, 12, 0, 28, 0, 1, 0, 28, 1, 71, 0, 34, 0, 15, 0, 27, 0, 25, 0, 11, 0, 27, 0, 74, 0, 1, 0, 28, 0, 16, 0, 76, 0, 6, 0, 27, 0, 11, 0, 28, 1, 52, 0, 26, 0, 233, 0, 60, 0, 12,
 // 194, 133]
-fn print_hex<T: AsRef<str>>(name: T, data: &Vec<u8>) {
-    let n = data.len();
-    let hex = data
-        .iter()
-        .map(|v| format!("{:02X} ", v))
-        .fold(String::new(), |mut x, y| {
-            x.push_str(&y);
-            x
-        });
-
-    println!("{} ({n}): {:?} \n{hex} \n", name.as_ref(), &data);
-}

@@ -7,10 +7,6 @@ use crate::Result;
 use serialport::{SerialPort, SerialPortType};
 
 pub fn call<T: Into<String>>(port_name: T, baudrate: u32, request: Vec<u8>) -> Result<Vec<u8>> {
-    // let port_name = "/dev/ttyUSB0";
-    // // let baudrate = 115200;
-    // let baudrate = 9600;
-
     let mut port = serialport::new(port_name.into(), baudrate)
         .timeout(Duration::from_secs(5))
         .open()?;
@@ -22,51 +18,13 @@ pub fn call<T: Into<String>>(port_name: T, baudrate: u32, request: Vec<u8>) -> R
 
     let mut response = vec![0u8; 1024];
     let n = read_full_response(&mut port, &mut response)?;
+    port.flush().unwrap();
 
     // 只保留实际读取到的字节
     response.truncate(n);
+
     Ok(response)
 }
-
-//     println!("读取了 {} 字节: {:?}", n, &response);
-
-//     let hex =
-//         response[..n]
-//             .iter()
-//             .map(|v| format!("{:02X} ", v))
-//             .fold(String::new(), |mut x, y| {
-//                 x.push_str(&y);
-//                 x
-//             });
-//     // println!("--Received({n}): {:?} \n", &response);
-//     println!("--Received({n}): {:?} \n{hex}", &response[..n]);
-
-//     if response == request {
-//         println!("--命令执行\n");
-//         return Ok(());
-//     }
-
-//     // 解析响应数据到 Vec<u16>
-//     if let Some(data) = parse_modbus_response(&response) {
-//         // 继电器 // 获取单位 u8
-//         // let data: Vec<String> = data
-//         //     .iter()
-//         //     .map(|&r| format!("{:b}", r))
-//         //     .collect::<Vec<String>>();
-
-//         // 温度 * 0.1
-//         // let data = Temperature::parse_u16(data);
-
-//         // 电压
-//         let data: Vec<f32> = data.iter().map(|&r| r as f32 / 1000.).collect::<Vec<f32>>();
-
-//         println!("解析结果: {:?}", data);
-//     } else {
-//         eprintln!("解析响应数据失败");
-//     }
-
-//     Ok(())
-// }
 
 // ch340 32位字节缓存读取
 fn read_full_response(port: &mut Box<dyn SerialPort>, buffer: &mut Vec<u8>) -> Result<usize> {
@@ -108,6 +66,28 @@ pub fn parse_modbus_response(response: &[u8]) -> Option<Vec<u16>> {
     for i in 0..(byte_count / 2) {
         let high_byte = response[3 + 2 * i] as u16;
         let low_byte = response[3 + 2 * i + 1] as u16;
+        result.push((high_byte << 8) | low_byte);
+    }
+
+    Some(result)
+}
+
+pub fn parse_modbus_request(request: &[u8]) -> Option<Vec<u16>> {
+    if request.len() < 4 {
+        return None; // 响应数据太短
+    }
+
+    // 掐头去尾
+    let byte_count = request.len() - 4 as usize;
+    if byte_count < 2 || byte_count % 2 != 0 {
+        return None; // 数据长度不匹配
+    }
+    println!("byte_count: {}, {}", byte_count, request.len());
+
+    let mut result = Vec::with_capacity(byte_count / 2);
+    for i in 0..(byte_count / 2) {
+        let high_byte = request[2 + 2 * i] as u16;
+        let low_byte = request[2 + 2 * i + 1] as u16;
         result.push((high_byte << 8) | low_byte);
     }
 
@@ -268,4 +248,14 @@ pub fn get_ports() -> Vec<String> {
 
     list.push("test".to_string());
     list
+}
+
+#[cfg(not(target_os = "windows"))]
+fn default_port_name() -> String {
+    "/dev/ttyUSB0".to_owned()
+}
+
+#[cfg(target_os = "windows")]
+fn default_port_name() -> String {
+    "COM1".to_owned()
 }

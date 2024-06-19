@@ -26,7 +26,7 @@ pub fn request(slave: u8) -> Vec<u8> {
     )
 }
 
-pub fn response(data: Vec<u8>) -> Result<Voltage> {
+pub fn response(data: Vec<u8>) -> Result<VoltageData> {
     let data = parse_modbus_response(&data).ok_or(Error::MbParseFail)?;
 
     let chs: [f32; 30] = data
@@ -38,13 +38,13 @@ pub fn response(data: Vec<u8>) -> Result<Voltage> {
 
     let dur = current_timestamp();
     let chs = mb_f32_ch(chs);
-    let data = Voltage::new(dur, chs);
+    let data = VoltageData::new(dur, chs);
 
     Ok(data)
 }
 
 #[derive(Debug, Clone, Copy)]
-pub struct Voltage {
+pub struct VoltageData {
     pub time: u64,
     pub data: [VoltageChannel; 15],
 }
@@ -56,7 +56,7 @@ pub struct VoltageChannel {
     pub current: f32,
 }
 
-impl Voltage {
+impl VoltageData {
     pub fn new(dur: u64, data: [VoltageChannel; 15]) -> Self {
         Self { time: dur, data }
     }

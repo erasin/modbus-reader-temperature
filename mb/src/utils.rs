@@ -7,3 +7,16 @@ pub fn current_timestamp() -> u64 {
         .unwrap()
         .as_secs()
 }
+
+pub fn print_hex<T: AsRef<str>>(name: T, data: &Vec<u8>) {
+    let n = data.len();
+    let hex = data
+        .iter()
+        .map(|v| format!("{:02X} ", v))
+        .fold(String::new(), |mut x, y| {
+            x.push_str(&y);
+            x
+        });
+
+    println!("{} ({n}): {:?} \n{hex} \n", name.as_ref(), &data);
+}
