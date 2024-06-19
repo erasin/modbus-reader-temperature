@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-use mb::{protocol::FunctionCode, relay::RelayMode, temperature::TempMode, utils::print_hex};
+use mb::utils::print_hex;
 use mb_mock::{relay::RelayMock, temperature::TempMock, voltage::VoltageMock, Mock};
 
 fn main() -> std::io::Result<()> {

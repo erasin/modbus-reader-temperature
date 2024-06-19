@@ -4,7 +4,7 @@ use std::fmt::Display;
 
 use crate::{
     error::Error,
-    protocol::{self, parse_modbus_response, FunctionCode},
+    protocol::{Function, FunctionCode},
     utils::current_timestamp,
     Result,
 };
@@ -17,15 +17,14 @@ use crate::{
 pub fn request(slave: u8, mode: &RelayMode) -> Vec<u8> {
     // 写入
     let mode = mode.params(); //(0x06, 0, 0b00000000);
-
     let params = vec![mode.1, mode.2];
 
-    protocol::request(slave, mode.0, params)
+    Function::new(slave, mode.0, params).request()
 }
 
 pub fn response(data: Vec<u8>) -> Result<RelayData> {
-    let data = parse_modbus_response(&data).ok_or(Error::MbParseFail)?;
-    RelayData::parse_u16(data)
+    let data = Function::parse_response(&data)?;
+    RelayData::parse_u16(data.data)
 }
 
 pub enum RelayMode {

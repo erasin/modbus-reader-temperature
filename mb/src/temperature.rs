@@ -2,7 +2,7 @@
 
 use crate::{
     error::Error,
-    protocol::{self, parse_modbus_response, FunctionCode},
+    protocol::{Function, FunctionCode},
     utils::current_timestamp,
     Result,
 };
@@ -23,12 +23,12 @@ pub fn request(slave: u8, mode: &TempMode) -> Vec<u8> {
     let mode = mode.params();
     let params = vec![mode.1, mode.2];
 
-    protocol::request(slave, mode.0, params)
+    Function::new(slave, mode.0, params).request()
 }
 
 pub fn response(data: Vec<u8>) -> Result<Temperature> {
-    let data = parse_modbus_response(&data).ok_or(Error::MbParseFail)?;
-    Temperature::parse_u16(data)
+    let data = Function::parse_response(&data)?;
+    Temperature::parse_u16(data.data)
 }
 
 /// 命令请求类型

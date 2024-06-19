@@ -1,12 +1,9 @@
 //! 电流电压
 
+use crate::protocol::{Function, FunctionCode};
 use crate::Result;
 
-use crate::{
-    error::Error,
-    protocol::{self, parse_modbus_response},
-    utils::current_timestamp,
-};
+use crate::utils::current_timestamp;
 
 /// 电压电流
 /// RS485
@@ -19,15 +16,13 @@ use crate::{
 /// ```
 ///
 pub fn request(slave: u8) -> Vec<u8> {
-    protocol::request(
-        slave as u8,
-        protocol::FunctionCode::ReadInputRegisters,
-        vec![0x00, 0x1E],
-    )
+    let mode = FunctionCode::ReadInputRegisters;
+    let params = vec![0x00, 0x1E];
+    Function::new(slave, mode, params).request()
 }
 
 pub fn response(data: Vec<u8>) -> Result<VoltageData> {
-    let data = parse_modbus_response(&data).ok_or(Error::MbParseFail)?;
+    let data = Function::parse_response(&data)?.data;
 
     let chs: [f32; 30] = data
         .iter()
@@ -36,24 +31,16 @@ pub fn response(data: Vec<u8>) -> Result<VoltageData> {
         .try_into()
         .unwrap_or([0.0; 30]);
 
-    let dur = current_timestamp();
-    let chs = mb_f32_ch(chs);
-    let data = VoltageData::new(dur, chs);
+    let data = VoltageData::from(chs);
 
     Ok(data)
 }
 
+/// 电压数据集合
 #[derive(Debug, Clone, Copy)]
 pub struct VoltageData {
     pub time: u64,
     pub data: [VoltageChannel; 15],
-}
-
-#[derive(Debug, Clone, Copy, Default)]
-pub struct VoltageChannel {
-    pub index: u32,
-    pub voltage: f32,
-    pub current: f32,
 }
 
 impl VoltageData {
@@ -62,38 +49,89 @@ impl VoltageData {
     }
 }
 
-/// 格式转换
-pub fn mb_f32_ch(data: [f32; 30]) -> [VoltageChannel; 15] {
-    let mut ch_list: [VoltageChannel; 15] = [VoltageChannel::default(); 15];
-
-    for (i, chunk) in data.chunks(2).enumerate() {
-        if chunk.len() == 2 {
-            let ch = VoltageChannel {
-                index: i as u32,
-                voltage: chunk[0] / 1000.0,
-                current: chunk[1],
-            };
-            ch_list[i] = ch;
-        }
-    }
-
-    ch_list
+/// 电压电流
+#[derive(Debug, Clone, Copy, Default)]
+pub struct VoltageChannel {
+    pub index: u32,
+    pub voltage: f32,
+    pub current: f32,
 }
 
-/// 格式转换
-pub fn mb_ch_f32(data: [VoltageChannel; 15]) -> [f32; 30] {
-    let mut result = [0.0; 30];
+/// 15对 电压&电流 值
+pub type VoltageF32 = [f32; 30];
 
-    for ch in data.iter() {
-        let idx = ch.index as usize;
-        if idx < 15 {
-            result[idx * 2] = ch.voltage * 1000.0;
-            result[idx * 2 + 1] = ch.current;
+impl From<VoltageF32> for VoltageData {
+    fn from(value: VoltageF32) -> Self {
+        let dur = current_timestamp();
+
+        let mut ch_list: [VoltageChannel; 15] = [VoltageChannel::default(); 15];
+
+        for (i, chunk) in value.chunks(2).enumerate() {
+            if chunk.len() == 2 {
+                let ch = VoltageChannel {
+                    index: i as u32,
+                    voltage: chunk[0] / 1000.0,
+                    current: chunk[1],
+                };
+                ch_list[i] = ch;
+            }
         }
-    }
 
-    result
+        VoltageData::new(dur, ch_list)
+    }
 }
+
+impl Into<VoltageF32> for VoltageData {
+    fn into(self) -> VoltageF32 {
+        let mut result = [0.0; 30];
+
+        for ch in self.data.iter() {
+            let idx = ch.index as usize;
+            if idx < 15 {
+                result[idx * 2] = ch.voltage * 1000.0;
+                result[idx * 2 + 1] = ch.current;
+            }
+        }
+
+        result
+    }
+}
+
+// impl From<
+
+// /// 格式转换
+// fn mb_f32_ch(data: [f32; 30]) -> [VoltageChannel; 15] {
+//     let mut ch_list: [VoltageChannel; 15] = [VoltageChannel::default(); 15];
+
+//     for (i, chunk) in data.chunks(2).enumerate() {
+//         if chunk.len() == 2 {
+//             let ch = VoltageChannel {
+//                 index: i as u32,
+//                 voltage: chunk[0] / 1000.0,
+//                 current: chunk[1],
+//             };
+//             ch_list[i] = ch;
+//         }
+//     }
+
+//     ch_list
+// }
+
+// /// 格式转换
+// fn mb_ch_f32(data: [VoltageChannel; 15]) -> [f32; 30] {
+//     let mut result = [0.0; 30];
+
+//     for ch in data.iter() {
+//         let idx = ch.index as usize;
+//         if idx < 15 {
+//             result[idx * 2] = ch.voltage * 1000.0;
+//             result[idx * 2 + 1] = ch.current;
+//         }
+//     }
+
+//     result
+// }
+
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub enum VoltageState {
     #[default]
@@ -120,19 +158,6 @@ impl VoltageState {
             VoltageState::NoOutput,
         ]
     }
-
-    // pub fn style(&self) -> (Color, Color) {
-    //     match self {
-    //         VoltageState::NoConnected => (colors::BLACK, colors::GREY),
-    //         VoltageState::Vacancy => (colors::BLACK, colors::WHITE),
-    //         VoltageState::Qualified => (colors::BLACK, colors::GREEN),
-    //         VoltageState::UnderVoltage => (colors::BLACK, colors::RED),
-    //         VoltageState::UnderCurrent => (colors::BLACK, colors::YELLOW),
-    //         VoltageState::OverVoltage => (colors::BLACK, colors::BLUE),
-    //         VoltageState::OverCurrent => (colors::BLACK, colors::PUPLE),
-    //         VoltageState::NoOutput => (colors::BLACK, colors::CYAN),
-    //     }
-    // }
 }
 
 impl std::fmt::Display for VoltageState {

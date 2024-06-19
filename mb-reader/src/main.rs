@@ -1,5 +1,3 @@
-use std::{thread, time::Duration};
-
 use mb::{relay::RelayMode, temperature::TempMode, utils::print_hex, Result};
 use mb_mock::{relay::RelayMock, temperature::TempMock, Mock};
 
@@ -8,9 +6,9 @@ fn main() -> Result<()> {
     let baudrate = 9600;
 
     // slave 1
-    // run_voltage(port_name, baudrate)?;
+    run_voltage(port_name, baudrate)?;
     // run_temp(port_name, baudrate)?;
-    run_relay(port_name, baudrate)?;
+    // run_relay(port_name, baudrate)?;
 
     Ok(())
 }

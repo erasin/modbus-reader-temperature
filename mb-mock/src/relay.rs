@@ -1,8 +1,7 @@
 use crate::Mock;
 use mb::{
-    protocol::{parse_modbus_request, FunctionCode},
+    protocol::{Function, FunctionCode},
     relay::{RelayData, RelayMode},
-    utils::print_hex,
 };
 use rand::Rng;
 
@@ -22,7 +21,7 @@ impl RelayMock {
                 RelayMock::new(request[0], RelayMode::Read)
             }
             _ => {
-                let req = parse_modbus_request(request).unwrap();
+                let req = Function::parse_request(request).unwrap().data;
                 let value = req.get(1).unwrap();
                 RelayMock::new(request[0], RelayMode::ONOFF(*value))
             }
@@ -38,7 +37,8 @@ impl Mock for RelayMock {
     fn response(&self) -> Vec<u8> {
         let mode = self.mode.params();
         let response = match self.mode {
-            RelayMode::Read => mb::protocol::response(self.slave, mode.0, generate_relay()),
+            RelayMode::Read => Function::new(self.slave, mode.0, generate_relay()).response(),
+
             _ => mb::relay::request(self.slave, &self.mode),
         };
         response

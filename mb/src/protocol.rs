@@ -3,7 +3,7 @@
 use core::fmt;
 use std::{fmt::Display, thread, time::Duration};
 
-use crate::Result;
+use crate::{error::Error, Result};
 use serialport::{SerialPort, SerialPortType};
 
 pub fn call<T: Into<String>>(port_name: T, baudrate: u32, request: Vec<u8>) -> Result<Vec<u8>> {
@@ -51,86 +51,114 @@ fn read_full_response(port: &mut Box<dyn SerialPort>, buffer: &mut Vec<u8>) -> R
     Ok(total_read)
 }
 
-// 解析Modbus响应数据，将其转换为Vec<u16>
-pub fn parse_modbus_response(response: &[u8]) -> Option<Vec<u16>> {
-    if response.len() < 5 {
-        return None; // 响应数据太短
-    }
-
-    let byte_count = response[2] as usize;
-    if response.len() < 3 + byte_count || byte_count % 2 != 0 {
-        return None; // 数据长度不匹配
-    }
-
-    let mut result = Vec::with_capacity(byte_count / 2);
-    for i in 0..(byte_count / 2) {
-        let high_byte = response[3 + 2 * i] as u16;
-        let low_byte = response[3 + 2 * i + 1] as u16;
-        result.push((high_byte << 8) | low_byte);
-    }
-
-    Some(result)
+/// Modbus Function
+#[derive(Debug, Clone)]
+pub struct Function {
+    slave: u8,
+    code: FunctionCode,
+    pub data: Vec<u16>,
 }
 
-pub fn parse_modbus_request(request: &[u8]) -> Option<Vec<u16>> {
-    if request.len() < 4 {
-        return None; // 响应数据太短
+impl Function {
+    pub fn new(slave: u8, code: FunctionCode, data: Vec<u16>) -> Self {
+        Self { slave, code, data }
     }
 
-    // 掐头去尾
-    let byte_count = request.len() - 4 as usize;
-    if byte_count < 2 || byte_count % 2 != 0 {
-        return None; // 数据长度不匹配
-    }
-    println!("byte_count: {}, {}", byte_count, request.len());
+    // 解析Modbus响应数据，将其转换为 Function
+    pub fn parse_response(response: &[u8]) -> Result<Self> {
+        if response.len() < 5 {
+            return Err(Box::new(Error::DataShort)); // 响应数据太短
+        }
 
-    let mut result = Vec::with_capacity(byte_count / 2);
-    for i in 0..(byte_count / 2) {
-        let high_byte = request[2 + 2 * i] as u16;
-        let low_byte = request[2 + 2 * i + 1] as u16;
-        result.push((high_byte << 8) | low_byte);
-    }
+        let byte_count = response[2] as usize;
+        if response.len() < 3 + byte_count || byte_count % 2 != 0 {
+            return Err(Box::new(Error::DataLenError)); // 数据长度不匹配
+        }
 
-    Some(result)
-}
+        let mut result = Vec::with_capacity(byte_count / 2);
+        for i in 0..(byte_count / 2) {
+            let high_byte = response[3 + 2 * i] as u16;
+            let low_byte = response[3 + 2 * i + 1] as u16;
+            result.push((high_byte << 8) | low_byte);
+        }
 
-/// 请求结构
-pub fn request(slave: u8, code: FunctionCode, params: Vec<u16>) -> Vec<u8> {
-    let mut data: Vec<u8> = Vec::new();
+        let fp = Function {
+            slave: response[0],
+            code: FunctionCode::new(response[1]),
+            data: result,
+        };
 
-    for i in params {
-        data.push((i >> 8) as u8); // 高位字节
-        data.push(i as u8); // 低位字节
-    }
-
-    let mut response: Vec<u8> = vec![slave, code.value()];
-    response.extend_from_slice(&data);
-
-    // 计算并添加 CRC 校验码
-    let crc = calculate_crc(&response);
-    response.push(crc as u8);
-    response.push((crc >> 8) as u8);
-
-    response
-}
-
-pub fn response(slave: u8, code: FunctionCode, params: Vec<u16>) -> Vec<u8> {
-    let mut data: Vec<u8> = Vec::new();
-
-    for i in params {
-        data.push((i >> 8) as u8); // 高位字节
-        data.push(i as u8); // 低位字节
+        Ok(fp)
     }
 
-    let mut response: Vec<u8> = vec![slave, code.value(), data.len() as u8];
-    response.extend_from_slice(&data);
+    /// 将数据解析为请求 Function
+    pub fn parse_request(request: &[u8]) -> Result<Self> {
+        if request.len() < 4 {
+            return Err(Box::new(Error::DataShort)); // 响应数据太短
+        }
 
-    // 计算并添加 CRC 校验码
-    let crc = calculate_crc(&response);
-    response.push(crc as u8);
-    response.push((crc >> 8) as u8);
+        // 掐头去尾
+        let byte_count = request.len() - 4 as usize;
+        if byte_count < 2 || byte_count % 2 != 0 {
+            return Err(Box::new(Error::DataLenError)); // 数据长度不匹配
+        }
+        println!("byte_count: {}, {}", byte_count, request.len());
 
-    response
+        let mut result = Vec::with_capacity(byte_count / 2);
+        for i in 0..(byte_count / 2) {
+            let high_byte = request[2 + 2 * i] as u16;
+            let low_byte = request[2 + 2 * i + 1] as u16;
+            result.push((high_byte << 8) | low_byte);
+        }
+
+        let fp = Function {
+            slave: request[0],
+            code: FunctionCode::new(request[1]),
+            data: result,
+        };
+
+        Ok(fp)
+    }
+
+    /// 生成请求数据
+    pub fn request(&self) -> Vec<u8> {
+        let mut data: Vec<u8> = Vec::new();
+
+        for &i in &self.data {
+            data.push((i >> 8) as u8); // 高位字节
+            data.push(i as u8); // 低位字节
+        }
+
+        let mut response: Vec<u8> = vec![self.slave, self.code.value()];
+        response.extend_from_slice(&data);
+
+        // 计算并添加 CRC 校验码
+        let crc = calculate_crc(&response);
+        response.push(crc as u8);
+        response.push((crc >> 8) as u8);
+
+        response
+    }
+
+    /// 生成返回数据
+    pub fn response(&self) -> Vec<u8> {
+        let mut data: Vec<u8> = Vec::new();
+
+        for &i in &self.data {
+            data.push((i >> 8) as u8); // 高位字节
+            data.push(i as u8); // 低位字节
+        }
+
+        let mut response: Vec<u8> = vec![self.slave, self.code.value(), data.len() as u8];
+        response.extend_from_slice(&data);
+
+        // 计算并添加 CRC 校验码
+        let crc = calculate_crc(&response);
+        response.push(crc as u8);
+        response.push((crc >> 8) as u8);
+
+        response
+    }
 }
 
 /// 计算 Modbus RTU CRC 校验码
@@ -155,33 +183,38 @@ pub fn calculate_crc(data: &[u8]) -> u16 {
 /// A Modbus function code.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum FunctionCode {
-    /// Modbus Function Code: `01` (`0x01`).
+    /// 读取线圈: `01` (`0x01`).
     ReadCoils,
-    /// Modbus Function Code: `02` (`0x02`).
+    /// 读取离散输入: `02` (`0x02`).
     ReadDiscreteInputs,
 
-    /// Modbus Function Code: `05` (`0x05`).
-    WriteSingleCoil,
-    /// Modbus Function Code: `06` (`0x06`).
-    WriteSingleRegister,
-
-    /// Modbus Function Code: `03` (`0x03`).
+    /// 读取保持寄存器: `03` (`0x03`).
     ReadHoldingRegisters,
-    /// Modbus Function Code: `04` (`0x04`).
+    /// 读取输入寄存器: `04` (`0x04`).
     ReadInputRegisters,
 
-    /// Modbus Function Code: `15` (`0x0F`).
+    /// 写入单线圈: `05` (`0x05`).
+    WriteSingleCoil,
+    /// 写入单个寄存器: `06` (`0x06`).
+    WriteSingleRegister,
+
+    // 诊断（限 serial port ) `08`（`0x08`)
+    // 获取通信事件计时器 (only serial port): `11` (`0x0B`)
+    // ----
+    /// 写入多个线圈: `15` (`0x0F`).
     WriteMultipleCoils,
-    /// Modbus Function Code: `16` (`0x10`).
+    /// 写入多个寄存器: `16` (`0x10`).
     WriteMultipleRegisters,
 
-    /// Modbus Function Code: `22` (`0x16`).
+    /// 掩码写入寄存器: `22` (`0x16`).
     MaskWriteRegister,
 
-    /// Modbus Function Code: `23` (`0x17`).
+    /// 读/写多个寄存器: `23` (`0x17`).
     ReadWriteMultipleRegisters,
 
-    /// Custom Modbus Function Code.
+    // 读取设备标识 `43/14` (`0x2B/0x0E`)
+    // ----
+    /// 自定义 Function Code.
     Custom(u8),
 }
 
@@ -251,11 +284,11 @@ pub fn get_ports() -> Vec<String> {
 }
 
 #[cfg(not(target_os = "windows"))]
-fn default_port_name() -> String {
+pub fn default_port_name() -> String {
     "/dev/ttyUSB0".to_owned()
 }
 
 #[cfg(target_os = "windows")]
-fn default_port_name() -> String {
+pub fn default_port_name() -> String {
     "COM1".to_owned()
 }

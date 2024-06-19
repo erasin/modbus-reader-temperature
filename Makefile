@@ -9,7 +9,7 @@ help:
 	@echo ""
 
 build: ## build
-	@cargo build --package mb
+	@cargo build 
 
 mock: ## mock
 	@cargo run --package mb-mock
