@@ -1,0 +1,9 @@
+[package]
+name = "mb-mock"
+version.workspace = true
+edition.workspace = true 
+
+[dependencies]
+mb = { path = "../mb" }
+serialport.workspace = true
+rand = "0.8"

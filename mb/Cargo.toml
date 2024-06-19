@@ -1,0 +1,11 @@
+[package]
+name = "mb"
+version.workspace = true
+edition.workspace = true 
+
+[dependencies]
+serialport.workspace = true
+thiserror.workspace = true
+
+
+

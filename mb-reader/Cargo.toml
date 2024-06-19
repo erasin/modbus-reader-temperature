@@ -1,0 +1,9 @@
+[package]
+name = "mb-reader"
+version.workspace = true
+edition.workspace = true 
+
+[dependencies]
+mb = { path = "../mb" }
+mb-mock = { path = "../mb-mock" }
+serialport.workspace = true
