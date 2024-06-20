@@ -10,21 +10,23 @@ impl TempMock {
     pub fn new(slave: u8, mode: TempMode) -> Self {
         TempMock { slave, mode }
     }
+}
 
-    pub fn from_request(_request: &[u8]) -> Self {
+impl From<&[u8]> for TempMock {
+    fn from(_value: &[u8]) -> Self {
         TempMock::new(0x02, TempMode::Temp1)
     }
 }
 
 impl Mock for TempMock {
-    fn request(&self) -> Vec<u8> {
+    fn request(&self) -> Function {
         mb::temperature::request(self.slave, &self.mode)
     }
 
-    fn response(&self) -> Vec<u8> {
+    fn response(&self) -> Function {
         let mode = self.mode.params();
 
-        let response = Function::new(self.slave, mode.0, vec![60 * 10]).response();
+        let response = Function::new(self.slave, mode.0, vec![60 * 10]);
 
         response
     }

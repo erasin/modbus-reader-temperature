@@ -20,6 +20,7 @@ pub fn set_config(db: &Database, data: Config) -> Result<(), Error> {
 
     Ok(())
 }
+
 pub fn get_config(db: &Database) -> Result<Config, Error> {
     let db = get_db_conn();
 
@@ -27,7 +28,7 @@ pub fn get_config(db: &Database) -> Result<Config, Error> {
 
     let read_txn = db.begin_read()?;
     {
-        let mut table = read_txn.open_table(TABLE)?;
+        let table = read_txn.open_table(TABLE)?;
 
         data.port = table.get("port".to_string())?.unwrap().value();
         data.baudrate = table

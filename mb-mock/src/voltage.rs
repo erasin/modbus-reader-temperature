@@ -11,25 +11,27 @@ impl VoltageMock {
     pub fn new(slave: u8) -> Self {
         VoltageMock { slave }
     }
+}
 
-    pub fn from_request(_request: &[u8]) -> Self {
+impl From<&[u8]> for VoltageMock {
+    fn from(_value: &[u8]) -> Self {
         VoltageMock::new(0x01)
     }
 }
 
 impl Mock for VoltageMock {
-    fn request(&self) -> Vec<u8> {
+    fn request(&self) -> Function {
         // let request: [u8; 8] = [0x01, 0x04, 0x00, 0x00, 0x00, 0x1E, 0x70, 0x02];
         let request = mb::voltage::request(self.slave);
         request
     }
 
-    fn response(&self) -> Vec<u8> {
+    fn response(&self) -> Function {
         let code = FunctionCode::ReadInputRegisters;
         let data = generate_response_voltage();
         // let data = static_response();
 
-        let response = Function::new(self.slave, code, data).response();
+        let response = Function::new(self.slave, code, data);
         response
     }
 }

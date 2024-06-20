@@ -2,7 +2,7 @@ use godot::{
     engine::{Control, IControl, Timer},
     prelude::*,
 };
-use mb::voltage::{get_mb_state, VoltageData, VoltageState};
+use mb::voltage::{get_mb_state, VoltageData};
 
 use crate::{
     colors::Style,

@@ -1,5 +1,5 @@
 use godot::{
-    builtin::{GString, StringName},
+    builtin::GString,
     register::{Export, GodotConvert, Var},
 };
 use mb::{protocol::default_port_name, voltage::Verify};

@@ -1,13 +1,13 @@
 //! 电流电压
+//! RS485
+//! b 115200
 
-use crate::protocol::{Function, FunctionCode};
+use crate::protocol::{FunRequest, FunResponse, Function, FunctionCode};
 use crate::Result;
 
 use crate::utils::current_timestamp;
 
 /// 电压电流
-/// RS485
-/// b 115200
 /// 返回
 /// ```
 /// // 请求
@@ -15,14 +15,14 @@ use crate::utils::current_timestamp;
 ///
 /// ```
 ///
-pub fn request(slave: u8) -> Vec<u8> {
+pub fn request(slave: u8) -> FunRequest {
     let mode = FunctionCode::ReadInputRegisters;
     let params = vec![0x00, 0x1E];
-    Function::new(slave, mode, params).request()
+    Function::new(slave, mode, params)
 }
 
-pub fn response(data: Vec<u8>) -> Result<VoltageData> {
-    let data = Function::parse_response(&data)?.data;
+pub fn response(response: &FunResponse) -> Result<VoltageData> {
+    let data = response.data();
 
     let chs: [f32; 30] = data
         .iter()

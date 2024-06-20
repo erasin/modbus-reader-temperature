@@ -4,7 +4,7 @@ use std::fmt::Display;
 
 use crate::{
     error::Error,
-    protocol::{Function, FunctionCode},
+    protocol::{FunRequest, FunResponse, Function, FunctionCode},
     utils::current_timestamp,
     Result,
 };
@@ -14,17 +14,13 @@ use crate::{
 /// 3-5 波特率
 /// 6-10 地址位 10 -> 6 二进制
 /// 继电器 0 ，参数二进制控制开关(8位) 0b00000000;
-pub fn request(slave: u8, mode: &RelayMode) -> Vec<u8> {
-    // 写入
+pub fn request(slave: u8, mode: &RelayMode) -> FunRequest {
     let mode = mode.params(); //(0x06, 0, 0b00000000);
-    let params = vec![mode.1, mode.2];
-
-    Function::new(slave, mode.0, params).request()
+    Function::new(slave, mode.0, mode.1.to_vec())
 }
 
-pub fn response(data: Vec<u8>) -> Result<RelayData> {
-    let data = Function::parse_response(&data)?;
-    RelayData::parse_u16(data.data)
+pub fn response(data: &FunResponse) -> Result<RelayData> {
+    RelayData::parse_u16(data.data())
 }
 
 pub enum RelayMode {
@@ -39,19 +35,17 @@ pub enum RelayMode {
 }
 
 impl RelayMode {
-    pub fn params(&self) -> (FunctionCode, u16, u16) {
+    pub fn params(&self) -> (FunctionCode, [u16; 2]) {
         match self {
-            RelayMode::ONOFF(n) => (FunctionCode::WriteSingleRegister, 0, *n),
-            RelayMode::Read => (FunctionCode::ReadHoldingRegisters, 0, 1),
+            RelayMode::ONOFF(n) => (FunctionCode::WriteSingleRegister, [0, *n]),
+            RelayMode::Read => (FunctionCode::ReadHoldingRegisters, [0, 1]),
             RelayMode::ON(value, position) => {
                 let bit = RelayData::set_bit(*value, *position, true);
-
-                (FunctionCode::WriteSingleRegister, 0, bit)
+                (FunctionCode::WriteSingleRegister, [0, bit])
             }
             RelayMode::OFF(value, position) => {
                 let bit = RelayData::set_bit(*value, *position, false);
-
-                (FunctionCode::WriteSingleRegister, 0, bit)
+                (FunctionCode::WriteSingleRegister, [0, bit])
             }
         }
     }

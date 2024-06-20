@@ -1,7 +1,4 @@
-use godot::{
-    engine::{Control, IControl, Label, Sprite2D},
-    prelude::*,
-};
+use godot::{engine::Control, prelude::*};
 
 #[derive(GodotClass)]
 #[class(init, base=Control)]

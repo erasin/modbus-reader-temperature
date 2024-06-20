@@ -1,6 +1,6 @@
 use crate::Mock;
 use mb::{
-    protocol::{Function, FunctionCode},
+    protocol::{FunRequest, FunResponse, Function, FunctionCode},
     relay::{RelayData, RelayMode},
 };
 use rand::Rng;
@@ -14,31 +14,33 @@ impl RelayMock {
     pub fn new(slave: u8, mode: RelayMode) -> Self {
         RelayMock { slave, mode }
     }
+}
 
-    pub fn from_request(request: &[u8]) -> Self {
-        match request[1] {
+impl From<&[u8]> for RelayMock {
+    fn from(value: &[u8]) -> Self {
+        match value[1] {
             n if n == FunctionCode::ReadHoldingRegisters.value() => {
-                RelayMock::new(request[0], RelayMode::Read)
+                RelayMock::new(value[0], RelayMode::Read)
             }
             _ => {
-                let req = Function::parse_request(request).unwrap().data;
-                let value = req.get(1).unwrap();
-                RelayMock::new(request[0], RelayMode::ONOFF(*value))
+                // 解析请求
+                let req = Function::parse_request(value).unwrap().data();
+                let bit = req.get(1).unwrap();
+                RelayMock::new(value[0], RelayMode::ONOFF(*bit))
             }
         }
     }
 }
 
 impl Mock for RelayMock {
-    fn request(&self) -> Vec<u8> {
+    fn request(&self) -> FunRequest {
         mb::relay::request(self.slave, &self.mode)
     }
 
-    fn response(&self) -> Vec<u8> {
+    fn response(&self) -> FunResponse {
         let mode = self.mode.params();
         let response = match self.mode {
-            RelayMode::Read => Function::new(self.slave, mode.0, generate_relay()).response(),
-
+            RelayMode::Read => Function::new(self.slave, mode.0, generate_relay()),
             _ => mb::relay::request(self.slave, &self.mode),
         };
         response

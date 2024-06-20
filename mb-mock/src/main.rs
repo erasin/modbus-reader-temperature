@@ -23,16 +23,16 @@ fn main() -> std::io::Result<()> {
                 let buffer = &buffer[..n];
 
                 let mock: Box<dyn Mock> = match &buffer[0] {
-                    0x01 => Box::new(VoltageMock::from_request(&buffer)),
-                    0x02 => Box::new(TempMock::from_request(&buffer)),
-                    0x03 => Box::new(RelayMock::from_request(&buffer)),
+                    0x01 => Box::new(VoltageMock::from(buffer)),
+                    0x02 => Box::new(TempMock::from(buffer)),
+                    0x03 => Box::new(RelayMock::from(buffer)),
 
-                    _ => Box::new(VoltageMock::from_request(&buffer)),
+                    _ => Box::new(VoltageMock::from(buffer)),
                 };
 
-                if buffer == mock.request().as_slice() {
+                if buffer == mock.request().request_data().as_slice() {
                     print_hex("request", &buffer.to_vec());
-                    let response = mock.response();
+                    let response = mock.response().response_data();
                     port.write_all(response.as_slice())?;
                     print_hex("response", &response);
 

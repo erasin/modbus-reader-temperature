@@ -1,5 +1,5 @@
 use godot::{
-    engine::{Button, Control, IControl, Label, OptionButton, Sprite2D},
+    engine::{Button, Control, IControl, OptionButton},
     prelude::*,
 };
 use mb::protocol::get_ports;

@@ -6,24 +6,41 @@ use std::{fmt::Display, thread, time::Duration};
 use crate::{error::Error, Result};
 use serialport::{SerialPort, SerialPortType};
 
-pub fn call<T: Into<String>>(port_name: T, baudrate: u32, request: Vec<u8>) -> Result<Vec<u8>> {
-    let mut port = serialport::new(port_name.into(), baudrate)
-        .timeout(Duration::from_secs(5))
-        .open()?;
+#[derive(Debug, Clone)]
+pub struct Builder {
+    pub port_name: String,
+    pub baudrate: u32,
+}
 
-    let _i = port.write(&request)?;
+impl Builder {
+    pub fn new<T: Into<String>>(port_name: T, baudrate: u32) -> Self {
+        Self {
+            port_name: port_name.into(),
+            baudrate,
+        }
+    }
 
-    port.flush().unwrap();
-    thread::sleep(Duration::from_millis(100));
+    pub fn call(&self, request: &FunRequest) -> Result<FunResponse> {
+        let mut port = serialport::new(self.port_name.clone(), self.baudrate)
+            .timeout(Duration::from_secs(5))
+            .open()?;
 
-    let mut response = vec![0u8; 1024];
-    let n = read_full_response(&mut port, &mut response)?;
-    port.flush().unwrap();
+        let _i = port.write(&request.request_data())?;
 
-    // 只保留实际读取到的字节
-    response.truncate(n);
+        port.flush().unwrap();
+        thread::sleep(Duration::from_millis(100));
 
-    Ok(response)
+        let mut response = vec![0u8; 1024];
+        let n = read_full_response(&mut port, &mut response)?;
+        port.flush().unwrap();
+
+        // 只保留实际读取到的字节
+        response.truncate(n);
+
+        let response = Function::parse_response(&response)?;
+
+        Ok(response)
+    }
 }
 
 // ch340 32位字节缓存读取
@@ -52,16 +69,31 @@ fn read_full_response(port: &mut Box<dyn SerialPort>, buffer: &mut Vec<u8>) -> R
 }
 
 /// Modbus Function
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Function {
     slave: u8,
     code: FunctionCode,
-    pub data: Vec<u16>,
+    data: Vec<u16>,
 }
+
+pub type FunRequest = Function;
+pub type FunResponse = Function;
 
 impl Function {
     pub fn new(slave: u8, code: FunctionCode, data: Vec<u16>) -> Self {
         Self { slave, code, data }
+    }
+
+    pub fn slave(&self) -> u8 {
+        self.slave
+    }
+
+    pub fn code(&self) -> FunctionCode {
+        self.code
+    }
+
+    pub fn data(&self) -> Vec<u16> {
+        self.data.clone()
     }
 
     // 解析Modbus响应数据，将其转换为 Function
@@ -102,7 +134,7 @@ impl Function {
         if byte_count < 2 || byte_count % 2 != 0 {
             return Err(Box::new(Error::DataLenError)); // 数据长度不匹配
         }
-        println!("byte_count: {}, {}", byte_count, request.len());
+        // println!("byte_count: {}, {}", byte_count, request.len());
 
         let mut result = Vec::with_capacity(byte_count / 2);
         for i in 0..(byte_count / 2) {
@@ -121,8 +153,9 @@ impl Function {
     }
 
     /// 生成请求数据
-    pub fn request(&self) -> Vec<u8> {
-        let mut data: Vec<u8> = Vec::new();
+    pub fn request_data(&self) -> Vec<u8> {
+        let len = self.data.len() * 2;
+        let mut data: Vec<u8> = Vec::with_capacity(len);
 
         for &i in &self.data {
             data.push((i >> 8) as u8); // 高位字节
@@ -141,8 +174,9 @@ impl Function {
     }
 
     /// 生成返回数据
-    pub fn response(&self) -> Vec<u8> {
-        let mut data: Vec<u8> = Vec::new();
+    pub fn response_data(&self) -> Vec<u8> {
+        let len = self.data.len() * 2;
+        let mut data: Vec<u8> = Vec::with_capacity(len);
 
         for &i in &self.data {
             data.push((i >> 8) as u8); // 高位字节

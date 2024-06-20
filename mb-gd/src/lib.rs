@@ -1,3 +1,6 @@
+#![allow(dead_code)]
+#![allow(unused_variables)]
+
 use godot::{engine::Engine, prelude::*};
 use scenes::my_global::MyGlobal;
 
@@ -23,20 +26,16 @@ unsafe impl ExtensionLibrary for MyExtension {
 
     fn on_level_deinit(level: InitLevel) {
         if level == InitLevel::Scene {
-            // Get the `Engine` instance and `StringName` for your singleton.
             let mut engine = Engine::singleton();
-            let singleton_name = MyGlobal::string_name();
+            let my_global_name = MyGlobal::string_name();
 
-            // We need to retrieve the pointer to the singleton object,
-            // as it has to be freed manually - unregistering singleton
-            // doesn't do it automatically.
+            // 获取指针
             let singleton = engine
-                .get_singleton(singleton_name.clone())
+                .get_singleton(my_global_name.clone())
                 .expect("cannot retrieve the singleton");
 
-            // Unregistering singleton and freeing the object itself is needed
-            // to avoid memory leaks and warnings, especially for hot reloading.
-            engine.unregister_singleton(singleton_name);
+            // 手动注销
+            engine.unregister_singleton(my_global_name);
             singleton.free();
         }
     }

@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use godot::{
     builtin::StringName,
     engine::{Engine, IObject, Object},
@@ -7,7 +5,6 @@ use godot::{
     obj::{Base, Gd},
     register::{godot_api, GodotClass},
 };
-use redb::Database;
 
 use crate::{
     data::config::Config,
