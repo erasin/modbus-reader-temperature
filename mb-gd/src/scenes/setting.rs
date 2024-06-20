@@ -15,14 +15,13 @@ use crate::{
 
 #[derive(GodotClass)]
 #[class(base=Control)]
-pub struct Setting {
+pub struct SettingView {
     config: Config,
-
     base: Base<Control>,
 }
 
 #[godot_api]
-impl IControl for Setting {
+impl IControl for SettingView {
     fn init(base: Base<Control>) -> Self {
         godot_print!("setting init");
         Self {
@@ -71,7 +70,7 @@ impl IControl for Setting {
 }
 
 #[godot_api]
-impl Setting {
+impl SettingView {
     #[signal]
     fn update_data();
 
@@ -118,4 +117,4 @@ impl Setting {
     }
 }
 
-impl Setting {}
+impl SettingView {}

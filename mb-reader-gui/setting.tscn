@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://cg63tx3u2mhnh"]
 
-[node name="Setting" type="Setting"]
+[node name="Setting" type="SettingView"]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0

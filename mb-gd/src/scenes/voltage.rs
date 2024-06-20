@@ -4,33 +4,31 @@ use godot::{
 };
 use mb::voltage::{get_mb_state, VoltageData};
 
-use crate::{
-    colors::Style,
-    mb_sync::get_voltage_data,
-    scenes::{item, my_global::get_global_config},
-};
+use crate::{colors::Style, mb_sync::get_voltage_data, scenes::my_global::get_global_config};
+
+pub mod channel;
 
 #[derive(GodotClass)]
 #[class(base=Control)]
-struct SerialPort {
-    item_scene: Gd<PackedScene>,
+struct VoltageView {
+    channel_scene: Gd<PackedScene>,
     data: Option<VoltageData>,
     base: Base<Control>,
 }
 
 #[godot_api]
-impl IControl for SerialPort {
+impl IControl for VoltageView {
     fn init(base: Base<Control>) -> Self {
         godot_print!("port init");
         Self {
-            item_scene: PackedScene::new_gd(),
+            channel_scene: PackedScene::new_gd(),
             data: None,
             base,
         }
     }
 
     fn ready(&mut self) {
-        self.item_scene = load("res://item.tscn");
+        self.channel_scene = load("res://voltage/channel.tscn");
 
         let mut req_timer = self.base().get_node_as::<Timer>("ReqTimer");
 
@@ -42,7 +40,7 @@ impl IControl for SerialPort {
 }
 
 #[godot_api]
-impl SerialPort {
+impl VoltageView {
     #[signal]
     fn mb_read_over();
 
@@ -72,32 +70,32 @@ impl SerialPort {
 
         for (i, data) in data.data.iter().enumerate() {
             let name = format!("i{i}").to_godot();
-            let item_scene = if !has {
-                let mut item_scene = self.item_scene.instantiate_as::<Control>();
-                content.add_child(item_scene.clone().upcast());
+            let channel_scene = if !has {
+                let mut channel_scene = self.channel_scene.instantiate_as::<Control>();
+                content.add_child(channel_scene.clone().upcast());
 
-                item_scene.set_name(name);
+                channel_scene.set_name(name);
                 // item_scene.set_offset(Side::LEFT, i as f32 * 200.);
 
-                item_scene
+                channel_scene
             } else {
-                let item_scene = content.get_node_as::<Control>(name);
+                let channel_scene = content.get_node_as::<Control>(name);
 
-                item_scene
+                channel_scene
             };
 
-            let mut item = item_scene.cast::<item::Item>();
+            let mut channel = channel_scene.cast::<channel::VoltageChannelView>();
 
             {
                 let (_, color) = get_mb_state(data, &config.verify).style();
-                let mut item = item.bind_mut();
+                let mut channel = channel.bind_mut();
 
-                item.set_data(data);
-                item.set_color(color);
-                item.update_show();
+                channel.set_data(data);
+                channel.set_color(color);
+                channel.update_show();
             }
 
-            item.emit_signal("update_data".into(), &[]);
+            channel.emit_signal("update_data".into(), &[]);
         }
 
         self.base_mut().emit_signal("mb_read_over".into(), &[]);

@@ -1,29 +1,12 @@
-[gd_scene load_steps=3 format=3 uid="uid://bwsl5763f6g6l"]
+[gd_scene load_steps=2 format=3 uid="uid://bwsl5763f6g6l"]
 
-[ext_resource type="Texture2D" uid="uid://c4j0cr737oyw" path="res://ball.png" id="1_m3afb"]
+[ext_resource type="Texture2D" uid="uid://c4j0cr737oyw" path="res://assets/ball.png" id="2_ndblk"]
 
-[sub_resource type="GDScript" id="GDScript_pltr7"]
-script/source = "extends Item
-
-@onready var state: TextureRect = %state
-
-func _on_update_data() -> void:
-	if color != null:
-		state.modulate = color.to_rgba32()
-		#state.material.set_shader_parameter(\"shader_parameter/color\",color)
-	
-	#print(index,\" \", voltage, \" V \", current , \" mA \", color)
-	#var s = state.material.get_shader_parameter(\"shader_parameter/color\")
-	
-	pass # Replace with function body.
-"
-
-[node name="Item" type="Item"]
+[node name="Channel" type="VoltageChannelView"]
 custom_minimum_size = Vector2(100, 150)
 offset_right = 100.0
 offset_bottom = 150.0
 size_flags_horizontal = 4
-script = SubResource("GDScript_pltr7")
 
 [node name="ColorRect" type="ColorRect" parent="."]
 layout_mode = 1
@@ -78,9 +61,8 @@ horizontal_alignment = 2
 
 [node name="state" type="TextureRect" parent="MarginContainer/box"]
 unique_name_in_owner = true
+modulate = Color(0.803922, 0.988235, 0.545098, 1)
 layout_mode = 2
 size_flags_horizontal = 8
 size_flags_vertical = 4
-texture = ExtResource("1_m3afb")
-
-[connection signal="update_data" from="." to="." method="_on_update_data"]
+texture = ExtResource("2_ndblk")
