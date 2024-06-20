@@ -1,4 +1,4 @@
-//! modbus 协议相关
+//! modbus 协议相关实现
 
 use core::fmt;
 use std::{fmt::Display, thread, time::Duration};

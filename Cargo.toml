@@ -3,10 +3,11 @@ resolver = "2"
 members = [
   "mb",
   "mb-reader",
-  "mb-mock"
+  "mb-mock",
+  "mb-gd"
 ]
 default-members = [
-  "mb-reader"
+  "mb-gd"
 ]
 
 [workspace.package]

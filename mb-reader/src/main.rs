@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use mb::{relay::RelayMode, temperature::TempMode, utils::print_hex, Result};
 use mb_mock::{relay::RelayMock, temperature::TempMock, Mock};
 

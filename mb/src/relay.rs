@@ -76,13 +76,15 @@ impl RelayData {
     }
 
     pub fn get_state(&self, position: u8) -> bool {
-        let position = if position > 8 { 7 } else { position };
+        let position = position.clamp(0, 7);
+
         (self.value & (1 << position)) != 0
     }
 
     // 修改第 n 位为 state
     pub fn set_bit(value: u16, position: u8, state: bool) -> u16 {
-        let position = if position > 8 { 7 } else { position };
+        let position = position.clamp(0, 7);
+
         if state {
             value | (1 << position)
         } else {

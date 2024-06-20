@@ -1,5 +1,3 @@
-use std::{thread, time::Duration};
-
 use mb::protocol::{Function, FunctionCode};
 use rand::Rng;
 
@@ -27,19 +25,16 @@ impl Mock for VoltageMock {
     }
 
     fn response(&self) -> Vec<u8> {
-        // let response = generate_response_voltage(self.slave);
-
         let code = FunctionCode::ReadInputRegisters;
         let data = generate_response_voltage();
         // let data = static_response();
-        println!("data : {:#?}", data);
 
         let response = Function::new(self.slave, code, data).response();
-
         response
     }
 }
 
+#[allow(dead_code)]
 fn static_response() -> Vec<u16> {
     let data: Vec<u16> = vec![
         0, 0, // 1
@@ -68,6 +63,7 @@ fn static_response() -> Vec<u16> {
     data
 }
 
+#[allow(dead_code)]
 fn generate_response_voltage() -> Vec<u16> {
     let mut rng = rand::thread_rng();
 

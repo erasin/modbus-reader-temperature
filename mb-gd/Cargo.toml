@@ -1,0 +1,20 @@
+[package]
+name = "mb-gd"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name="mbgd"
+crate-type = ["cdylib"]
+
+[dependencies]
+etcetera = "0.8"
+godot = { git = "https://github.com/godot-rust/gdext", branch="master", features = ["experimental-threads"] }
+log = "0.4.21"
+redb = "2.1"
+thiserror = "1.0"
+time = { version = "0.3.36", features = ["formatting", "local-offset"] }
+mb = {path = "../mb"}
+
+[profile.release]
+lto = "thin"

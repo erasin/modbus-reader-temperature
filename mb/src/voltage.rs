@@ -47,6 +47,10 @@ impl VoltageData {
     pub fn new(dur: u64, data: [VoltageChannel; 15]) -> Self {
         Self { time: dur, data }
     }
+
+    pub fn set_time(&mut self, dur: u64) {
+        self.time = dur;
+    }
 }
 
 /// 电压电流
@@ -96,41 +100,6 @@ impl Into<VoltageF32> for VoltageData {
         result
     }
 }
-
-// impl From<
-
-// /// 格式转换
-// fn mb_f32_ch(data: [f32; 30]) -> [VoltageChannel; 15] {
-//     let mut ch_list: [VoltageChannel; 15] = [VoltageChannel::default(); 15];
-
-//     for (i, chunk) in data.chunks(2).enumerate() {
-//         if chunk.len() == 2 {
-//             let ch = VoltageChannel {
-//                 index: i as u32,
-//                 voltage: chunk[0] / 1000.0,
-//                 current: chunk[1],
-//             };
-//             ch_list[i] = ch;
-//         }
-//     }
-
-//     ch_list
-// }
-
-// /// 格式转换
-// fn mb_ch_f32(data: [VoltageChannel; 15]) -> [f32; 30] {
-//     let mut result = [0.0; 30];
-
-//     for ch in data.iter() {
-//         let idx = ch.index as usize;
-//         if idx < 15 {
-//             result[idx * 2] = ch.voltage * 1000.0;
-//             result[idx * 2 + 1] = ch.current;
-//         }
-//     }
-
-//     result
-// }
 
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub enum VoltageState {
