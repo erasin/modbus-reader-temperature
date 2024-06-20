@@ -262,7 +262,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "mb-reader"
+name = "mb-read"
 version = "0.1.0"
 dependencies = [
  "mb",

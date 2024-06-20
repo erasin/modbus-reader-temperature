@@ -15,7 +15,7 @@ mock: ## mock
 	@cargo run --package mb-mock
 
 read: ## reader
-	@cargo run --package mb-reader
+	@cargo run --package mb-read
 
 
 gui:build ## build and gui

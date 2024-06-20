@@ -1,5 +1,5 @@
 [package]
-name = "mb-reader"
+name = "mb-read"
 version.workspace = true
 edition.workspace = true 
 

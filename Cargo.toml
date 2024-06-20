@@ -2,7 +2,7 @@
 resolver = "2"
 members = [
   "mb",
-  "mb-reader",
+  "mb-read",
   "mb-mock",
   "mb-gd"
 ]
