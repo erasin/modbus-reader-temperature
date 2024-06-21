@@ -2,8 +2,6 @@ use redb::{Database, TableDefinition};
 
 use crate::{config::Config, error::Error};
 
-use super::get_db;
-
 pub const TABLE: TableDefinition<String, String> = TableDefinition::new("user");
 
 pub fn set_config(db: &Database, data: Config) -> Result<(), Error> {

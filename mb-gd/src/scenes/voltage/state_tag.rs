@@ -1,5 +1,5 @@
 use godot::{
-    engine::{Control, IControl, Label, Sprite2D},
+    engine::{Control, IControl, Label},
     obj::WithBaseField,
     prelude::*,
 };

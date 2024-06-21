@@ -24,8 +24,8 @@ gui:build ## build and gui
 	@cd mb-reader-gui && godot
 
 win: ## window
-	cargo build --package mb-gd --release --target i686-pc-windows-gnu;\
-    cargo build --package mb-gd --release --target x86_64-pc-windows-gnu
+	# cargo build --package mb-gd --release --target i686-pc-windows-gnu;\
+    cargo build --package mb-gd --release --target x86_64-pc-windows-gnu;
 
 clean: ## clean cache files
 	@cargo clean

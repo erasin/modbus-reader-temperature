@@ -1,11 +1,11 @@
 use godot::{
-    engine::{Control, IControl, Label, Sprite2D},
+    engine::{Control, IControl, Label},
     obj::WithBaseField,
     prelude::*,
 };
 use mb::voltage::VoltageChannel;
 
-use crate::colors::{self, ColorPlate};
+use crate::colors::ColorPlate;
 
 #[derive(GodotClass)]
 #[class(base=Control)]
@@ -33,25 +33,21 @@ impl IControl for VoltageChannelView {
     }
 }
 
-impl VoltageChannelView {
-    pub fn set_data(&mut self, data: &VoltageChannel) {
-        self.data = data.clone();
-    }
-}
-
 #[godot_api]
 impl VoltageChannelView {
     #[signal]
     fn update_data();
 
     #[func]
-    pub fn on_update_data(&mut self) {
-        // let mut state = self.base().get_node_as::<Sprite2D>("%state2");
-        // state.set_modulate(self.color);
+    pub fn on_update_data(&mut self) {}
+}
+
+impl VoltageChannelView {
+    pub fn set_data(&mut self, data: &VoltageChannel) {
+        self.data = data.clone();
     }
 
-    #[func]
-    pub fn update_show(&mut self) {
+    pub fn update_ui(&mut self) {
         let mut index_label = self.base().get_node_as::<Label>("%index");
         let mut voltage_label = self.base().get_node_as::<Label>("%voltage");
         let mut current_label = self.base().get_node_as::<Label>("%current");

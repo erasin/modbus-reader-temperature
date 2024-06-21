@@ -48,11 +48,10 @@ impl IControl for VoltageView {
 
         let mut tags_container = self.base_mut().get_node_as::<Control>("%Tags");
         for s in VoltageState::vec() {
-            let tag_scene = self.tag_scene.instantiate_as::<Control>();
+            let mut tag_scene = self.tag_scene.instantiate_as::<VoltageStateTagView>();
             tags_container.add_child(tag_scene.clone().upcast());
 
-            let mut tag = tag_scene.cast::<state_tag::VoltageStateTagView>();
-            let mut tag = tag.bind_mut();
+            let mut tag = tag_scene.bind_mut();
             tag.set_color(s.style());
             tag.set_label(s.to_string().into());
             tag.update_ui();
@@ -97,27 +96,20 @@ impl VoltageView {
             let mut channel = if !has {
                 let mut channel_scene = self.channel_scene.instantiate_as::<VoltageChannelView>();
                 content.add_child(channel_scene.clone().upcast());
-
                 channel_scene.set_name(name);
-                // item_scene.set_offset(Side::LEFT, i as f32 * 200.);
-
                 channel_scene
             } else {
                 let channel_scene = content.get_node_as::<VoltageChannelView>(name);
-
                 channel_scene
             };
-
-            // let mut channel = channel_scene.cast::<channel::VoltageChannelView>();
-            // let mut channel = channel_scene;
 
             {
                 let color = get_mb_state(data, &config.verify).style();
                 let mut channel = channel.bind_mut();
 
-                channel.set_data(data);
                 channel.set_color(color);
-                channel.update_show();
+                channel.set_data(data);
+                channel.update_ui();
             }
 
             channel.emit_signal("update_data".into(), &[]);
