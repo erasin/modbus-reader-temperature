@@ -1,14 +1,12 @@
 use redb::{Database, TableDefinition};
 
-use crate::{data::config::Config, error::Error};
+use crate::{config::Config, error::Error};
 
-use super::get_db_conn;
+use super::get_db;
 
 pub const TABLE: TableDefinition<String, String> = TableDefinition::new("user");
 
 pub fn set_config(db: &Database, data: Config) -> Result<(), Error> {
-    let db = get_db_conn();
-
     let write_txn = db.begin_write()?;
     {
         let mut table = write_txn.open_table(TABLE)?;
@@ -22,8 +20,6 @@ pub fn set_config(db: &Database, data: Config) -> Result<(), Error> {
 }
 
 pub fn get_config(db: &Database) -> Result<Config, Error> {
-    let db = get_db_conn();
-
     let mut data = Config::default();
 
     let read_txn = db.begin_read()?;

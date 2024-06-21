@@ -240,16 +240,25 @@ dependencies = [
 ]
 
 [[package]]
-name = "mb-gd"
+name = "mb-data"
 version = "0.1.0"
 dependencies = [
  "etcetera",
- "godot",
- "log",
  "mb",
  "redb",
  "thiserror",
  "time",
+]
+
+[[package]]
+name = "mb-gd"
+version = "0.1.0"
+dependencies = [
+ "godot",
+ "log",
+ "mb",
+ "mb-data",
+ "thiserror",
 ]
 
 [[package]]

@@ -6,7 +6,6 @@ use scenes::my_global::MyGlobal;
 
 mod colors;
 mod data;
-mod db;
 mod error;
 mod mb_sync;
 mod scenes;

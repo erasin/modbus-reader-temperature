@@ -6,9 +6,9 @@ use godot::{
     register::{godot_api, GodotClass},
 };
 
-use crate::{
-    data::config::Config,
-    db::get_db_conn,
+use mb_data::{
+    config::Config,
+    db::get_db,
     utils::{get_time_offset, time_now},
 };
 
@@ -48,7 +48,6 @@ impl MyGlobal {
     /// let config = my_global.get_config();
     /// ```
     pub fn singleton() -> Gd<Self> {
-        // godot::classes::
         Engine::singleton()
             .get_singleton(MyGlobal::string_name())
             .unwrap()
@@ -63,8 +62,8 @@ impl MyGlobal {
     pub fn get_config(&mut self) -> Config {
         // from db
         if self.config.is_none() {
-            let db = get_db_conn();
-            let conf = match crate::db::config::get_config(&db) {
+            let db = get_db().lock().unwrap();
+            let conf = match mb_data::db::config::get_config(&db) {
                 Ok(c) => c,
                 Err(_) => Config::default(),
             };

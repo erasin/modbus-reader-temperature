@@ -1,34 +1,42 @@
 use godot::{
     engine::{Control, IControl, Timer},
+    obj::WithBaseField,
     prelude::*,
 };
-use mb::voltage::{get_mb_state, VoltageData};
+use mb::voltage::{get_mb_state, VoltageData, VoltageState};
+use state_tag::VoltageStateTagView;
 
 use crate::{colors::Style, mb_sync::get_voltage_data, scenes::my_global::get_global_config};
 
 pub mod channel;
+pub mod state_tag;
 
 #[derive(GodotClass)]
-#[class(base=Control)]
+#[class(init, base=Control)]
 struct VoltageView {
+    #[var]
+    sync: bool,
     channel_scene: Gd<PackedScene>,
+    tag_scene: Gd<PackedScene>,
     data: Option<VoltageData>,
     base: Base<Control>,
 }
 
 #[godot_api]
 impl IControl for VoltageView {
-    fn init(base: Base<Control>) -> Self {
-        godot_print!("port init");
-        Self {
-            channel_scene: PackedScene::new_gd(),
-            data: None,
-            base,
-        }
-    }
+    // fn init(base: Base<Control>) -> Self {
+    //     godot_print!("voltage init");
+    //     Self {
+    //         channel_scene: PackedScene::new_gd(),
+    //         tag_scene: PackedScene::new_gd(),
+    //         data: None,
+    //         base,
+    //     }
+    // }
 
     fn ready(&mut self) {
         self.channel_scene = load("res://voltage/channel.tscn");
+        self.tag_scene = load("res://voltage/state_tag.tscn");
 
         let mut req_timer = self.base().get_node_as::<Timer>("ReqTimer");
 
@@ -36,6 +44,18 @@ impl IControl for VoltageView {
             "timeout".into(),
             self.base().callable("on_req_timer_timeout"),
         );
+
+        let mut tags_container = self.base_mut().get_node_as::<Control>("%Tags");
+        for s in VoltageState::vec() {
+            let tag_scene = self.tag_scene.instantiate_as::<Control>();
+            tags_container.add_child(tag_scene.clone().upcast());
+
+            let mut tag = tag_scene.cast::<state_tag::VoltageStateTagView>();
+            let mut tag = tag.bind_mut();
+            tag.set_color(s.style());
+            tag.set_label(s.to_string().into());
+            tag.update_ui();
+        }
     }
 }
 
@@ -46,10 +66,13 @@ impl VoltageView {
 
     #[func]
     fn on_req_timer_timeout(&mut self) {
-        self.mb_read();
+        if !self.sync {
+            self.mb_read();
+        }
     }
+}
 
-    #[func]
+impl VoltageView {
     pub fn mb_read(&mut self) {
         let config = get_global_config();
 
@@ -63,7 +86,7 @@ impl VoltageView {
 
         self.data = Some(data);
 
-        godot_print!(" Write failed {:?}", data);
+        // godot_print!(" Write failed {:?}", data);
 
         let mut content = self.base_mut().get_node_as::<Control>("%Container");
         let has = content.get_child_count() == 15;
@@ -87,7 +110,7 @@ impl VoltageView {
             let mut channel = channel_scene.cast::<channel::VoltageChannelView>();
 
             {
-                let (_, color) = get_mb_state(data, &config.verify).style();
+                let color = get_mb_state(data, &config.verify).style();
                 let mut channel = channel.bind_mut();
 
                 channel.set_data(data);

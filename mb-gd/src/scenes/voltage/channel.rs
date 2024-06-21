@@ -1,10 +1,11 @@
 use godot::{
-    engine::{Control, IControl, Label},
+    engine::{Control, IControl, Label, Sprite2D},
+    obj::WithBaseField,
     prelude::*,
 };
 use mb::voltage::VoltageChannel;
 
-use crate::colors;
+use crate::colors::{self, ColorPlate};
 
 #[derive(GodotClass)]
 #[class(base=Control)]
@@ -21,17 +22,14 @@ impl IControl for VoltageChannelView {
         // godot_print!("item init");
         Self {
             data: VoltageChannel::default(),
-            color: colors::GREY,
+            color: ColorPlate::White.color(),
             base,
         }
     }
     fn ready(&mut self) {
-        // let mut channel = self.base().cast::<Self>().bind_mut();
-
-        // channel.connect(
-        //     "timeout".into(),
-        //     self.base().callable("on_req_timer_timeout"),
-        // );
+        // let on_update_data = self.base().callable("on_update_data");
+        // self.base_mut()
+        //     .connect("update_data".into(), on_update_data);
     }
 }
 
@@ -47,6 +45,12 @@ impl VoltageChannelView {
     fn update_data();
 
     #[func]
+    pub fn on_update_data(&mut self) {
+        // let mut state = self.base().get_node_as::<Sprite2D>("%state2");
+        // state.set_modulate(self.color);
+    }
+
+    #[func]
     pub fn update_show(&mut self) {
         let mut index_label = self.base().get_node_as::<Label>("%index");
         let mut voltage_label = self.base().get_node_as::<Label>("%voltage");
@@ -58,13 +62,10 @@ impl VoltageChannelView {
         // voltage_label.set_text(data.at("voltage").to());
         // current_label.set_text(data.at("current").to());
 
-        index_label.set_text(format!("{:2}", self.data.index + 1).to_godot());
-        voltage_label.set_text(format!("{:.2}V", self.data.voltage).to_godot());
-        current_label.set_text(format!("{:2} mA", self.data.current).to_godot());
+        index_label.set_text(format!("{:2}", self.data.index + 1).into());
+        voltage_label.set_text(format!("{:.2}V", self.data.voltage).into());
+        current_label.set_text(format!("{:2} mA", self.data.current).into());
 
         state.set_modulate(self.color);
-
-        // let mut mt = state.get_material().unwrap();
-        // mt.set("shader_parameter/color".to_godot(), self.color.to_godot());
     }
 }

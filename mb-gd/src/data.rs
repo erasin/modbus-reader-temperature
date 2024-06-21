@@ -1,8 +1,7 @@
+//! data extra for godot
+
 use godot::prelude::*;
 use mb::voltage::VoltageChannel;
-
-pub mod config;
-pub mod user;
 
 /// 使用新的 特性实现 to_godot
 pub trait ToGodotVia {

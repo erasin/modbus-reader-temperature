@@ -1,0 +1,12 @@
+[package]
+name = "mb-data"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+
+[dependencies]
+mb = {path = "../mb"}
+etcetera = "0.8"
+redb = "2.1"
+thiserror = "1.0"
+time = { version = "0.3", features = ["formatting", "local-offset"] }

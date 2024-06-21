@@ -2,7 +2,7 @@ use mb::protocol::Builder;
 use mb::voltage::{self, VoltageData};
 use mb::Result;
 
-use crate::data::config::Config;
+use mb_data::config::Config;
 
 /// 获取电压电流
 pub fn get_voltage_data(config: &Config) -> Result<VoltageData> {

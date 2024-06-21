@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://d24d627rjkbnl"]
 
-[ext_resource type="PackedScene" uid="uid://cg63tx3u2mhnh" path="res://setting.tscn" id="1_tskm2"]
+[ext_resource type="PackedScene" uid="uid://cg63tx3u2mhnh" path="res://sys/setting.tscn" id="1_m74pw"]
 
 [node name="SysSettingWindowView" type="SysSettingWindowView"]
 position = Vector2i(0, 36)
@@ -11,8 +11,5 @@ anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0
 
-[node name="Setting" parent="Control" instance=ExtResource("1_tskm2")]
+[node name="Setting" parent="Control" instance=ExtResource("1_m74pw")]
 layout_mode = 0
-anchors_preset = 0
-
-[connection signal="close_requested" from="." to="." method="on_close_requested"]

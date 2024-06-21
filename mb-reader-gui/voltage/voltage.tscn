@@ -19,12 +19,9 @@ offset_bottom = 40.0
 [node name="PanelContainer" type="PanelContainer" parent="VBoxContainer"]
 layout_mode = 2
 
-[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/PanelContainer"]
+[node name="Tags" type="HBoxContainer" parent="VBoxContainer/PanelContainer"]
+unique_name_in_owner = true
 layout_mode = 2
-
-[node name="Label" type="Label" parent="VBoxContainer/PanelContainer/HBoxContainer"]
-layout_mode = 2
-text = "显示状态预览"
 
 [node name="MarginContainer" type="MarginContainer" parent="VBoxContainer"]
 layout_mode = 2

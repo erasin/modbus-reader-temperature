@@ -4,13 +4,13 @@ use godot::{
 };
 use mb::protocol::get_ports;
 
-use crate::{
-    data::config::{Baudrate, Config},
+use crate::scenes::my_global::{get_global_config, set_global_config};
+use mb_data::{
+    config::{Baudrate, Config},
     db::{
         config::{get_config, set_config},
-        get_db_conn,
+        get_db,
     },
-    scenes::my_global::set_global_config,
 };
 
 #[derive(GodotClass)]
@@ -25,8 +25,7 @@ impl IControl for SettingView {
     fn init(base: Base<Control>) -> Self {
         godot_print!("setting init");
         Self {
-            config: Config::default(),
-
+            config: get_global_config(),
             base,
         }
     }
@@ -103,7 +102,7 @@ impl SettingView {
     #[func]
     fn on_submit(&mut self) {
         {
-            let db = get_db_conn();
+            let db = get_db().lock().unwrap();
             let _ = set_config(&db, self.config.clone());
 
             match get_config(&db) {

@@ -4,6 +4,7 @@ members = [
   "mb",
   "mb-read",
   "mb-mock",
+  "mb-data",
   "mb-gd"
 ]
 default-members = [
@@ -21,3 +22,4 @@ lto = "thin"
 [workspace.dependencies]
 serialport = "4.3.0"
 thiserror = "1.0"
+log = "0.4"

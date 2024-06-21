@@ -84,13 +84,14 @@ pub fn get_last(db: &Database) -> Result<VoltageData, Error> {
 #[cfg(test)]
 mod test {
 
-    use crate::db::get_db_conn;
+    use crate::db::get_db;
 
     use super::get_last;
 
     #[test]
     fn test_get() {
-        let data = get_last(&get_db_conn());
+        let db = get_db().lock().unwrap();
+        let data = get_last(&db);
         match data {
             Ok(data) => {
                 println!("{:?}", data.data);

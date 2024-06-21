@@ -1,7 +1,3 @@
-use godot::{
-    builtin::GString,
-    register::{Export, GodotConvert, Var},
-};
 use mb::{protocol::default_port_name, voltage::Verify};
 
 #[derive(Debug, Clone)]
@@ -37,8 +33,6 @@ impl Config {
     }
 }
 
-#[derive(GodotConvert, Var, Export)]
-#[godot(via = GString)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum Baudrate {
     R1200,

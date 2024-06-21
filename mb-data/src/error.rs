@@ -9,6 +9,30 @@ pub enum Error {
     Time(#[from] std::time::SystemTimeError),
 
     #[error(transparent)]
+    DB(#[from] redb::Error),
+
+    #[error(transparent)]
+    DB1(#[from] redb::TableError),
+
+    #[error(transparent)]
+    DB2(#[from] redb::CommitError),
+
+    #[error(transparent)]
+    DB3(#[from] redb::StorageError),
+
+    #[error(transparent)]
+    DB4(#[from] redb::DatabaseError),
+
+    #[error(transparent)]
+    DB5(#[from] redb::SavepointError),
+
+    #[error(transparent)]
+    DB6(#[from] redb::CompactionError),
+
+    #[error(transparent)]
+    DB7(#[from] redb::TransactionError),
+
+    #[error(transparent)]
     Prase(#[from] ParseIntError),
 
     #[error("没有对应的数据")]
