@@ -18,5 +18,5 @@ pub fn print_hex<T: AsRef<str>>(name: T, data: &Vec<u8>) {
             x
         });
 
-    println!("{} ({n}): {:?} \n{hex} \n", name.as_ref(), &data);
+    log::debug!("{} ({n}): {:?} \n{hex} \n", name.as_ref(), &data);
 }

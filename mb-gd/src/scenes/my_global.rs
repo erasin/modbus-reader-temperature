@@ -12,6 +12,8 @@ use mb_data::{
     utils::{get_time_offset, time_now},
 };
 
+use crate::utils::init_logging;
+
 /// 单例：用于全局数据存储
 #[derive(GodotClass)]
 #[class(base=Object)]
@@ -26,6 +28,7 @@ impl IObject for MyGlobal {
         godot_print!("my singleton init");
 
         let _ = get_time_offset();
+        let _ = init_logging(3);
 
         Self { config: None, base }
     }

@@ -6,6 +6,6 @@ edition.workspace = true
 [dependencies]
 serialport.workspace = true
 thiserror.workspace = true
-
+log.workspace = true
 
 

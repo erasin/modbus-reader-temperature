@@ -1,3 +1,4 @@
+use channel::VoltageChannelView;
 use godot::{
     engine::{Control, IControl, Timer},
     obj::WithBaseField,
@@ -93,8 +94,8 @@ impl VoltageView {
 
         for (i, data) in data.data.iter().enumerate() {
             let name = format!("i{i}").to_godot();
-            let channel_scene = if !has {
-                let mut channel_scene = self.channel_scene.instantiate_as::<Control>();
+            let mut channel = if !has {
+                let mut channel_scene = self.channel_scene.instantiate_as::<VoltageChannelView>();
                 content.add_child(channel_scene.clone().upcast());
 
                 channel_scene.set_name(name);
@@ -102,12 +103,13 @@ impl VoltageView {
 
                 channel_scene
             } else {
-                let channel_scene = content.get_node_as::<Control>(name);
+                let channel_scene = content.get_node_as::<VoltageChannelView>(name);
 
                 channel_scene
             };
 
-            let mut channel = channel_scene.cast::<channel::VoltageChannelView>();
+            // let mut channel = channel_scene.cast::<channel::VoltageChannelView>();
+            // let mut channel = channel_scene;
 
             {
                 let color = get_mb_state(data, &config.verify).style();

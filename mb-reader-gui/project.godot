@@ -24,6 +24,10 @@ window/stretch/mode="viewport"
 window/vsync/vsync_mode=0
 window/ios/allow_high_refresh_rate=false
 
+[filesystem]
+
+import/blender/enabled=false
+
 [rendering]
 
 renderer/rendering_method="gl_compatibility"

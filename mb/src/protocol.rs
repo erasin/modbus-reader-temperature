@@ -51,7 +51,7 @@ fn read_full_response(port: &mut Box<dyn SerialPort>, buffer: &mut Vec<u8>) -> R
     loop {
         match port.read(&mut read_buffer) {
             Ok(n) => {
-                // println!("--- {n} {:?}", read_buffer);
+                // log::debug!("--- {n} {:?}", read_buffer);
                 buffer[total_read..total_read + n].copy_from_slice(&read_buffer[..n]);
                 total_read += n;
                 if n < read_buffer.len() {
@@ -134,8 +134,7 @@ impl Function {
         if byte_count < 2 || byte_count % 2 != 0 {
             return Err(Box::new(Error::DataLenError)); // 数据长度不匹配
         }
-        // println!("byte_count: {}, {}", byte_count, request.len());
-
+        // log::trace!("byte_count: {}, {}", byte_count, request.len());
         let mut result = Vec::with_capacity(byte_count / 2);
         for i in 0..(byte_count / 2) {
             let high_byte = request[2 + 2 * i] as u16;

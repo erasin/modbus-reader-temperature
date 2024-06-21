@@ -25,46 +25,13 @@ impl IControl for SettingView {
     fn init(base: Base<Control>) -> Self {
         godot_print!("setting init");
         Self {
-            config: get_global_config(),
+            config: Config::default(),
             base,
         }
     }
 
     fn ready(&mut self) {
-        let mut port_btn = self.base().get_node_as::<OptionButton>("%Port");
-
-        let ports = get_ports();
-
-        for (index, port) in ports.iter().enumerate() {
-            port_btn.add_item(port.to_godot());
-            if port.bytes().eq(self.config.port.bytes()) {
-                port_btn.select(index as i32);
-            }
-        }
-
-        port_btn.connect(
-            "item_selected".into(),
-            self.base().callable("on_port_item_selected"),
-        );
-
-        let mut baudrate_btn = self.base().get_node_as::<OptionButton>("%Baudrate");
-
-        for (index, &item) in Baudrate::ALL.iter().enumerate() {
-            baudrate_btn.add_item(item.to_string().to_godot());
-
-            if item == self.config.baudrate {
-                baudrate_btn.select(index as i32);
-            }
-        }
-
-        baudrate_btn.connect(
-            "item_selected".into(),
-            self.base().callable("on_baudrate_item_selected"),
-        );
-
-        let mut submit_btn = self.base().get_node_as::<Button>("%Submit");
-
-        submit_btn.connect("pressed".into(), self.base().callable("on_submit"));
+        self.init_data();
     }
 }
 
@@ -116,4 +83,43 @@ impl SettingView {
     }
 }
 
-impl SettingView {}
+impl SettingView {
+    pub fn init_data(&mut self) {
+        self.config = get_global_config();
+
+        let mut port_btn = self.base().get_node_as::<OptionButton>("%Port");
+
+        let ports = get_ports();
+
+        for (index, port) in ports.iter().enumerate() {
+            port_btn.add_item(port.to_godot());
+            if port.bytes().eq(self.config.port.bytes()) {
+                port_btn.select(index as i32);
+            }
+        }
+
+        port_btn.connect(
+            "item_selected".into(),
+            self.base().callable("on_port_item_selected"),
+        );
+
+        let mut baudrate_btn = self.base().get_node_as::<OptionButton>("%Baudrate");
+
+        for (index, &item) in Baudrate::ALL.iter().enumerate() {
+            baudrate_btn.add_item(item.to_string().to_godot());
+
+            if item == self.config.baudrate {
+                baudrate_btn.select(index as i32);
+            }
+        }
+
+        baudrate_btn.connect(
+            "item_selected".into(),
+            self.base().callable("on_baudrate_item_selected"),
+        );
+
+        let mut submit_btn = self.base().get_node_as::<Button>("%Submit");
+
+        submit_btn.connect("pressed".into(), self.base().callable("on_submit"));
+    }
+}

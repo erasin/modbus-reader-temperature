@@ -8,5 +8,6 @@ authors.workspace = true
 mb = {path = "../mb"}
 etcetera = "0.8"
 redb = "2.1"
-thiserror = "1.0"
 time = { version = "0.3", features = ["formatting", "local-offset"] }
+thiserror.workspace = true
+log.workspace = true

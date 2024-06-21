@@ -11,7 +11,7 @@ pub fn get_time_offset() -> &'static UtcOffset {
     })
 }
 
-pub fn time_format(unix_time: i64, s: &str) -> Result<String, Box<dyn std::error::Error>> {
+pub fn time_format_human(unix_time: i64, s: &str) -> Result<String, Box<dyn std::error::Error>> {
     let format = format_description::parse(s)?;
 
     let s = OffsetDateTime::from_unix_timestamp(unix_time)?
@@ -25,6 +25,9 @@ pub fn time_now() -> OffsetDateTime {
     OffsetDateTime::now_utc().to_offset(*get_time_offset())
 }
 
-pub fn time_unix_second() -> u64 {
-    time_now().unix_timestamp() as u64
+pub fn time_human(dur: OffsetDateTime) -> String {
+    let format = "[year]-[month]-[day] [hour]:[minute]:[second]";
+    let format = format_description::parse(format).unwrap();
+
+    dur.to_offset(*get_time_offset()).format(&format).unwrap()
 }

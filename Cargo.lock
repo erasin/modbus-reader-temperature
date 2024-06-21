@@ -56,6 +56,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "fern"
+version = "0.6.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d9f0c14694cbd524c8720dd69b0e3179344f04ebb5f90f2e4a440c6ea3b2f1ee"
+dependencies = [
+ "log",
+]
+
+[[package]]
 name = "gdextension-api"
 version = "4.2.0-rev.0"
 source = "git+https://github.com/godot-rust/godot4-prebuilt?branch=4.2#b3bdb57bddd60ed40ef4672e9c3754a5afe0a21f"
@@ -235,6 +244,7 @@ dependencies = [
 name = "mb"
 version = "0.1.0"
 dependencies = [
+ "log",
  "serialport",
  "thiserror",
 ]
@@ -244,6 +254,7 @@ name = "mb-data"
 version = "0.1.0"
 dependencies = [
  "etcetera",
+ "log",
  "mb",
  "redb",
  "thiserror",
@@ -254,6 +265,7 @@ dependencies = [
 name = "mb-gd"
 version = "0.1.0"
 dependencies = [
+ "fern",
  "godot",
  "log",
  "mb",
