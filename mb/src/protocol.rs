@@ -22,7 +22,7 @@ impl Builder {
 
     pub fn call(&self, request: &FunRequest) -> Result<FunResponse> {
         let mut port = serialport::new(self.port_name.clone(), self.baudrate)
-            .timeout(Duration::from_secs(5))
+            .timeout(Duration::from_millis(300))
             .open()?;
 
         let _i = port.write(&request.request_data())?;
@@ -51,6 +51,9 @@ fn read_full_response(port: &mut Box<dyn SerialPort>, buffer: &mut Vec<u8>) -> R
     loop {
         match port.read(&mut read_buffer) {
             Ok(n) => {
+                if n == 0 {
+                    break;
+                }
                 // log::debug!("--- {n} {:?}", read_buffer);
                 buffer[total_read..total_read + n].copy_from_slice(&read_buffer[..n]);
                 total_read += n;

@@ -1,5 +1,5 @@
 use godot::{
-    engine::{DisplayServer, IWindow, Window},
+    engine::{window::WindowInitialPosition, DisplayServer, IWindow, Window},
     prelude::*,
 };
 
@@ -22,6 +22,7 @@ impl IWindow for SysSettingWindowView {
 
         win.set_title("系统设置".into());
         win.set_size(Vector2i::new(600, 600));
+        win.set_initial_position(WindowInitialPosition::CENTER_PRIMARY_SCREEN);
         win.set_visible(true);
     }
 }

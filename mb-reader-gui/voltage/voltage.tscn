@@ -1,4 +1,7 @@
-[gd_scene format=3 uid="uid://ciewnonjuycx6"]
+[gd_scene load_steps=3 format=3 uid="uid://ciewnonjuycx6"]
+
+[ext_resource type="StyleBox" uid="uid://bhtstjj7isp2b" path="res://assets/pane.tres" id="1_vnvb2"]
+[ext_resource type="Texture2D" uid="uid://c4j0cr737oyw" path="res://assets/ball.png" id="2_gtrl5"]
 
 [node name="Voltage" type="VoltageView"]
 anchors_preset = 15
@@ -8,33 +11,248 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="ReqTimer" type="Timer" parent="."]
+unique_name_in_owner = true
 wait_time = 2.0
-autostart = true
 
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
-layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
+[node name="HboxContainer" type="HBoxContainer" parent="."]
+layout_mode = 2
+metadata/_edit_use_anchors_ = true
 
-[node name="PanelContainer" type="PanelContainer" parent="VBoxContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="HboxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="标签显示" type="PanelContainer" parent="HboxContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="Tags" type="HBoxContainer" parent="VBoxContainer/PanelContainer"]
+[node name="Tags" type="HBoxContainer" parent="HboxContainer/VBoxContainer/标签显示"]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer"]
+[node name="MarginContainer" type="MarginContainer" parent="HboxContainer/VBoxContainer"]
 layout_mode = 2
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_top = 20
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 20
 
-[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/MarginContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="HboxContainer/VBoxContainer/MarginContainer"]
 layout_mode = 2
 
-[node name="Container" type="GridContainer" parent="VBoxContainer/MarginContainer/VBoxContainer"]
+[node name="Container" type="GridContainer" parent="HboxContainer/VBoxContainer/MarginContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 2
 columns = 10
+
+[node name="功能区" type="PanelContainer" parent="HboxContainer"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+theme_override_styles/panel = ExtResource("1_vnvb2")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HboxContainer/功能区"]
+layout_mode = 2
+
+[node name="按钮" type="PanelContainer" parent="HboxContainer/功能区/VBoxContainer"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HboxContainer/功能区/VBoxContainer/按钮"]
+layout_mode = 2
+
+[node name="StartToggle" type="Button" parent="HboxContainer/功能区/VBoxContainer/按钮/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = " 开启"
+
+[node name="AgeingToggle" type="Button" parent="HboxContainer/功能区/VBoxContainer/按钮/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "老化"
+
+[node name="VccToggle" type="Button" parent="HboxContainer/功能区/VBoxContainer/按钮/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "电源开启"
+
+[node name="时间" type="PanelContainer" parent="HboxContainer/功能区/VBoxContainer"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HboxContainer/功能区/VBoxContainer/时间"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="HboxContainer/功能区/VBoxContainer/时间/VBoxContainer"]
+layout_mode = 2
+
+[node name="程序名称" type="Label" parent="HboxContainer/功能区/VBoxContainer/时间/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "程序名称："
+
+[node name="ProName" type="Label" parent="HboxContainer/功能区/VBoxContainer/时间/VBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="HboxContainer/功能区/VBoxContainer/时间/VBoxContainer"]
+layout_mode = 2
+
+[node name="开始时间" type="Label" parent="HboxContainer/功能区/VBoxContainer/时间/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+text = "开始时间："
+
+[node name="StartTime" type="Label" parent="HboxContainer/功能区/VBoxContainer/时间/VBoxContainer/HBoxContainer2"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="HBoxContainer3" type="HBoxContainer" parent="HboxContainer/功能区/VBoxContainer/时间/VBoxContainer"]
+layout_mode = 2
+
+[node name="剩余时间" type="Label" parent="HboxContainer/功能区/VBoxContainer/时间/VBoxContainer/HBoxContainer3"]
+layout_mode = 2
+text = "剩余时间："
+
+[node name="CountDownTime" type="Label" parent="HboxContainer/功能区/VBoxContainer/时间/VBoxContainer/HBoxContainer3"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="HBoxContainer4" type="HBoxContainer" parent="HboxContainer/功能区/VBoxContainer/时间/VBoxContainer"]
+layout_mode = 2
+
+[node name="老化时间" type="Label" parent="HboxContainer/功能区/VBoxContainer/时间/VBoxContainer/HBoxContainer4"]
+layout_mode = 2
+text = "老化时间："
+
+[node name="AgeingTime" type="Label" parent="HboxContainer/功能区/VBoxContainer/时间/VBoxContainer/HBoxContainer4"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="HBoxContainer5" type="HBoxContainer" parent="HboxContainer/功能区/VBoxContainer/时间/VBoxContainer"]
+layout_mode = 2
+
+[node name="输入电源" type="Label" parent="HboxContainer/功能区/VBoxContainer/时间/VBoxContainer/HBoxContainer5"]
+layout_mode = 2
+text = "输入电源："
+horizontal_alignment = 2
+
+[node name="AccState" type="Label" parent="HboxContainer/功能区/VBoxContainer/时间/VBoxContainer/HBoxContainer5"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="HBoxContainer6" type="HBoxContainer" parent="HboxContainer/功能区/VBoxContainer/时间/VBoxContainer"]
+layout_mode = 2
+
+[node name="总数" type="Label" parent="HboxContainer/功能区/VBoxContainer/时间/VBoxContainer/HBoxContainer6"]
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
+text = "总数："
+horizontal_alignment = 2
+
+[node name="CountNum" type="Label" parent="HboxContainer/功能区/VBoxContainer/时间/VBoxContainer/HBoxContainer6"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="HBoxContainer7" type="HBoxContainer" parent="HboxContainer/功能区/VBoxContainer/时间/VBoxContainer"]
+layout_mode = 2
+
+[node name="良品" type="Label" parent="HboxContainer/功能区/VBoxContainer/时间/VBoxContainer/HBoxContainer7"]
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
+text = "良品："
+horizontal_alignment = 2
+
+[node name="CountGood" type="Label" parent="HboxContainer/功能区/VBoxContainer/时间/VBoxContainer/HBoxContainer7"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="HBoxContainer8" type="HBoxContainer" parent="HboxContainer/功能区/VBoxContainer/时间/VBoxContainer"]
+layout_mode = 2
+
+[node name="不良品" type="Label" parent="HboxContainer/功能区/VBoxContainer/时间/VBoxContainer/HBoxContainer8"]
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
+text = "不良品："
+horizontal_alignment = 2
+
+[node name="CountDefective" type="Label" parent="HboxContainer/功能区/VBoxContainer/时间/VBoxContainer/HBoxContainer8"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="HboxContainer/功能区/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="状态" type="PanelContainer" parent="HboxContainer/功能区/VBoxContainer"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HboxContainer/功能区/VBoxContainer/状态"]
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 8
+
+[node name="HBoxContainer" type="HBoxContainer" parent="HboxContainer/功能区/VBoxContainer/状态/VBoxContainer"]
+layout_mode = 2
+alignment = 2
+
+[node name="AbName" type="Label" parent="HboxContainer/功能区/VBoxContainer/状态/VBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(6.83457e-06, 0.657962, 7.70092e-07, 1)
+theme_override_font_sizes/font_size = 24
+text = "区域名称"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="HboxContainer/功能区/VBoxContainer/状态/VBoxContainer"]
+layout_mode = 2
+alignment = 2
+
+[node name="运行" type="Label" parent="HboxContainer/功能区/VBoxContainer/状态/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+text = "运行:"
+
+[node name="StateRun" type="TextureRect" parent="HboxContainer/功能区/VBoxContainer/状态/VBoxContainer/HBoxContainer2"]
+unique_name_in_owner = true
+layout_mode = 2
+texture = ExtResource("2_gtrl5")
+expand_mode = 2
+
+[node name="HBoxContainer3" type="HBoxContainer" parent="HboxContainer/功能区/VBoxContainer/状态/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+alignment = 2
+
+[node name="故障" type="Label" parent="HboxContainer/功能区/VBoxContainer/状态/VBoxContainer/HBoxContainer3"]
+layout_mode = 2
+text = "故障:"
+
+[node name="StateError" type="TextureRect" parent="HboxContainer/功能区/VBoxContainer/状态/VBoxContainer/HBoxContainer3"]
+layout_mode = 2
+texture = ExtResource("2_gtrl5")
+expand_mode = 2
+
+[node name="HBoxContainer4" type="HBoxContainer" parent="HboxContainer/功能区/VBoxContainer/状态/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+alignment = 2
+
+[node name="老化完成" type="Label" parent="HboxContainer/功能区/VBoxContainer/状态/VBoxContainer/HBoxContainer4"]
+layout_mode = 2
+text = "老化完成:"
+
+[node name="StateAgeing" type="TextureRect" parent="HboxContainer/功能区/VBoxContainer/状态/VBoxContainer/HBoxContainer4"]
+layout_mode = 2
+texture = ExtResource("2_gtrl5")
+expand_mode = 2
+
+[node name="HBoxContainer5" type="HBoxContainer" parent="HboxContainer/功能区/VBoxContainer/状态/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+alignment = 2
+
+[node name="Acc电源" type="Label" parent="HboxContainer/功能区/VBoxContainer/状态/VBoxContainer/HBoxContainer5"]
+layout_mode = 2
+text = "Acc电源:"
+
+[node name="StateAcc" type="TextureRect" parent="HboxContainer/功能区/VBoxContainer/状态/VBoxContainer/HBoxContainer5"]
+layout_mode = 2
+texture = ExtResource("2_gtrl5")
+expand_mode = 2

@@ -1,30 +1,33 @@
 use channel::VoltageChannelView;
 use godot::{
-    engine::{Control, IControl, Timer},
+    engine::{Button, Control, IPanelContainer, Label, PanelContainer, Timer},
     obj::WithBaseField,
     prelude::*,
 };
 use mb::voltage::{get_mb_state, VoltageData, VoltageState};
 use state_tag::VoltageStateTagView;
 
-use crate::{colors::Style, mb_sync::get_voltage_data, scenes::my_global::get_global_config};
+use crate::{
+    colors::Style, data::AB, mb_sync::get_voltage_data, scenes::my_global::get_global_config,
+};
 
 pub mod channel;
 pub mod state_tag;
 
 #[derive(GodotClass)]
-#[class(init, base=Control)]
-struct VoltageView {
-    #[var]
-    sync: bool,
+#[class(init, base=PanelContainer)]
+pub struct VoltageView {
+    #[export]
+    ab: AB,
+
     channel_scene: Gd<PackedScene>,
     tag_scene: Gd<PackedScene>,
     data: Option<VoltageData>,
-    base: Base<Control>,
+    base: Base<PanelContainer>,
 }
 
 #[godot_api]
-impl IControl for VoltageView {
+impl IPanelContainer for VoltageView {
     // fn init(base: Base<Control>) -> Self {
     //     godot_print!("voltage init");
     //     Self {
@@ -39,6 +42,13 @@ impl IControl for VoltageView {
         self.channel_scene = load("res://voltage/channel.tscn");
         self.tag_scene = load("res://voltage/state_tag.tscn");
 
+        let mut label_ab_name = self.base().get_node_as::<Label>("%AbName");
+
+        match self.ab {
+            AB::A => label_ab_name.set_text("A面".into()),
+            AB::B => label_ab_name.set_text("B面".into()),
+        };
+
         let mut req_timer = self.base().get_node_as::<Timer>("ReqTimer");
 
         req_timer.connect(
@@ -46,6 +56,7 @@ impl IControl for VoltageView {
             self.base().callable("on_req_timer_timeout"),
         );
 
+        // 标签显示
         let mut tags_container = self.base_mut().get_node_as::<Control>("%Tags");
         for s in VoltageState::vec() {
             let mut tag_scene = self.tag_scene.instantiate_as::<VoltageStateTagView>();
@@ -56,6 +67,13 @@ impl IControl for VoltageView {
             tag.set_label(s.to_string().into());
             tag.update_ui();
         }
+
+        // 开启
+        let mut start_btn = self.base().get_node_as::<Button>("%StartToggle");
+        start_btn.connect(
+            "pressed".into(),
+            self.base().callable("on_start_toggle_sync"),
+        );
     }
 }
 
@@ -66,8 +84,21 @@ impl VoltageView {
 
     #[func]
     fn on_req_timer_timeout(&mut self) {
-        if !self.sync {
-            self.mb_read();
+        self.mb_read();
+    }
+
+    #[func]
+    fn on_start_toggle_sync(&mut self) {
+        godot_print!("--- start pull");
+        let mut start_btn = self.base().get_node_as::<Button>("%StartToggle");
+
+        let mut timer = self.base().get_node_as::<Timer>("%ReqTimer");
+        if timer.is_stopped() {
+            timer.start();
+            start_btn.set_text("停止".into());
+        } else {
+            timer.stop();
+            start_btn.set_text("开始".into());
         }
     }
 }
@@ -76,10 +107,23 @@ impl VoltageView {
     pub fn mb_read(&mut self) {
         let config = get_global_config();
 
+        //TODO 根据 AB 区 获取参数
+        let _config = match self.ab {
+            AB::A => {}
+            AB::B => {}
+        };
+
+        let mut timer = self.base().get_node_as::<Timer>("%ReqTimer");
+
         let data = match get_voltage_data(&config) {
             Ok(i) => i,
             Err(e) => {
-                godot_print!(" Write failed {}: {:?}", config.port(), e);
+                timer.stop();
+
+                let mut start_btn = self.base().get_node_as::<Button>("%StartToggle");
+                start_btn.set_text("开始".into());
+
+                godot_print!(" Write failed {:?}: {:?}", config.voltage, e);
                 return;
             }
         };
@@ -104,7 +148,7 @@ impl VoltageView {
             };
 
             {
-                let color = get_mb_state(data, &config.verify).style();
+                let color = get_mb_state(data, &config.voltage.verify).style();
                 let mut channel = channel.bind_mut();
 
                 channel.set_color(color);

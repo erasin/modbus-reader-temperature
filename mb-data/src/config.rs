@@ -1,48 +1,71 @@
 use mb::{protocol::default_port_name, voltage::Verify};
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct Config {
-    pub port: String,       // com or tty
-    pub baudrate: Baudrate, //
-    pub verify: Verify,
+    pub voltage: VoltageConfig,
+    pub temperature: TemperatureConfig,
+    pub relay: RelayConfig,
 }
 
-impl Default for Config {
+// 端口
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SerialPortConfig {
+    pub name: String,
+    pub port: String,       // com or tty
+    pub baudrate: Baudrate, //
+}
+
+impl Default for SerialPortConfig {
     fn default() -> Self {
         Self {
+            name: String::default(),
             port: default_port_name(),
-            baudrate: Baudrate::R115200,
-            verify: Verify::default(),
+            baudrate: Baudrate::default(),
         }
     }
 }
 
-impl Config {
-    pub fn port(&self) -> String {
-        self.port.clone()
-    }
+// 电流
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct VoltageConfig {
+    pub name: String,
+    pub serial_port: SerialPortConfig,
+    // 站
+    pub salve_a: Vec<u8>,
+    pub salve_b: Vec<u8>,
 
-    pub fn baudrate(&self) -> Baudrate {
-        self.baudrate
-    }
-
-    pub async fn load() -> Option<Config> {
-        let config = Config::default();
-
-        Some(config)
-    }
+    // 验证
+    pub verify: Verify,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+// 温度
+// 双温控
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct TemperatureConfig {
+    pub name: String,
+    pub serial_port: SerialPortConfig,
+    pub salve: u8,
+}
+
+// 继电器
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct RelayConfig {
+    pub name: String,
+    pub serial_port: SerialPortConfig,
+    pub salve: u8,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Serialize, Deserialize)]
 pub enum Baudrate {
     R1200,
     R2400,
     R4800,
+    #[default]
     R9600,
     R19200,
     R38400,
     R57600,
-    #[default]
     R115200,
 }
 

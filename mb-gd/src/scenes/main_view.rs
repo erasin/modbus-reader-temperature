@@ -2,7 +2,7 @@ use godot::{
     engine::{
         file_dialog::{Access, FileMode},
         window::WindowInitialPosition,
-        Button, Control, FileDialog, IControl,
+        Button, FileDialog, IPanelContainer, PanelContainer,
     },
     prelude::*,
 };
@@ -11,18 +11,17 @@ use mb_data::dirs;
 use super::sys_setting::SysSettingWindowView;
 
 #[derive(GodotClass)]
-#[class(init, base=Control)]
+#[class(init, base=PanelContainer)]
 pub struct MainView {
     sys_setting_scene: Gd<PackedScene>,
     file_dialog: Gd<PackedScene>,
-    base: Base<Control>,
+    base: Base<PanelContainer>,
 }
 
 #[godot_api]
-impl IControl for MainView {
+impl IPanelContainer for MainView {
     fn ready(&mut self) {
         self.sys_setting_scene = load("res://sys/setting_win.tscn");
-
         self.file_dialog = load("res://sys/file_dialog.tscn");
 
         let mut sys_btn = self.base().get_node_as::<Button>("%SystemSetBtn");

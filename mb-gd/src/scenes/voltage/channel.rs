@@ -1,5 +1,5 @@
 use godot::{
-    engine::{Control, IControl, Label},
+    engine::{Control, IPanelContainer, Label, PanelContainer},
     obj::WithBaseField,
     prelude::*,
 };
@@ -8,17 +8,17 @@ use mb::voltage::VoltageChannel;
 use crate::colors::ColorPlate;
 
 #[derive(GodotClass)]
-#[class(base=Control)]
+#[class(base=PanelContainer)]
 pub struct VoltageChannelView {
     #[var]
     color: Color,
     data: VoltageChannel,
-    base: Base<Control>,
+    base: Base<PanelContainer>,
 }
 
 #[godot_api]
-impl IControl for VoltageChannelView {
-    fn init(base: Base<Control>) -> Self {
+impl IPanelContainer for VoltageChannelView {
+    fn init(base: Base<PanelContainer>) -> Self {
         // godot_print!("item init");
         Self {
             data: VoltageChannel::default(),

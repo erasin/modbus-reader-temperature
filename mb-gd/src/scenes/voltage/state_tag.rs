@@ -1,5 +1,5 @@
 use godot::{
-    engine::{Control, IControl, Label},
+    engine::{Control, IPanelContainer, Label, PanelContainer},
     obj::WithBaseField,
     prelude::*,
 };
@@ -7,19 +7,19 @@ use godot::{
 use crate::colors::ColorPlate;
 
 #[derive(GodotClass)]
-#[class(base=Control)]
+#[class(base=PanelContainer)]
 pub struct VoltageStateTagView {
     #[var]
     color: Color,
     #[var]
     label: GString,
 
-    base: Base<Control>,
+    base: Base<PanelContainer>,
 }
 
 #[godot_api]
-impl IControl for VoltageStateTagView {
-    fn init(base: Base<Control>) -> Self {
+impl IPanelContainer for VoltageStateTagView {
+    fn init(base: Base<PanelContainer>) -> Self {
         // godot_print!("item init");
         Self {
             label: "空位".into(),

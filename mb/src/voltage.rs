@@ -2,6 +2,8 @@
 //! RS485
 //! b 115200
 
+use serde::{Deserialize, Serialize};
+
 use crate::protocol::{FunRequest, FunResponse, Function, FunctionCode};
 use crate::Result;
 
@@ -183,7 +185,7 @@ pub fn get_mb_state(data: &VoltageChannel, verify: &Verify) -> VoltageState {
 }
 
 /// 合格校验
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Verify {
     /// 电压上限 V
     pub voltage_top: f32,

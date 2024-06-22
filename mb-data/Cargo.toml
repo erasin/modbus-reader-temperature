@@ -11,3 +11,5 @@ redb = "2.1"
 time = { version = "0.3", features = ["formatting", "local-offset"] }
 thiserror.workspace = true
 log.workspace = true
+serde.workspace = true
+serde_json.workspace = true

@@ -8,7 +8,7 @@ use godot::{
 
 use mb_data::{
     config::Config,
-    db::get_db,
+    db::{config::TableGlobal, get_db},
     utils::{get_time_offset, time_now},
 };
 
@@ -66,7 +66,7 @@ impl MyGlobal {
         // from db
         if self.config.is_none() {
             let db = get_db().lock().unwrap();
-            let conf = match mb_data::db::config::get_config(&db) {
+            let conf = match TableGlobal::get_config(&db) {
                 Ok(c) => c,
                 Err(_) => Config::default(),
             };

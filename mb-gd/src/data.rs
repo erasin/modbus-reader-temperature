@@ -3,6 +3,24 @@
 use godot::prelude::*;
 use mb::voltage::VoltageChannel;
 
+#[derive(GodotConvert, Var, Export, Debug, Default, Clone, Copy, PartialEq, Eq)]
+#[godot(via = GString)]
+pub enum AB {
+    #[default]
+    A,
+    B,
+}
+
+impl AB {
+    pub fn is_a(&self) -> bool {
+        *self == AB::A
+    }
+
+    pub fn is_b(&self) -> bool {
+        *self == AB::B
+    }
+}
+
 /// 使用新的 特性实现 to_godot
 pub trait ToGodotVia {
     type Via;

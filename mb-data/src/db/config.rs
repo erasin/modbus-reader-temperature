@@ -1,37 +1,42 @@
+use mb::Result;
 use redb::{Database, TableDefinition};
 
-use crate::{config::Config, error::Error};
+use crate::config::Config;
 
-pub const TABLE: TableDefinition<String, String> = TableDefinition::new("user");
+pub const TABLE: TableDefinition<String, &[u8]> = TableDefinition::new("global");
 
-pub fn set_config(db: &Database, data: Config) -> Result<(), Error> {
-    let write_txn = db.begin_write()?;
-    {
-        let mut table = write_txn.open_table(TABLE)?;
+pub struct TableGlobal {}
 
-        table.insert("port".to_string(), &data.port)?;
-        table.insert("baudrate".to_string(), &data.baudrate.to_string())?;
+impl TableGlobal {
+    pub fn set_config(db: &Database, data: &Config) -> Result<()> {
+        let write_txn = db.begin_write()?;
+        {
+            let mut table = write_txn.open_table(TABLE)?;
+            let data = serde_json::to_vec(data)?;
+            table.insert("config".to_string(), data.as_slice())?;
+        }
+        write_txn.commit()?;
+
+        Ok(())
     }
-    write_txn.commit()?;
 
-    Ok(())
-}
-
-pub fn get_config(db: &Database) -> Result<Config, Error> {
-    let mut data = Config::default();
-
-    let read_txn = db.begin_read()?;
-    {
+    pub fn get_config(db: &Database) -> Result<Config> {
+        let read_txn = db.begin_read()?;
         let table = read_txn.open_table(TABLE)?;
 
-        data.port = table.get("port".to_string())?.unwrap().value();
-        data.baudrate = table
-            .get("baudrate".to_string())?
-            .unwrap()
-            .value()
-            .parse::<u32>()?
-            .into();
+        let query = table.get("config".to_string())?;
+        let data = match query {
+            Some(d) => {
+                let c: Config = serde_json::from_slice(d.value())?;
+                c
+            }
+            None => Config::default(),
+        };
+
+        Ok(data)
     }
 
-    Ok(data)
+    // pub fn get_config(db: &Database) -> Result<Config> {
+    //     get_global("config")
+    // }
 }

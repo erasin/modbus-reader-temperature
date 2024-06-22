@@ -7,10 +7,7 @@ use mb::protocol::get_ports;
 use crate::scenes::my_global::{get_global_config, set_global_config};
 use mb_data::{
     config::{Baudrate, Config},
-    db::{
-        config::{get_config, set_config},
-        get_db,
-    },
+    db::{config::TableGlobal, get_db},
 };
 
 #[derive(GodotClass)]
@@ -49,7 +46,7 @@ impl SettingView {
             None => return,
         };
 
-        self.config.port = sel;
+        self.config.voltage.serial_port.port = sel;
 
         return;
     }
@@ -61,7 +58,7 @@ impl SettingView {
             None => return,
         };
 
-        self.config.baudrate = sel;
+        self.config.voltage.serial_port.baudrate = sel;
 
         return;
     }
@@ -70,9 +67,9 @@ impl SettingView {
     fn on_submit(&mut self) {
         {
             let db = get_db().lock().unwrap();
-            let _ = set_config(&db, self.config.clone());
+            let _ = TableGlobal::set_config(&db, &self.config);
 
-            match get_config(&db) {
+            match TableGlobal::get_config(&db) {
                 Ok(conf) => {
                     godot_print!("--- config: {:?}", conf);
                     set_global_config(conf);
@@ -93,7 +90,10 @@ impl SettingView {
 
         for (index, port) in ports.iter().enumerate() {
             port_btn.add_item(port.to_godot());
-            if port.bytes().eq(self.config.port.bytes()) {
+            if port
+                .bytes()
+                .eq(self.config.voltage.serial_port.port.bytes())
+            {
                 port_btn.select(index as i32);
             }
         }
@@ -108,7 +108,7 @@ impl SettingView {
         for (index, &item) in Baudrate::ALL.iter().enumerate() {
             baudrate_btn.add_item(item.to_string().to_godot());
 
-            if item == self.config.baudrate {
+            if item == self.config.voltage.serial_port.baudrate {
                 baudrate_btn.select(index as i32);
             }
         }
