@@ -1,4 +1,7 @@
-use mb::protocol::{Function, FunctionCode};
+use mb::{
+    protocol::{Function, FunctionCode},
+    voltage::Voltage,
+};
 use rand::Rng;
 
 use crate::Mock;
@@ -14,15 +17,15 @@ impl VoltageMock {
 }
 
 impl From<&[u8]> for VoltageMock {
-    fn from(_value: &[u8]) -> Self {
-        VoltageMock::new(0x01)
+    fn from(value: &[u8]) -> Self {
+        VoltageMock::new(value[0])
     }
 }
 
 impl Mock for VoltageMock {
     fn request(&self) -> Function {
         // let request: [u8; 8] = [0x01, 0x04, 0x00, 0x00, 0x00, 0x1E, 0x70, 0x02];
-        let request = mb::voltage::request(self.slave);
+        let request = Voltage::request(self.slave);
         request
     }
 

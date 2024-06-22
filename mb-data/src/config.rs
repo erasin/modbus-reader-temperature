@@ -32,8 +32,8 @@ pub struct VoltageConfig {
     pub name: String,
     pub serial_port: SerialPortConfig,
     // 站
-    pub salve_a: Vec<u8>,
-    pub salve_b: Vec<u8>,
+    pub slave_a: Vec<u8>,
+    pub slave_b: Vec<u8>,
 
     // 验证
     pub verify: Verify,
@@ -45,7 +45,7 @@ pub struct VoltageConfig {
 pub struct TemperatureConfig {
     pub name: String,
     pub serial_port: SerialPortConfig,
-    pub salve: u8,
+    pub slave: u8,
 }
 
 // 继电器
@@ -53,7 +53,7 @@ pub struct TemperatureConfig {
 pub struct RelayConfig {
     pub name: String,
     pub serial_port: SerialPortConfig,
-    pub salve: u8,
+    pub slave: u8,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Serialize, Deserialize)]

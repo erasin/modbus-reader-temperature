@@ -1,26 +1,25 @@
 //! 继电器
-
+/// 1 2 奇偶校验
+/// 3-5 波特率
+/// 6-10 地址位 10 -> 6 二进制
+/// 继电器 0 ，参数二进制控制开关(8位) 0b00000000;
 use std::fmt::Display;
 
 use crate::{
     error::Error,
     protocol::{FunRequest, FunResponse, Function, FunctionCode},
     utils::current_timestamp,
-    Result,
 };
 
-/// 继电器
-/// 1 2 奇偶校验
-/// 3-5 波特率
-/// 6-10 地址位 10 -> 6 二进制
-/// 继电器 0 ，参数二进制控制开关(8位) 0b00000000;
-pub fn request(slave: u8, mode: &RelayMode) -> FunRequest {
-    let mode = mode.params(); //(0x06, 0, 0b00000000);
-    Function::new(slave, mode.0, mode.1.to_vec())
-}
+pub struct Relay;
 
-pub fn response(data: &FunResponse) -> Result<RelayData> {
-    RelayData::parse_u16(data.data())
+impl Relay {
+    /// 继电器
+    /// 继电器 0 ，参数二进制控制开关(8位) 0b00000000;
+    pub fn request(slave: u8, mode: &RelayMode) -> FunRequest {
+        let mode = mode.params(); //(0x06, 0, 0b00000000);
+        Function::new(slave, mode.0, mode.1.to_vec())
+    }
 }
 
 pub enum RelayMode {
@@ -58,17 +57,6 @@ pub struct RelayData {
 }
 
 impl RelayData {
-    fn parse_u16(data: Vec<u16>) -> Result<RelayData> {
-        let value = data.get(0).ok_or(Error::DataNull)?;
-
-        let dur = current_timestamp();
-        let temp = RelayData {
-            time: dur,
-            value: *value,
-        };
-        Ok(temp)
-    }
-
     pub fn get_state(&self, position: u8) -> bool {
         let position = position.clamp(0, 7);
 
@@ -84,6 +72,21 @@ impl RelayData {
         } else {
             value & !(1 << position)
         }
+    }
+}
+
+impl TryFrom<FunResponse> for RelayData {
+    type Error = Box<dyn std::error::Error + Send + Sync>;
+
+    fn try_from(value: FunResponse) -> std::result::Result<Self, Self::Error> {
+        let data = value.data();
+        let data = data.get(0).ok_or(Box::new(Error::DataNull))?;
+        let dur = current_timestamp();
+        let temp = RelayData {
+            time: dur,
+            value: *data,
+        };
+        Ok(temp)
     }
 }
 

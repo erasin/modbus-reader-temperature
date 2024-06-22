@@ -4,8 +4,8 @@
 
 use serde::{Deserialize, Serialize};
 
+use crate::error::Error;
 use crate::protocol::{FunRequest, FunResponse, Function, FunctionCode};
-use crate::Result;
 
 use crate::utils::current_timestamp;
 
@@ -17,25 +17,15 @@ use crate::utils::current_timestamp;
 ///
 /// ```
 ///
-pub fn request(slave: u8) -> FunRequest {
-    let mode = FunctionCode::ReadInputRegisters;
-    let params = vec![0x00, 0x1E];
-    Function::new(slave, mode, params)
-}
 
-pub fn response(response: &FunResponse) -> Result<VoltageData> {
-    let data = response.data();
+pub struct Voltage;
 
-    let chs: [f32; 30] = data
-        .iter()
-        .map(|&r| r as f32)
-        .collect::<Vec<f32>>()
-        .try_into()
-        .unwrap_or([0.0; 30]);
-
-    let data = VoltageData::from(chs);
-
-    Ok(data)
+impl Voltage {
+    pub fn request(slave: u8) -> FunRequest {
+        let mode = FunctionCode::ReadInputRegisters;
+        let params = vec![0x00, 0x1E];
+        Function::new(slave, mode, params)
+    }
 }
 
 /// 电压数据集合
@@ -52,6 +42,32 @@ impl VoltageData {
 
     pub fn set_time(&mut self, dur: u64) {
         self.time = dur;
+    }
+}
+
+impl TryFrom<FunResponse> for VoltageData {
+    type Error = Box<dyn std::error::Error + Send + Sync>;
+
+    fn try_from(data: FunResponse) -> std::result::Result<Self, Self::Error> {
+        let data = data.data();
+
+        if data.len() == 0 {
+            return Err(Box::new(Error::DataNull));
+        }
+
+        if data.len() < 30 {
+            return Err(Box::new(Error::DataLenError));
+        }
+
+        let chs: [f32; 30] = data
+            .iter()
+            .map(|&r| r as f32)
+            .collect::<Vec<f32>>()
+            .try_into()
+            .unwrap_or([0.0; 30]);
+
+        let data = VoltageData::from(chs);
+        Ok(data)
     }
 }
 
@@ -76,8 +92,8 @@ impl From<VoltageF32> for VoltageData {
             if chunk.len() == 2 {
                 let ch = VoltageChannel {
                     index: i as u32,
-                    voltage: chunk[0] / 1000.0,
-                    current: chunk[1],
+                    voltage: chunk[0] / 1000.0, // 电压 / 1000. 单位 V
+                    current: chunk[1],          // TODO 处理电流单位 mA ？
                 };
                 ch_list[i] = ch;
             }

@@ -1,8 +1,8 @@
 [gd_resource type="Theme" load_steps=2 format=3 uid="uid://4oh4ghhxi672"]
 
-[ext_resource type="FontFile" uid="uid://ciy3e3gn2vwbm" path="res://assets/HarmonyOS_Sans_SC_Regular.ttf" id="1_qjwg5"]
+[ext_resource type="FontFile" uid="uid://ciy3e3gn2vwbm" path="res://assets/HarmonyOS_Sans_SC_Regular.ttf" id="1_o0eq2"]
 
 [resource]
 resource_local_to_scene = true
-default_font = ExtResource("1_qjwg5")
+default_font = ExtResource("1_o0eq2")
 /colors/bg = Color(0.948096, 0.896045, 0.968596, 1)

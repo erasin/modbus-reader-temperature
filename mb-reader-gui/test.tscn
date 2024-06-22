@@ -1,6 +1,4 @@
-[gd_scene load_steps=2 format=3 uid="uid://dj31ieg4l82ul"]
-
-[ext_resource type="Theme" uid="uid://bjvr4wiwjbd51" path="res://assets/light_blue.tres" id="1_sjg1k"]
+[gd_scene format=3 uid="uid://dj31ieg4l82ul"]
 
 [node name="Test" type="Control"]
 layout_mode = 3
@@ -9,7 +7,6 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme = ExtResource("1_sjg1k")
 
 [node name="PanelContainer" type="PanelContainer" parent="."]
 layout_mode = 0

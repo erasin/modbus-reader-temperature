@@ -16,28 +16,27 @@ use crate::{
     error::Error,
     protocol::{FunRequest, FunResponse, Function, FunctionCode},
     utils::current_timestamp,
-    Result,
 };
 
-pub fn request(slave: u8, mode: &TempMode) -> FunRequest {
-    let mode = mode.params();
-    Function::new(slave, mode.0, mode.1.to_vec())
-}
+pub struct Temperature;
 
-pub fn response(data: &FunResponse) -> Result<Temperature> {
-    Temperature::parse_u16(data.data())
+impl Temperature {
+    pub fn request(slave: u8, mode: &TemperatureMode) -> FunRequest {
+        let mode = mode.params();
+        Function::new(slave, mode.0, mode.1.to_vec())
+    }
 }
 
 /// 命令请求类型
-pub enum TempMode {
+pub enum TemperatureMode {
     /// 温度1: 获取温度 * 0.1
     Temp1,
     /// 温度2: 获取温度 * 0.1
     Temp2,
     /// 设定温度1: 温度 * 10.0
-    S1(u16),
+    Set1(u16),
     /// 设定温度2: 温度 * 10.0
-    S2(u16),
+    Set2(u16),
     /// 运行状态: 0 停止 1 运行 2 暂停
     Run(u16),
     /// 按键1: 0 on 1 off
@@ -46,38 +45,44 @@ pub enum TempMode {
     KeyB(u16),
 }
 
-impl TempMode {
+impl TemperatureMode {
     /// 获取参数 (功能, 指令, 参数)
     pub fn params(&self) -> (FunctionCode, [u16; 2]) {
         match self {
-            TempMode::Temp1 => (FunctionCode::ReadHoldingRegisters, [10, 1]),
-            TempMode::Temp2 => (FunctionCode::ReadHoldingRegisters, [14, 1]),
-            TempMode::S1(n) => (FunctionCode::WriteSingleRegister, [60, *n]),
-            TempMode::S2(n) => (FunctionCode::WriteSingleRegister, [61, *n]),
-            TempMode::Run(n) if *n < 3 => (FunctionCode::WriteSingleRegister, [63, *n]), // 0 1 2
-            TempMode::KeyA(n) if *n < 2 => (FunctionCode::WriteSingleRegister, [46, *n]), // 0 1
-            TempMode::KeyB(n) if *n < 2 => (FunctionCode::WriteSingleRegister, [47, *n]), // 0 1
-            TempMode::Run(_) => (FunctionCode::WriteSingleRegister, [63, 0]),            // 0 1 2
-            TempMode::KeyA(_) => (FunctionCode::WriteSingleRegister, [46, 0]),           // 0 1
-            TempMode::KeyB(_) => (FunctionCode::WriteSingleRegister, [47, 0]),           // 0 1
+            TemperatureMode::Temp1 => (FunctionCode::ReadHoldingRegisters, [10, 1]),
+            TemperatureMode::Temp2 => (FunctionCode::ReadHoldingRegisters, [14, 1]),
+            TemperatureMode::Set1(n) => (FunctionCode::WriteSingleRegister, [60, *n]),
+            TemperatureMode::Set2(n) => (FunctionCode::WriteSingleRegister, [61, *n]),
+            TemperatureMode::Run(n) if *n < 3 => (FunctionCode::WriteSingleRegister, [63, *n]), // 0 1 2
+            TemperatureMode::KeyA(n) if *n < 2 => (FunctionCode::WriteSingleRegister, [46, *n]), // 0 1
+            TemperatureMode::KeyB(n) if *n < 2 => (FunctionCode::WriteSingleRegister, [47, *n]), // 0 1
+            TemperatureMode::Run(_) => (FunctionCode::WriteSingleRegister, [63, 0]), // 0 1 2
+            TemperatureMode::KeyA(_) => (FunctionCode::WriteSingleRegister, [46, 0]), // 0 1
+            TemperatureMode::KeyB(_) => (FunctionCode::WriteSingleRegister, [47, 0]), // 0 1
         }
     }
 }
 
 /// 温度
 #[derive(Debug, Copy, Clone, PartialEq, PartialOrd)]
-pub struct Temperature {
+pub struct TemperatureData {
     pub time: u64,
     pub value: f32,
 }
 
-impl Temperature {
-    fn parse_u16(data: Vec<u16>) -> Result<Temperature> {
-        let data: Vec<f32> = data.iter().map(|&r| r as f32 * 0.1).collect::<Vec<f32>>();
-        let value = data.get(0).ok_or(Error::DataNull)?;
+impl TryFrom<FunResponse> for TemperatureData {
+    type Error = Box<dyn std::error::Error + Send + Sync>;
+
+    fn try_from(value: FunResponse) -> std::result::Result<Self, Self::Error> {
+        let data: Vec<f32> = value
+            .data()
+            .iter()
+            .map(|&r| r as f32 * 0.1)
+            .collect::<Vec<f32>>();
+        let value = data.get(0).ok_or(Box::new(Error::DataNull))?;
 
         let dur = current_timestamp();
-        let temp = Temperature {
+        let temp = TemperatureData {
             time: dur,
             value: *value,
         };

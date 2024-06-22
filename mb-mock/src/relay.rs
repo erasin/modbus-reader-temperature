@@ -1,7 +1,7 @@
 use crate::Mock;
 use mb::{
     protocol::{FunRequest, FunResponse, Function, FunctionCode},
-    relay::{RelayData, RelayMode},
+    relay::{Relay, RelayData, RelayMode},
 };
 use rand::Rng;
 
@@ -34,14 +34,14 @@ impl From<&[u8]> for RelayMock {
 
 impl Mock for RelayMock {
     fn request(&self) -> FunRequest {
-        mb::relay::request(self.slave, &self.mode)
+        Relay::request(self.slave, &self.mode)
     }
 
     fn response(&self) -> FunResponse {
         let mode = self.mode.params();
         let response = match self.mode {
             RelayMode::Read => Function::new(self.slave, mode.0, generate_relay()),
-            _ => mb::relay::request(self.slave, &self.mode),
+            _ => Relay::request(self.slave, &self.mode),
         };
         response
     }

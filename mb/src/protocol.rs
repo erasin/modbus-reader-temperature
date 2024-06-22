@@ -1,10 +1,11 @@
 //! modbus 协议相关实现
 
 use core::fmt;
+use serialport::{SerialPort, SerialPortType};
 use std::{fmt::Display, thread, time::Duration};
 
-use crate::{error::Error, Result};
-use serialport::{SerialPort, SerialPortType};
+use crate::error::Error;
+use crate::Result;
 
 #[derive(Debug, Clone)]
 pub struct Builder {

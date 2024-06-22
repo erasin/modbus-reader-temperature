@@ -1,6 +1,13 @@
 #![allow(dead_code)]
 
-use mb::{protocol::Builder, relay::RelayMode, temperature::TempMode, utils::print_hex, Result};
+use mb::{
+    protocol::Builder,
+    relay::{Relay, RelayData, RelayMode},
+    temperature::{TemperatureData, TemperatureMode},
+    utils::print_hex,
+    voltage::{Voltage, VoltageData},
+    Result,
+};
 use mb_mock::{relay::RelayMock, temperature::TempMock, Mock};
 
 fn main() -> Result<()> {
@@ -9,18 +16,17 @@ fn main() -> Result<()> {
 
     let builder = Builder::new(port_name, baudrate);
 
-    // slave 1
-    run_voltage(&builder)?;
-    run_temp(&builder)?;
-    run_relay(&builder)?;
+    run_temp(&builder, 1)?;
+    run_relay(&builder, 2)?;
+    run_voltage(&builder, 0x03)?;
 
     Ok(())
 }
 
 /// 电压电流
-fn run_voltage(builder: &Builder) -> Result<()> {
+fn run_voltage(builder: &Builder, slave: u8) -> Result<()> {
     println!("\n----\nstart votage: \n");
-    let request = mb::voltage::request(0x01);
+    let request = Voltage::request(slave);
     print_hex("request", &request.request_data());
 
     let response = builder.call(&request)?;
@@ -31,16 +37,16 @@ fn run_voltage(builder: &Builder) -> Result<()> {
         return Ok(());
     }
 
-    let data = mb::voltage::response(&response)?;
+    let data: VoltageData = response.try_into()?;
     println!("解析结果:\n{:?}", data);
 
     Ok(())
 }
 
 /// 温度
-fn run_temp(builder: &Builder) -> Result<()> {
+fn run_temp(builder: &Builder, slave: u8) -> Result<()> {
     println!("\n----\nstart temp: \n");
-    let mock = TempMock::new(0x02, TempMode::Temp1);
+    let mock = TempMock::new(slave, TemperatureMode::Temp1);
 
     let request = mock.request();
     print_hex("request", &request.request_data());
@@ -53,16 +59,16 @@ fn run_temp(builder: &Builder) -> Result<()> {
         return Ok(());
     }
 
-    let data = mb::temperature::response(&response)?;
+    let data: TemperatureData = response.try_into()?;
     println!("解析结果:\n{:?}", data);
 
     Ok(())
 }
 
-fn run_relay(builder: &Builder) -> Result<()> {
+fn run_relay(builder: &Builder, slave: u8) -> Result<()> {
     println!("\n----\nstart relay: \n");
     // let mock = RelayMock::new(0x03, RelayMode::Read);
-    let mock = RelayMock::new(0x03, RelayMode::ONOFF(2));
+    let mock = RelayMock::new(slave, RelayMode::ONOFF(2));
 
     let request = mock.request();
     print_hex("request", &request.request_data());
@@ -75,7 +81,7 @@ fn run_relay(builder: &Builder) -> Result<()> {
         return Ok(());
     }
 
-    let data = mb::relay::response(&response)?;
+    let data: RelayData = response.try_into()?;
     println!("解析结果:\n{}", data);
 
     Ok(())

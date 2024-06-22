@@ -1,26 +1,29 @@
 use crate::Mock;
-use mb::{protocol::Function, temperature::TempMode};
+use mb::{
+    protocol::Function,
+    temperature::{Temperature, TemperatureMode},
+};
 
 pub struct TempMock {
     slave: u8,
-    mode: TempMode,
+    mode: TemperatureMode,
 }
 
 impl TempMock {
-    pub fn new(slave: u8, mode: TempMode) -> Self {
+    pub fn new(slave: u8, mode: TemperatureMode) -> Self {
         TempMock { slave, mode }
     }
 }
 
 impl From<&[u8]> for TempMock {
-    fn from(_value: &[u8]) -> Self {
-        TempMock::new(0x02, TempMode::Temp1)
+    fn from(value: &[u8]) -> Self {
+        TempMock::new(value[0], TemperatureMode::Temp1)
     }
 }
 
 impl Mock for TempMock {
     fn request(&self) -> Function {
-        mb::temperature::request(self.slave, &self.mode)
+        Temperature::request(self.slave, &self.mode)
     }
 
     fn response(&self) -> Function {
