@@ -21,6 +21,15 @@ impl AB {
     }
 }
 
+impl From<mb_data::task::AB> for AB {
+    fn from(value: mb_data::task::AB) -> Self {
+        match value {
+            mb_data::task::AB::A => Self::A,
+            mb_data::task::AB::B => Self::B,
+        }
+    }
+}
+
 /// 使用新的 特性实现 to_godot
 pub trait ToGodotVia {
     type Via;

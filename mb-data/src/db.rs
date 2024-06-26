@@ -4,6 +4,7 @@ use mb::Result;
 use redb::{Database, TableDefinition};
 
 pub mod config;
+pub mod user;
 pub mod voltage;
 
 use crate::dirs::data_dir;

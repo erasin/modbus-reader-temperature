@@ -50,3 +50,11 @@ pub enum Error {
     #[error("配置失败")]
     Fail,
 }
+
+use mb::Result;
+
+impl<T> Into<Result<T>> for Error {
+    fn into(self) -> Result<T> {
+        Err(Box::new(self))
+    }
+}

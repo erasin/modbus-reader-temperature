@@ -1,7 +1,7 @@
 [gd_scene load_steps=4 format=3 uid="uid://1g11avvt8a46"]
 
 [ext_resource type="PackedScene" uid="uid://ciewnonjuycx6" path="res://voltage/voltage.tscn" id="1_6pq7q"]
-[ext_resource type="Theme" uid="uid://bjvr4wiwjbd51" path="res://assets/light_blue.tres" id="1_ebrij"]
+[ext_resource type="Theme" uid="uid://bqplrcrrq65aj" path="res://assets/light.tres" id="1_ml6vt"]
 [ext_resource type="StyleBox" uid="uid://bhtstjj7isp2b" path="res://assets/pane.tres" id="2_qfy1n"]
 
 [node name="Main" type="MainView"]
@@ -10,7 +10,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme = ExtResource("1_ebrij")
+theme = ExtResource("1_ml6vt")
 
 [node name="PanelContainer" type="MarginContainer" parent="."]
 layout_mode = 2

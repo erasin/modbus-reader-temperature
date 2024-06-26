@@ -115,7 +115,7 @@ impl VoltageView {
 
         let mut timer = self.base().get_node_as::<Timer>("%ReqTimer");
 
-        let data = match get_voltage_data(&config) {
+        let data = match get_voltage_data(&config.voltage) {
             Ok(i) => i,
             Err(e) => {
                 timer.stop();
@@ -128,7 +128,7 @@ impl VoltageView {
             }
         };
 
-        self.data = Some(data);
+        self.data = Some(data.clone());
 
         // godot_print!(" Write failed {:?}", data);
 

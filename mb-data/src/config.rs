@@ -6,6 +6,8 @@ pub struct Config {
     pub voltage: VoltageConfig,
     pub temperature: TemperatureConfig,
     pub relay: RelayConfig,
+    pub use_a: bool,
+    pub use_b: bool,
 }
 
 // 端口

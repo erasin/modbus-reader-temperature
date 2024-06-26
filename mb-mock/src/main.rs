@@ -25,6 +25,7 @@ fn main() -> std::io::Result<()> {
                 let mock: Box<dyn Mock> = match &buffer[0] {
                     0x01 => Box::new(TempMock::from(buffer)),
                     0x02 => Box::new(RelayMock::from(buffer)),
+
                     0x03 => Box::new(VoltageMock::from(buffer)),
                     0x04 => Box::new(VoltageMock::from(buffer)),
                     0x05 => Box::new(VoltageMock::from(buffer)),

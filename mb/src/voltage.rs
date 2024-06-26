@@ -29,14 +29,14 @@ impl Voltage {
 }
 
 /// 电压数据集合
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct VoltageData {
     pub time: u64,
-    pub data: [VoltageChannel; 15],
+    pub data: Vec<VoltageChannel>,
 }
 
 impl VoltageData {
-    pub fn new(dur: u64, data: [VoltageChannel; 15]) -> Self {
+    pub fn new(dur: u64, data: Vec<VoltageChannel>) -> Self {
         Self { time: dur, data }
     }
 
@@ -72,7 +72,7 @@ impl TryFrom<FunResponse> for VoltageData {
 }
 
 /// 电压电流
-#[derive(Debug, Clone, Copy, Default)]
+#[derive(Debug, Clone, Copy, Default, Serialize, Deserialize)]
 pub struct VoltageChannel {
     pub index: u32,
     pub voltage: f32,
@@ -86,6 +86,7 @@ impl From<VoltageF32> for VoltageData {
     fn from(value: VoltageF32) -> Self {
         let dur = current_timestamp();
 
+        // TODO vec ?
         let mut ch_list: [VoltageChannel; 15] = [VoltageChannel::default(); 15];
 
         for (i, chunk) in value.chunks(2).enumerate() {
@@ -99,7 +100,7 @@ impl From<VoltageF32> for VoltageData {
             }
         }
 
-        VoltageData::new(dur, ch_list)
+        VoltageData::new(dur, ch_list.to_vec())
     }
 }
 

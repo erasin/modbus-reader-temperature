@@ -16,8 +16,8 @@ fn main() -> Result<()> {
 
     let builder = Builder::new(port_name, baudrate);
 
-    run_temp(&builder, 1)?;
-    run_relay(&builder, 2)?;
+    run_temp(&builder, 0x01)?;
+    run_relay(&builder, 0x02)?;
     run_voltage(&builder, 0x03)?;
 
     Ok(())

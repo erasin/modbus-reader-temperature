@@ -24,6 +24,7 @@ size_flags_horizontal = 3
 
 [node name="标签显示" type="PanelContainer" parent="HboxContainer/VBoxContainer"]
 layout_mode = 2
+theme_override_styles/panel = ExtResource("1_vnvb2")
 
 [node name="Tags" type="HBoxContainer" parent="HboxContainer/VBoxContainer/标签显示"]
 unique_name_in_owner = true
@@ -48,13 +49,13 @@ columns = 10
 [node name="功能区" type="PanelContainer" parent="HboxContainer"]
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
-theme_override_styles/panel = ExtResource("1_vnvb2")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="HboxContainer/功能区"]
 layout_mode = 2
 
 [node name="按钮" type="PanelContainer" parent="HboxContainer/功能区/VBoxContainer"]
 layout_mode = 2
+theme_override_styles/panel = ExtResource("1_vnvb2")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="HboxContainer/功能区/VBoxContainer/按钮"]
 layout_mode = 2
@@ -76,6 +77,7 @@ text = "电源开启"
 
 [node name="时间" type="PanelContainer" parent="HboxContainer/功能区/VBoxContainer"]
 layout_mode = 2
+theme_override_styles/panel = ExtResource("1_vnvb2")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="HboxContainer/功能区/VBoxContainer/时间"]
 layout_mode = 2
@@ -181,6 +183,7 @@ size_flags_vertical = 3
 
 [node name="状态" type="PanelContainer" parent="HboxContainer/功能区/VBoxContainer"]
 layout_mode = 2
+theme_override_styles/panel = ExtResource("1_vnvb2")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="HboxContainer/功能区/VBoxContainer/状态"]
 layout_mode = 2
