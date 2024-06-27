@@ -4,6 +4,7 @@ use godot::{
     prelude::*,
 };
 use mb::voltage::VoltageChannel;
+use strum::AsRefStr;
 
 use crate::colors::ColorPlate;
 
@@ -48,10 +49,18 @@ impl VoltageChannelView {
     }
 
     pub fn update_ui(&mut self) {
-        let mut index_label = self.base().get_node_as::<Label>("%index");
-        let mut voltage_label = self.base().get_node_as::<Label>("%voltage");
-        let mut current_label = self.base().get_node_as::<Label>("%current");
-        let mut state = self.base().get_node_as::<Control>("%state");
+        let mut index_label = self
+            .base()
+            .get_node_as::<Label>(UniqueName::Index.to_string());
+        let mut voltage_label = self
+            .base()
+            .get_node_as::<Label>(UniqueName::Voltage.to_string());
+        let mut current_label = self
+            .base()
+            .get_node_as::<Label>(UniqueName::Current.to_string());
+        let mut state = self
+            .base()
+            .get_node_as::<Control>(UniqueName::State.to_string());
 
         // let data = self.data.to_godot();
         // index_label.set_text(data.at("index").to());
@@ -63,5 +72,19 @@ impl VoltageChannelView {
         current_label.set_text(format!("{:2} mA", self.data.current).into());
 
         state.set_modulate(self.color);
+    }
+}
+
+#[derive(AsRefStr, Debug)]
+enum UniqueName {
+    Index,
+    Voltage,
+    Current,
+    State,
+}
+
+impl std::fmt::Display for UniqueName {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "%{}", self.as_ref())
     }
 }

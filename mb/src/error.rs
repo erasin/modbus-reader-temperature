@@ -12,3 +12,9 @@ pub enum Error {
     #[error("数据为空")]
     DataNull,
 }
+
+impl<T> Into<crate::Result<T>> for Error {
+    fn into(self) -> crate::Result<T> {
+        Err(Box::new(self))
+    }
+}

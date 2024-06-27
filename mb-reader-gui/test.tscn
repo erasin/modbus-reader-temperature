@@ -45,6 +45,7 @@ layout_mode = 2
 size_flags_vertical = 3
 
 [node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/HSplitContainer/VBoxContainer/Panel"]
+layout_mode = 0
 
 [node name="Label" type="Label" parent="PanelContainer/HSplitContainer/VBoxContainer/Panel/HBoxContainer"]
 layout_mode = 2
@@ -82,3 +83,22 @@ item_2/text = "3"
 layout_mode = 0
 offset_right = 40.0
 offset_bottom = 19.0
+
+[node name="TabBar" type="TabBar" parent="PanelContainer/HSplitContainer/VBoxContainer/Panel"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Panel2" type="PanelContainer" parent="PanelContainer/HSplitContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="TabContainer" type="TabContainer" parent="PanelContainer/HSplitContainer/VBoxContainer/Panel2"]
+custom_minimum_size = Vector2(500, 500)
+layout_mode = 2
+
+[node name="Panel" type="Panel" parent="PanelContainer/HSplitContainer/VBoxContainer/Panel2/TabContainer"]
+layout_mode = 2
+
+[node name="Panel2" type="Panel" parent="PanelContainer/HSplitContainer/VBoxContainer/Panel2/TabContainer"]
+visible = false
+layout_mode = 2

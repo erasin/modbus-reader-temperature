@@ -3,8 +3,6 @@
 /// 3-5 波特率
 /// 6-10 地址位 10 -> 6 二进制
 /// 继电器 0 ，参数二进制控制开关(8位) 0b00000000;
-use std::fmt::Display;
-
 use crate::{
     error::Error,
     protocol::{FunRequest, FunResponse, Function, FunctionCode},
@@ -90,7 +88,7 @@ impl TryFrom<FunResponse> for RelayData {
     }
 }
 
-impl Display for RelayData {
+impl std::fmt::Display for RelayData {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "time:{}\nvalue: {:08b}", self.time, self.value)
     }

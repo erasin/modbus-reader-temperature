@@ -32,6 +32,12 @@ pub enum AB {
     B,
 }
 
+impl AB {
+    pub fn all() -> [AB; 2] {
+        [AB::A, AB::B]
+    }
+}
+
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct AccConfig {
     pub mode: AccMode,

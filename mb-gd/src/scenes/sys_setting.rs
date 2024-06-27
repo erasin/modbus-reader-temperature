@@ -21,8 +21,8 @@ impl IWindow for SysSettingWindowView {
         win.connect("close_requested".into(), on_close);
 
         win.set_title("系统设置".into());
-        win.set_size(Vector2i::new(600, 600));
-        win.set_initial_position(WindowInitialPosition::CENTER_PRIMARY_SCREEN);
+        // win.set_size(Vector2i::new(600, 600));
+        // win.set_initial_position(WindowInitialPosition::CENTER_PRIMARY_SCREEN);
         win.set_visible(true);
     }
 }
@@ -41,8 +41,10 @@ impl SysSettingWindowView {
         let screen = DisplayServer::singleton();
         let screen_size = screen.screen_get_size();
         let win_size = self.base().get_size();
-        let position = (screen_size - win_size) / 3 + win_size;
-
+        let position = (screen_size - win_size) / 2 + win_size;
         self.base_mut().set_position(position);
+
+        self.base_mut()
+            .set_initial_position(WindowInitialPosition::CENTER_PRIMARY_SCREEN);
     }
 }

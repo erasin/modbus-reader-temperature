@@ -1,0 +1,7 @@
+[gd_resource type="StyleBoxFlat" format=3 uid="uid://cxwvlet43ndso"]
+
+[resource]
+content_margin_left = 8.0
+draw_center = false
+border_width_bottom = 4
+border_color = Color(0.225615, 0.396891, 0.825383, 1)

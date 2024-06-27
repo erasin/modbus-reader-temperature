@@ -51,10 +51,8 @@ pub enum Error {
     Fail,
 }
 
-use mb::Result;
-
-impl<T> Into<Result<T>> for Error {
-    fn into(self) -> Result<T> {
+impl<T> Into<mb::Result<T>> for Error {
+    fn into(self) -> mb::Result<T> {
         Err(Box::new(self))
     }
 }

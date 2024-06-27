@@ -1,7 +1,15 @@
-[gd_scene load_steps=3 format=3 uid="uid://ciewnonjuycx6"]
+[gd_scene load_steps=7 format=3 uid="uid://ciewnonjuycx6"]
 
 [ext_resource type="StyleBox" uid="uid://bhtstjj7isp2b" path="res://assets/pane.tres" id="1_vnvb2"]
 [ext_resource type="Texture2D" uid="uid://c4j0cr737oyw" path="res://assets/ball.png" id="2_gtrl5"]
+[ext_resource type="Script" path="res://voltage/chart.gd" id="2_syu0v"]
+[ext_resource type="PackedScene" uid="uid://dlwq4kmdb3bhs" path="res://addons/easy_charts/control_charts/chart.tscn" id="3_abnxj"]
+[ext_resource type="FontFile" uid="uid://ciy3e3gn2vwbm" path="res://assets/HarmonyOS_Sans_SC_Regular.ttf" id="4_y82ud"]
+
+[sub_resource type="Theme" id="Theme_lqox3"]
+resource_local_to_scene = true
+default_font = ExtResource("4_y82ud")
+/colors/bg = Color(0.948096, 0.896045, 0.968596, 1)
 
 [node name="Voltage" type="VoltageView"]
 anchors_preset = 15
@@ -30,21 +38,31 @@ theme_override_styles/panel = ExtResource("1_vnvb2")
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="MarginContainer" type="MarginContainer" parent="HboxContainer/VBoxContainer"]
+[node name="状态" type="MarginContainer" parent="HboxContainer/VBoxContainer"]
 layout_mode = 2
+size_flags_vertical = 3
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_top = 20
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 20
 
-[node name="VBoxContainer" type="VBoxContainer" parent="HboxContainer/VBoxContainer/MarginContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="HboxContainer/VBoxContainer/状态"]
 layout_mode = 2
 
-[node name="Container" type="GridContainer" parent="HboxContainer/VBoxContainer/MarginContainer/VBoxContainer"]
+[node name="Container" type="GridContainer" parent="HboxContainer/VBoxContainer/状态/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 2
 columns = 10
+
+[node name="图表" type="PanelContainer" parent="HboxContainer/VBoxContainer"]
+layout_mode = 2
+script = ExtResource("2_syu0v")
+
+[node name="Chart" parent="HboxContainer/VBoxContainer/图表" instance=ExtResource("3_abnxj")]
+custom_minimum_size = Vector2(0, 300)
+layout_mode = 2
+theme = SubResource("Theme_lqox3")
 
 [node name="功能区" type="PanelContainer" parent="HboxContainer"]
 custom_minimum_size = Vector2(200, 0)
@@ -228,6 +246,7 @@ layout_mode = 2
 text = "故障:"
 
 [node name="StateError" type="TextureRect" parent="HboxContainer/功能区/VBoxContainer/状态/VBoxContainer/HBoxContainer3"]
+unique_name_in_owner = true
 layout_mode = 2
 texture = ExtResource("2_gtrl5")
 expand_mode = 2
@@ -242,6 +261,7 @@ layout_mode = 2
 text = "老化完成:"
 
 [node name="StateAgeing" type="TextureRect" parent="HboxContainer/功能区/VBoxContainer/状态/VBoxContainer/HBoxContainer4"]
+unique_name_in_owner = true
 layout_mode = 2
 texture = ExtResource("2_gtrl5")
 expand_mode = 2
@@ -256,6 +276,7 @@ layout_mode = 2
 text = "Acc电源:"
 
 [node name="StateAcc" type="TextureRect" parent="HboxContainer/功能区/VBoxContainer/状态/VBoxContainer/HBoxContainer5"]
+unique_name_in_owner = true
 layout_mode = 2
 texture = ExtResource("2_gtrl5")
 expand_mode = 2

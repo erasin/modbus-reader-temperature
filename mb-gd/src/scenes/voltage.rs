@@ -6,6 +6,7 @@ use godot::{
 };
 use mb::voltage::{get_mb_state, VoltageData, VoltageState};
 use state_tag::VoltageStateTagView;
+use strum::{AsRefStr, IntoEnumIterator};
 
 use crate::{
     colors::Style, data::AB, mb_sync::get_voltage_data, scenes::my_global::get_global_config,
@@ -42,11 +43,13 @@ impl IPanelContainer for VoltageView {
         self.channel_scene = load("res://voltage/channel.tscn");
         self.tag_scene = load("res://voltage/state_tag.tscn");
 
-        let mut label_ab_name = self.base().get_node_as::<Label>("%AbName");
+        let mut label_ab_name = self
+            .base()
+            .get_node_as::<Label>(UniqueName::AbName.to_string());
 
         match self.ab {
-            AB::A => label_ab_name.set_text("A面".into()),
-            AB::B => label_ab_name.set_text("B面".into()),
+            AB::Apanel => label_ab_name.set_text("A面".into()),
+            AB::Bpanel => label_ab_name.set_text("B面".into()),
         };
 
         let mut req_timer = self.base().get_node_as::<Timer>("ReqTimer");
@@ -57,8 +60,10 @@ impl IPanelContainer for VoltageView {
         );
 
         // 标签显示
-        let mut tags_container = self.base_mut().get_node_as::<Control>("%Tags");
-        for s in VoltageState::vec() {
+        let mut tags_container = self
+            .base_mut()
+            .get_node_as::<Control>(UniqueName::Tags.to_string());
+        for s in VoltageState::iter() {
             let mut tag_scene = self.tag_scene.instantiate_as::<VoltageStateTagView>();
             tags_container.add_child(tag_scene.clone().upcast());
 
@@ -69,7 +74,9 @@ impl IPanelContainer for VoltageView {
         }
 
         // 开启
-        let mut start_btn = self.base().get_node_as::<Button>("%StartToggle");
+        let mut start_btn = self
+            .base()
+            .get_node_as::<Button>(UniqueName::StartToggle.to_string());
         start_btn.connect(
             "pressed".into(),
             self.base().callable("on_start_toggle_sync"),
@@ -90,9 +97,13 @@ impl VoltageView {
     #[func]
     fn on_start_toggle_sync(&mut self) {
         godot_print!("--- start pull");
-        let mut start_btn = self.base().get_node_as::<Button>("%StartToggle");
+        let mut start_btn = self
+            .base()
+            .get_node_as::<Button>(UniqueName::StartToggle.to_string());
 
-        let mut timer = self.base().get_node_as::<Timer>("%ReqTimer");
+        let mut timer = self
+            .base()
+            .get_node_as::<Timer>(UniqueName::ReqTimer.to_string());
         if timer.is_stopped() {
             timer.start();
             start_btn.set_text("停止".into());
@@ -109,18 +120,22 @@ impl VoltageView {
 
         //TODO 根据 AB 区 获取参数
         let _config = match self.ab {
-            AB::A => {}
-            AB::B => {}
+            AB::Apanel => {}
+            AB::Bpanel => {}
         };
 
-        let mut timer = self.base().get_node_as::<Timer>("%ReqTimer");
+        let mut timer = self
+            .base()
+            .get_node_as::<Timer>(UniqueName::ReqTimer.to_string());
 
         let data = match get_voltage_data(&config.voltage) {
             Ok(i) => i,
             Err(e) => {
                 timer.stop();
 
-                let mut start_btn = self.base().get_node_as::<Button>("%StartToggle");
+                let mut start_btn = self
+                    .base()
+                    .get_node_as::<Button>(UniqueName::StartToggle.to_string());
                 start_btn.set_text("开始".into());
 
                 godot_print!(" Write failed {:?}: {:?}", config.voltage, e);
@@ -132,7 +147,9 @@ impl VoltageView {
 
         // godot_print!(" Write failed {:?}", data);
 
-        let mut content = self.base_mut().get_node_as::<Control>("%Container");
+        let mut content = self
+            .base_mut()
+            .get_node_as::<Control>(UniqueName::Container.to_string());
         let has = content.get_child_count() == 15;
 
         for (i, data) in data.data.iter().enumerate() {
@@ -160,5 +177,37 @@ impl VoltageView {
         }
 
         self.base_mut().emit_signal("mb_read_over".into(), &[]);
+    }
+}
+
+#[derive(AsRefStr, Debug)]
+enum UniqueName {
+    Tags,
+    ReqTimer,
+    Container,
+    StartToggle,
+    AgeingToggle,
+    VccToggle,
+
+    ProName,
+    StartTime,
+    CountDownTime,
+    AgeingTime,
+    AccState,
+    CountNum,
+    CountGood,
+    CountDefective,
+
+    AbName,
+    StateRun,
+    StateError,
+    StateAgeing,
+    StateAcc,
+}
+
+// godot 唯一
+impl std::fmt::Display for UniqueName {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "%{}", self.as_ref())
     }
 }

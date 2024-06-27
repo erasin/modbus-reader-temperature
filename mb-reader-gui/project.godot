@@ -25,6 +25,10 @@ window/subwindows/embed_subwindows=false
 window/vsync/vsync_mode=0
 window/ios/allow_high_refresh_rate=false
 
+[editor_plugins]
+
+enabled=PackedStringArray()
+
 [filesystem]
 
 import/blender/enabled=false

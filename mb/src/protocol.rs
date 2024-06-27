@@ -2,7 +2,7 @@
 
 use core::fmt;
 use serialport::{SerialPort, SerialPortType};
-use std::{fmt::Display, thread, time::Duration};
+use std::{thread, time::Duration};
 
 use crate::error::Error;
 use crate::Result;
@@ -293,8 +293,8 @@ impl FunctionCode {
     }
 }
 
-impl Display for FunctionCode {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+impl std::fmt::Display for FunctionCode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> fmt::Result {
         self.value().fmt(f)
     }
 }

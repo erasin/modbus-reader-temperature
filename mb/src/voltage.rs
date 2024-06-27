@@ -3,6 +3,7 @@
 //! b 115200
 
 use serde::{Deserialize, Serialize};
+use strum::{EnumIter, VariantArray};
 
 use crate::error::Error;
 use crate::protocol::{FunRequest, FunResponse, Function, FunctionCode};
@@ -120,7 +121,7 @@ impl Into<VoltageF32> for VoltageData {
     }
 }
 
-#[derive(Debug, Clone, Default, PartialEq, Eq)]
+#[derive(Debug, Clone, Default, PartialEq, Eq, EnumIter, VariantArray)]
 pub enum VoltageState {
     #[default]
     NoConnected,
@@ -133,20 +134,20 @@ pub enum VoltageState {
     NoOutput,
 }
 
-impl VoltageState {
-    pub fn vec() -> [VoltageState; 8] {
-        [
-            VoltageState::NoConnected,
-            VoltageState::Vacancy,
-            VoltageState::Qualified,
-            VoltageState::UnderVoltage,
-            VoltageState::OverVoltage,
-            VoltageState::UnderCurrent,
-            VoltageState::OverCurrent,
-            VoltageState::NoOutput,
-        ]
-    }
-}
+// impl VoltageState {
+//     pub fn vec() -> [VoltageState; 8] {
+//         [
+//             VoltageState::NoConnected,
+//             VoltageState::Vacancy,
+//             VoltageState::Qualified,
+//             VoltageState::UnderVoltage,
+//             VoltageState::OverVoltage,
+//             VoltageState::UnderCurrent,
+//             VoltageState::OverCurrent,
+//             VoltageState::NoOutput,
+//         ]
+//     }
+// }
 
 impl std::fmt::Display for VoltageState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {

@@ -7,6 +7,7 @@ use godot::{
     prelude::*,
 };
 use mb_data::dirs;
+use strum::AsRefStr;
 
 use super::sys_setting::SysSettingWindowView;
 
@@ -24,13 +25,19 @@ impl IPanelContainer for MainView {
         self.sys_setting_scene = load("res://sys/setting_win.tscn");
         self.file_dialog = load("res://sys/file_dialog.tscn");
 
-        let mut sys_btn = self.base().get_node_as::<Button>("%SystemSetBtn");
+        let mut sys_btn = self
+            .base()
+            .get_node_as::<Button>(UniqueName::SystemSetBtn.to_string());
         sys_btn.connect("pressed".into(), self.base().callable("on_sys_open"));
 
-        let mut open_btn = self.base().get_node_as::<Button>("%Open");
+        let mut open_btn = self
+            .base()
+            .get_node_as::<Button>(UniqueName::Open.to_string());
         open_btn.connect("pressed".into(), self.base().callable("open_xls"));
 
-        let mut save_btn = self.base().get_node_as::<Button>("%Save");
+        let mut save_btn = self
+            .base()
+            .get_node_as::<Button>(UniqueName::Save.to_string());
         save_btn.connect("pressed".into(), self.base().callable("save_xls"));
     }
 }
@@ -45,11 +52,11 @@ impl MainView {
         let mut root = self.base().get_tree().unwrap().get_root().unwrap();
 
         // 加载新窗口
-        let mut win_scene = self
+        let win_scene = self
             .sys_setting_scene
             .instantiate_as::<SysSettingWindowView>();
 
-        win_scene.bind_mut().to_center();
+        // win_scene.bind_mut().to_center();
 
         root.add_child(win_scene.upcast());
     }
@@ -121,5 +128,18 @@ impl MainView {
     #[func]
     fn on_save_file(&mut self, file_name: GString) {
         godot_print!("--file--{}", file_name);
+    }
+}
+
+#[derive(AsRefStr, Debug)]
+enum UniqueName {
+    SystemSetBtn,
+    Open,
+    Save,
+}
+
+impl std::fmt::Display for UniqueName {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "%{}", self.as_ref())
     }
 }

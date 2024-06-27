@@ -12,8 +12,9 @@ layout_mode = 2
 
 [node name="box" type="VBoxContainer" parent="MarginContainer"]
 layout_mode = 2
+alignment = 1
 
-[node name="index" type="Label" parent="MarginContainer/box"]
+[node name="Index" type="Label" parent="MarginContainer/box"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 8
@@ -22,23 +23,25 @@ text = "1"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="voltage" type="Label" parent="MarginContainer/box"]
+[node name="Voltage" type="Label" parent="MarginContainer/box"]
 unique_name_in_owner = true
+visible = false
 layout_mode = 2
 size_flags_horizontal = 8
 size_flags_vertical = 1
 text = "电压"
 horizontal_alignment = 2
 
-[node name="current" type="Label" parent="MarginContainer/box"]
+[node name="Current" type="Label" parent="MarginContainer/box"]
 unique_name_in_owner = true
+visible = false
 layout_mode = 2
 size_flags_horizontal = 8
 size_flags_vertical = 1
 text = "电流"
 horizontal_alignment = 2
 
-[node name="state" type="TextureRect" parent="MarginContainer/box"]
+[node name="State" type="TextureRect" parent="MarginContainer/box"]
 unique_name_in_owner = true
 modulate = Color(0.803922, 0.988235, 0.545098, 1)
 custom_minimum_size = Vector2(32, 32)

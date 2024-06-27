@@ -7,25 +7,25 @@ use mb::voltage::VoltageChannel;
 #[godot(via = GString)]
 pub enum AB {
     #[default]
-    A,
-    B,
+    Apanel,
+    Bpanel,
 }
 
 impl AB {
     pub fn is_a(&self) -> bool {
-        *self == AB::A
+        *self == AB::Apanel
     }
 
     pub fn is_b(&self) -> bool {
-        *self == AB::B
+        *self == AB::Bpanel
     }
 }
 
 impl From<mb_data::task::AB> for AB {
     fn from(value: mb_data::task::AB) -> Self {
         match value {
-            mb_data::task::AB::A => Self::A,
-            mb_data::task::AB::B => Self::B,
+            mb_data::task::AB::A => Self::Apanel,
+            mb_data::task::AB::B => Self::Bpanel,
         }
     }
 }
