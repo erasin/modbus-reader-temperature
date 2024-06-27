@@ -1,6 +1,6 @@
 use channel::VoltageChannelView;
 use godot::{
-    engine::{Button, Control, IPanelContainer, Label, PanelContainer, Timer},
+    engine::{Button, Control, IPanelContainer, Label, PanelContainer, Range, Timer},
     obj::WithBaseField,
     prelude::*,
 };
@@ -9,7 +9,11 @@ use state_tag::VoltageStateTagView;
 use strum::{AsRefStr, IntoEnumIterator};
 
 use crate::{
-    colors::Style, data::AB, mb_sync::get_voltage_data, scenes::my_global::get_global_config,
+    chart::ChartView,
+    colors::{self, ColorPlate, Style},
+    data::AB,
+    mb_sync::get_voltage_data,
+    scenes::my_global::get_global_config,
 };
 
 pub mod channel;
@@ -81,6 +85,34 @@ impl IPanelContainer for VoltageView {
             "pressed".into(),
             self.base().callable("on_start_toggle_sync"),
         );
+
+        let mut chart = self
+            .base()
+            .get_node_as::<ChartView>(UniqueName::Chart.to_string());
+
+        {
+            let mut chart = chart.bind_mut();
+
+            let points = [
+                Vector2::new(0., 10.),
+                Vector2::new(10., 110.),
+                Vector2::new(20., 110.),
+                Vector2::new(30., 110.),
+                Vector2::new(40., 10.),
+                Vector2::new(50., 10.),
+                Vector2::new(60., 10.),
+            ];
+
+            let x_labels = [0., 10., 20., 30., 40., 50., 60.0];
+            let y_labels = [0., 55., 110., 220., 240.0];
+
+            chart.set_points(points.into());
+            chart.set_x_labels(x_labels.into());
+            chart.set_y_labels(y_labels.into());
+            // chart.set_color(ColorPlate::Red.into());
+            // chart.set_background_color(ColorPlate::Black.into());
+            // chart.set_grid_color(ColorPlate::Grey.into());
+        }
     }
 }
 
@@ -203,6 +235,8 @@ enum UniqueName {
     StateError,
     StateAgeing,
     StateAcc,
+
+    Chart,
 }
 
 // godot 唯一

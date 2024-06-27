@@ -23,7 +23,7 @@ impl IPanelContainer for VoltageChannelView {
         // godot_print!("item init");
         Self {
             data: VoltageChannel::default(),
-            color: ColorPlate::White.color(),
+            color: ColorPlate::White.into(),
             base,
         }
     }

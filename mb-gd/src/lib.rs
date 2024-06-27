@@ -4,6 +4,7 @@
 use godot::{engine::Engine, prelude::*};
 use scenes::my_global::MyGlobal;
 
+mod chart;
 mod colors;
 mod data;
 mod error;

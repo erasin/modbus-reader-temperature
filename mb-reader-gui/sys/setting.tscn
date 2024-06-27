@@ -124,6 +124,7 @@ text = "B面通道："
 horizontal_alignment = 2
 
 [node name="BpanelStartNum" type="LineEdit" parent="MarginContainer/VBoxContainer/HBoxContainer/电压电流/VBoxContainer/HBoxContainer6"]
+unique_name_in_owner = true
 custom_minimum_size = Vector2(50, 0)
 layout_mode = 2
 text = "1"
@@ -137,6 +138,7 @@ layout_mode = 2
 text = "至"
 
 [node name="BpanelEndNum" type="LineEdit" parent="MarginContainer/VBoxContainer/HBoxContainer/电压电流/VBoxContainer/HBoxContainer6"]
+unique_name_in_owner = true
 custom_minimum_size = Vector2(50, 0)
 layout_mode = 2
 placeholder_text = "0"

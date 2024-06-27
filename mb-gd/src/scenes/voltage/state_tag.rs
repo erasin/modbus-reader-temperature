@@ -23,7 +23,7 @@ impl IPanelContainer for VoltageStateTagView {
         // godot_print!("item init");
         Self {
             label: "空位".into(),
-            color: ColorPlate::White.color(),
+            color: ColorPlate::White.into(),
             base,
         }
     }

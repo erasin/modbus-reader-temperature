@@ -8,6 +8,7 @@ pub enum ColorPlate {
     #[default]
     White,
     Grey,
+    Grey8,
     Red,
     Blue,
     Yellow,
@@ -20,13 +21,14 @@ pub enum ColorPlate {
     Teal,
 }
 
-impl ColorPlate {
-    pub fn color(&self) -> Color {
+impl Into<Color> for ColorPlate {
+    fn into(self) -> Color {
         match self {
             ColorPlate::Bg => Color::from_rgba8(236, 239, 241, 255),
             ColorPlate::Black => Color::from_rgba8(33, 33, 33, 255),
             ColorPlate::White => Color::from_rgba8(250, 250, 250, 255),
             ColorPlate::Grey => Color::from_rgba8(158, 158, 158, 255),
+            ColorPlate::Grey8 => Color::from_rgba8(66, 66, 66, 255),
             ColorPlate::Red => Color::from_rgba8(244, 67, 54, 255),
             ColorPlate::Blue => Color::from_rgba8(33, 150, 243, 255),
             ColorPlate::Yellow => Color::from_rgba8(255, 235, 59, 255),
@@ -50,14 +52,14 @@ pub trait Style {
 impl Style for VoltageState {
     fn style(&self) -> Color {
         match self {
-            VoltageState::NoConnected => ColorPlate::Grey.color(),
-            VoltageState::Vacancy => ColorPlate::White.color(),
-            VoltageState::Qualified => ColorPlate::Green.color(),
-            VoltageState::UnderVoltage => ColorPlate::Red.color(),
-            VoltageState::UnderCurrent => ColorPlate::Yellow.color(),
-            VoltageState::OverVoltage => ColorPlate::Blue.color(),
-            VoltageState::OverCurrent => ColorPlate::Puple.color(),
-            VoltageState::NoOutput => ColorPlate::Cyan.color(),
+            VoltageState::NoConnected => ColorPlate::Grey.into(),
+            VoltageState::Vacancy => ColorPlate::White.into(),
+            VoltageState::Qualified => ColorPlate::Green.into(),
+            VoltageState::UnderVoltage => ColorPlate::Red.into(),
+            VoltageState::UnderCurrent => ColorPlate::Yellow.into(),
+            VoltageState::OverVoltage => ColorPlate::Blue.into(),
+            VoltageState::OverCurrent => ColorPlate::Puple.into(),
+            VoltageState::NoOutput => ColorPlate::Cyan.into(),
         }
     }
 }

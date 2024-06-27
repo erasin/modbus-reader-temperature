@@ -89,6 +89,7 @@ impl SettingView {
         number.set_text(text.into());
         number.set_caret_column(len as i32);
     }
+
     #[func]
     fn on_number_b_start(&mut self, text: String) {
         let mut number = self

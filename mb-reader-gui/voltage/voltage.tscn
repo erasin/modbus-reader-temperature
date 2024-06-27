@@ -1,15 +1,8 @@
-[gd_scene load_steps=7 format=3 uid="uid://ciewnonjuycx6"]
+[gd_scene load_steps=4 format=3 uid="uid://ciewnonjuycx6"]
 
 [ext_resource type="StyleBox" uid="uid://bhtstjj7isp2b" path="res://assets/pane.tres" id="1_vnvb2"]
 [ext_resource type="Texture2D" uid="uid://c4j0cr737oyw" path="res://assets/ball.png" id="2_gtrl5"]
-[ext_resource type="Script" path="res://voltage/chart.gd" id="2_syu0v"]
-[ext_resource type="PackedScene" uid="uid://dlwq4kmdb3bhs" path="res://addons/easy_charts/control_charts/chart.tscn" id="3_abnxj"]
-[ext_resource type="FontFile" uid="uid://ciy3e3gn2vwbm" path="res://assets/HarmonyOS_Sans_SC_Regular.ttf" id="4_y82ud"]
-
-[sub_resource type="Theme" id="Theme_lqox3"]
-resource_local_to_scene = true
-default_font = ExtResource("4_y82ud")
-/colors/bg = Color(0.948096, 0.896045, 0.968596, 1)
+[ext_resource type="PackedScene" uid="uid://c28yq4x6cbvc7" path="res://voltage/chart.tscn" id="2_qnsh8"]
 
 [node name="Voltage" type="VoltageView"]
 anchors_preset = 15
@@ -57,12 +50,11 @@ columns = 10
 
 [node name="图表" type="PanelContainer" parent="HboxContainer/VBoxContainer"]
 layout_mode = 2
-script = ExtResource("2_syu0v")
 
-[node name="Chart" parent="HboxContainer/VBoxContainer/图表" instance=ExtResource("3_abnxj")]
+[node name="Chart" parent="HboxContainer/VBoxContainer/图表" instance=ExtResource("2_qnsh8")]
+unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 300)
 layout_mode = 2
-theme = SubResource("Theme_lqox3")
 
 [node name="功能区" type="PanelContainer" parent="HboxContainer"]
 custom_minimum_size = Vector2(200, 0)
