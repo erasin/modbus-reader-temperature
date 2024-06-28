@@ -44,14 +44,20 @@ impl Into<Color> for ColorPlate {
 }
 
 /// 输出 color
-pub trait Style {
+pub trait IntoColor {
     /// bg, fg
-    fn style(&self) -> Color;
+    fn color(&self) -> Color;
 }
 
-impl Style for VoltageState {
-    fn style(&self) -> Color {
-        match self {
+impl IntoColor for VoltageState {
+    fn color(&self) -> Color {
+        ColorPlate::from(self.clone()).into()
+    }
+}
+
+impl From<VoltageState> for ColorPlate {
+    fn from(value: VoltageState) -> Self {
+        match value {
             VoltageState::NoConnected => ColorPlate::Grey.into(),
             VoltageState::Vacancy => ColorPlate::White.into(),
             VoltageState::Qualified => ColorPlate::Green.into(),

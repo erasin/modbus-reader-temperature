@@ -76,6 +76,7 @@ impl VoltageChannelView {
 }
 
 #[derive(AsRefStr, Debug)]
+#[strum(prefix = "%")]
 enum UniqueName {
     Index,
     Voltage,
@@ -85,6 +86,6 @@ enum UniqueName {
 
 impl std::fmt::Display for UniqueName {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "%{}", self.as_ref())
+        write!(f, "{}", self.as_ref())
     }
 }

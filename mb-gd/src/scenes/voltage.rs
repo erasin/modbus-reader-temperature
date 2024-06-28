@@ -9,10 +9,7 @@ use state_tag::VoltageStateTagView;
 use strum::{AsRefStr, IntoEnumIterator};
 
 use crate::{
-    chart::ChartView,
-    colors::{self, ColorPlate, Style},
-    data::AB,
-    mb_sync::get_voltage_data,
+    chart::ChartView, colors::IntoColor, data::AB, mb_sync::get_voltage_data,
     scenes::my_global::get_global_config,
 };
 
@@ -49,7 +46,7 @@ impl IPanelContainer for VoltageView {
 
         let mut label_ab_name = self
             .base()
-            .get_node_as::<Label>(UniqueName::AbName.to_string());
+            .get_node_as::<Label>(UniqueName::AbName.as_ref());
 
         match self.ab {
             AB::Apanel => label_ab_name.set_text("A面".into()),
@@ -66,13 +63,13 @@ impl IPanelContainer for VoltageView {
         // 标签显示
         let mut tags_container = self
             .base_mut()
-            .get_node_as::<Control>(UniqueName::Tags.to_string());
+            .get_node_as::<Control>(UniqueName::Tags.as_ref());
         for s in VoltageState::iter() {
             let mut tag_scene = self.tag_scene.instantiate_as::<VoltageStateTagView>();
             tags_container.add_child(tag_scene.clone().upcast());
 
             let mut tag = tag_scene.bind_mut();
-            tag.set_color(s.style());
+            tag.set_color(s.color());
             tag.set_label(s.to_string().into());
             tag.update_ui();
         }
@@ -80,7 +77,7 @@ impl IPanelContainer for VoltageView {
         // 开启
         let mut start_btn = self
             .base()
-            .get_node_as::<Button>(UniqueName::StartToggle.to_string());
+            .get_node_as::<Button>(UniqueName::StartToggle.as_ref());
         start_btn.connect(
             "pressed".into(),
             self.base().callable("on_start_toggle_sync"),
@@ -88,7 +85,7 @@ impl IPanelContainer for VoltageView {
 
         let mut chart = self
             .base()
-            .get_node_as::<ChartView>(UniqueName::Chart.to_string());
+            .get_node_as::<ChartView>(UniqueName::Chart.as_ref());
 
         {
             let mut chart = chart.bind_mut();
@@ -107,11 +104,10 @@ impl IPanelContainer for VoltageView {
             let y_labels = [0., 55., 110., 220., 240.0];
 
             chart.set_points(points.into());
-            chart.set_x_labels(x_labels.into());
-            chart.set_y_labels(y_labels.into());
-            // chart.set_color(ColorPlate::Red.into());
-            // chart.set_background_color(ColorPlate::Black.into());
-            // chart.set_grid_color(ColorPlate::Grey.into());
+            chart.set_x_coord(x_labels.into());
+            chart.set_y_coord(y_labels.into());
+            chart.set_x_label("s");
+            chart.set_y_label("V");
         }
     }
 }
@@ -131,11 +127,11 @@ impl VoltageView {
         godot_print!("--- start pull");
         let mut start_btn = self
             .base()
-            .get_node_as::<Button>(UniqueName::StartToggle.to_string());
+            .get_node_as::<Button>(UniqueName::StartToggle.as_ref());
 
         let mut timer = self
             .base()
-            .get_node_as::<Timer>(UniqueName::ReqTimer.to_string());
+            .get_node_as::<Timer>(UniqueName::ReqTimer.as_ref());
         if timer.is_stopped() {
             timer.start();
             start_btn.set_text("停止".into());
@@ -158,7 +154,7 @@ impl VoltageView {
 
         let mut timer = self
             .base()
-            .get_node_as::<Timer>(UniqueName::ReqTimer.to_string());
+            .get_node_as::<Timer>(UniqueName::ReqTimer.as_ref());
 
         let data = match get_voltage_data(&config.voltage) {
             Ok(i) => i,
@@ -167,7 +163,7 @@ impl VoltageView {
 
                 let mut start_btn = self
                     .base()
-                    .get_node_as::<Button>(UniqueName::StartToggle.to_string());
+                    .get_node_as::<Button>(UniqueName::StartToggle.as_ref());
                 start_btn.set_text("开始".into());
 
                 godot_print!(" Write failed {:?}: {:?}", config.voltage, e);
@@ -181,7 +177,7 @@ impl VoltageView {
 
         let mut content = self
             .base_mut()
-            .get_node_as::<Control>(UniqueName::Container.to_string());
+            .get_node_as::<Control>(UniqueName::Container.as_ref());
         let has = content.get_child_count() == 15;
 
         for (i, data) in data.data.iter().enumerate() {
@@ -197,7 +193,7 @@ impl VoltageView {
             };
 
             {
-                let color = get_mb_state(data, &config.voltage.verify).style();
+                let color = get_mb_state(data, &config.voltage.verify).color();
                 let mut channel = channel.bind_mut();
 
                 channel.set_color(color);
@@ -213,6 +209,7 @@ impl VoltageView {
 }
 
 #[derive(AsRefStr, Debug)]
+#[strum(prefix = "%")]
 enum UniqueName {
     Tags,
     ReqTimer,
@@ -239,9 +236,8 @@ enum UniqueName {
     Chart,
 }
 
-// godot 唯一
 impl std::fmt::Display for UniqueName {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "%{}", self.as_ref())
+        write!(f, "{}", self.as_ref())
     }
 }

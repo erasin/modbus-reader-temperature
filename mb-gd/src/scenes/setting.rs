@@ -1,7 +1,5 @@
 use godot::{
-    engine::{
-        control::LayoutPreset, Button, IPanelContainer, LineEdit, OptionButton, PanelContainer,
-    },
+    engine::{Button, IPanelContainer, LineEdit, OptionButton, PanelContainer},
     prelude::*,
 };
 use mb::protocol::get_ports;
@@ -232,6 +230,7 @@ fn number_only(text: String) -> String {
 }
 
 #[derive(AsRefStr, Debug)]
+#[strum(prefix = "%")]
 enum UniqueName {
     VoltagePort,
     VoltageBaudrate,
@@ -246,9 +245,8 @@ enum UniqueName {
     Submit,
 }
 
-// godot 唯一
 impl std::fmt::Display for UniqueName {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "%{}", self.as_ref())
+        write!(f, "{}", self.as_ref())
     }
 }

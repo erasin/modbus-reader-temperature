@@ -24,21 +24,52 @@ layout_mode = 2
 [node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/VSplitContainer/Panel1"]
 layout_mode = 2
 
-[node name="SystemSetBtn" type="Button" parent="PanelContainer/VSplitContainer/Panel1/HBoxContainer"]
-unique_name_in_owner = true
+[node name="HBoxContainer2" type="HBoxContainer" parent="PanelContainer/VSplitContainer/Panel1/HBoxContainer"]
 layout_mode = 2
-text = "系统设置"
+size_flags_horizontal = 3
+alignment = 1
 
-[node name="Save" type="Button" parent="PanelContainer/VSplitContainer/Panel1/HBoxContainer"]
+[node name="Save" type="Button" parent="PanelContainer/VSplitContainer/Panel1/HBoxContainer/HBoxContainer2"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "保存"
 
-[node name="Open" type="Button" parent="PanelContainer/VSplitContainer/Panel1/HBoxContainer"]
+[node name="Open" type="Button" parent="PanelContainer/VSplitContainer/Panel1/HBoxContainer/HBoxContainer2"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "打开
 "
+
+[node name="HBoxContainer3" type="HBoxContainer" parent="PanelContainer/VSplitContainer/Panel1/HBoxContainer"]
+layout_mode = 2
+
+[node name="LoginStage" type="Label" parent="PanelContainer/VSplitContainer/Panel1/HBoxContainer/HBoxContainer3"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "未登录"
+
+[node name="LoginBtn" type="Button" parent="PanelContainer/VSplitContainer/Panel1/HBoxContainer/HBoxContainer3"]
+unique_name_in_owner = true
+layout_mode = 2
+text = " 登录 "
+
+[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/VSplitContainer/Panel1/HBoxContainer"]
+layout_mode = 2
+
+[node name="SystemSetBtn" type="Button" parent="PanelContainer/VSplitContainer/Panel1/HBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "系统设置"
+
+[node name="ProgramsBtn" type="Button" parent="PanelContainer/VSplitContainer/Panel1/HBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "程序编辑"
+
+[node name="UserManagerBtn" type="Button" parent="PanelContainer/VSplitContainer/Panel1/HBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "用户管理"
 
 [node name="Panel3" type="PanelContainer" parent="PanelContainer/VSplitContainer"]
 layout_mode = 2

@@ -9,6 +9,7 @@ use godot::{
 use mb_data::{
     config::Config,
     db::{config::TableGlobal, get_db},
+    user::UserConfig,
     utils::{get_time_offset, time_now},
 };
 
@@ -19,6 +20,9 @@ use crate::utils::init_logging;
 #[class(base=Object)]
 pub struct MyGlobal {
     config: Option<Config>,
+    pub user_state: Option<UserConfig>,
+    sub_window: u8,
+
     base: Base<Object>,
 }
 
@@ -30,7 +34,12 @@ impl IObject for MyGlobal {
         let _ = get_time_offset();
         let _ = init_logging(3);
 
-        Self { config: None, base }
+        Self {
+            config: None,
+            user_state: None,
+            sub_window: 0b0000,
+            base,
+        }
     }
 }
 
@@ -79,6 +88,15 @@ impl MyGlobal {
 
     pub fn set_config(&mut self, config: Config) {
         self.config = Some(config);
+    }
+
+    pub fn get_sub_window(&self) -> u8 {
+        // godot_print!("state: {:b}", state);
+        self.sub_window
+    }
+
+    pub fn set_sub_window(&mut self, state: u8) {
+        self.sub_window = state;
     }
 }
 
