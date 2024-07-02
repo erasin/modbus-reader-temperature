@@ -20,6 +20,7 @@ use crate::utils::current_timestamp;
 ///
 
 pub struct Voltage;
+pub const VOLTAGE_CHANNEL: usize = 15;
 
 impl Voltage {
     pub fn request(slave: u8) -> FunRequest {
@@ -75,7 +76,7 @@ impl TryFrom<FunResponse> for VoltageData {
 /// 电压电流
 #[derive(Debug, Clone, Copy, Default, Serialize, Deserialize)]
 pub struct VoltageChannel {
-    pub index: u32,
+    pub index: usize,
     pub voltage: f32,
     pub current: f32,
 }
@@ -93,7 +94,7 @@ impl From<VoltageF32> for VoltageData {
         for (i, chunk) in value.chunks(2).enumerate() {
             if chunk.len() == 2 {
                 let ch = VoltageChannel {
-                    index: i as u32,
+                    index: i,
                     voltage: chunk[0] / 1000.0, // 电压 / 1000. 单位 V
                     current: chunk[1],          // TODO 处理电流单位 mA ？
                 };

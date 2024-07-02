@@ -1,7 +1,7 @@
 //! 用户定义
 
 use serde::{Deserialize, Serialize};
-use strum::{Display, EnumIter, VariantArray};
+use strum::{EnumIter, VariantArray};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct UserConfig {
@@ -12,6 +12,15 @@ pub struct UserConfig {
 }
 
 impl UserConfig {
+    pub fn new(name: String, pwd: String) -> Self {
+        Self {
+            name,
+            pwd,
+            created_at: 0,
+            purview: Vec::new(),
+        }
+    }
+
     pub fn check_pwd(&self, pwd: String) -> bool {
         if self.pwd.is_empty() {
             return false;
@@ -24,9 +33,9 @@ impl Default for UserConfig {
     fn default() -> Self {
         Self {
             name: "root".into(),
-            pwd: "3600".into(),
+            pwd: "9600".into(),
             created_at: 0,
-            purview: Vec::new(),
+            purview: UserPurview::VARIANTS.to_vec(),
         }
     }
 }

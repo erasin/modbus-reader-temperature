@@ -2,12 +2,15 @@ use godot::{
     engine::{
         file_dialog::{Access, FileMode},
         window::WindowInitialPosition,
-        Button, FileDialog, IPanelContainer, PanelContainer,
+        Button, FileDialog, IPanelContainer, Label, PanelContainer,
     },
+    obj::WithBaseField,
     prelude::*,
 };
 use mb_data::dirs;
 use strum::AsRefStr;
+
+use crate::scenes::my_global::get_global_config;
 
 use super::{
     my_global::MyGlobal,
@@ -29,13 +32,14 @@ impl IPanelContainer for MainView {
         self.sub_window = load("res://sub_window.tscn");
         self.file_dialog = load("res://sys/file_dialog.tscn");
 
+        let mut login_btn = self
+            .base()
+            .get_node_as::<Button>(UniqueName::LoginBtn.as_ref());
+        login_btn.connect("pressed".into(), self.base().callable("on_login"));
+
         self.base()
             .get_node_as::<Button>(UniqueName::SystemSetBtn.as_ref())
             .connect("pressed".into(), self.base().callable("on_setting"));
-
-        self.base()
-            .get_node_as::<Button>(UniqueName::LoginBtn.as_ref())
-            .connect("pressed".into(), self.base().callable("on_login"));
 
         self.base()
             .get_node_as::<Button>(UniqueName::UserManagerBtn.as_ref())
@@ -45,6 +49,30 @@ impl IPanelContainer for MainView {
             .get_node_as::<Button>(UniqueName::ProgramsBtn.as_ref())
             .connect("pressed".into(), self.base().callable("on_programs"));
 
+        let mut my_global = MyGlobal::singleton();
+        my_global.connect(
+            "config_update".into(),
+            self.base().callable("on_global_config_update"),
+        );
+        my_global.connect(
+            "login_update".into(),
+            self.base().callable("on_global_login_update"),
+        );
+
+        self.ab_init();
+        self.user_init();
+
+        // let mut voltage_a = self
+        //     .base()
+        //     .get_node_as::<VoltageView>(UniqueName::VoltageA.as_ref());
+        // voltage_a.bind_mut().set_ab(AB::Apanel.to_godot());
+
+        // let mut voltage_b = self
+        //     .base()
+        //     .get_node_as::<VoltageView>(UniqueName::VoltageA.as_ref());
+        // voltage_b.bind_mut().set_ab(AB::Bpanel.to_godot());
+
+        // TODO remove
         let mut open_btn = self.base().get_node_as::<Button>(UniqueName::Open.as_ref());
         open_btn.connect("pressed".into(), self.base().callable("open_xls"));
 
@@ -57,6 +85,16 @@ impl IPanelContainer for MainView {
 impl MainView {
     #[signal]
     fn load_over();
+
+    #[func]
+    fn on_global_config_update(&mut self) {
+        self.ab_init();
+    }
+
+    #[func]
+    fn on_global_login_update(&mut self) {
+        self.user_init()
+    }
 
     #[func]
     fn on_setting(&mut self) {
@@ -74,6 +112,19 @@ impl MainView {
     #[func]
 
     fn on_login(&mut self) {
+        let mut g = MyGlobal::singleton();
+        if !g.bind().get_login().is_none() {
+            // 退出登录
+            g.bind_mut().set_logout();
+
+            let mut login_btn = self
+                .base()
+                .get_node_as::<Button>(UniqueName::LoginBtn.as_ref());
+            login_btn.set_text("登录".into());
+
+            return;
+        };
+
         let scene = SubScenes::Login;
         if scene.has_open() {
             return;
@@ -182,12 +233,49 @@ impl MainView {
     }
 }
 
+impl MainView {
+    fn ab_init(&mut self) {
+        let config = get_global_config();
+
+        self.base()
+            .get_node_as::<PanelContainer>(UniqueName::Apanel.as_ref())
+            .set_visible(config.enable_a_panel);
+
+        self.base()
+            .get_node_as::<PanelContainer>(UniqueName::Bpanel.as_ref())
+            .set_visible(config.enable_b_panel);
+    }
+
+    fn user_init(&mut self) {
+        let g = MyGlobal::singleton();
+        if let Some(user) = g.bind().get_login() {
+            self.base()
+                .get_node_as::<Label>(UniqueName::LoginUserName.as_ref())
+                .set_text(user.name.into());
+
+            let mut login_btn = self
+                .base()
+                .get_node_as::<Button>(UniqueName::LoginBtn.as_ref());
+
+            login_btn.set_text("退出".into());
+        };
+    }
+}
+
 #[derive(AsRefStr, Debug)]
 #[strum(prefix = "%")]
 enum UniqueName {
+    LoginUserName,
+    LoginBtn,
+
+    Apanel,
+    Bpanel,
+
+    VoltageA,
+    VoltageB,
+
     SystemSetBtn,
     ProgramsBtn,
-    LoginBtn,
     UserManagerBtn,
 
     Open,

@@ -1,10 +1,10 @@
 use channel::VoltageChannelView;
 use godot::{
-    engine::{Button, Control, IPanelContainer, Label, PanelContainer, Range, Timer},
+    engine::{Button, Control, IPanelContainer, Label, PanelContainer, Timer},
     obj::WithBaseField,
     prelude::*,
 };
-use mb::voltage::{get_mb_state, VoltageData, VoltageState};
+use mb::voltage::{get_mb_state, VoltageData, VoltageState, VOLTAGE_CHANNEL};
 use state_tag::VoltageStateTagView;
 use strum::{AsRefStr, IntoEnumIterator};
 
@@ -24,7 +24,7 @@ pub struct VoltageView {
 
     channel_scene: Gd<PackedScene>,
     tag_scene: Gd<PackedScene>,
-    data: Option<VoltageData>,
+    // data: Option<VoltageData>,
     base: Base<PanelContainer>,
 }
 
@@ -47,14 +47,9 @@ impl IPanelContainer for VoltageView {
         let mut label_ab_name = self
             .base()
             .get_node_as::<Label>(UniqueName::AbName.as_ref());
-
-        match self.ab {
-            AB::Apanel => label_ab_name.set_text("A面".into()),
-            AB::Bpanel => label_ab_name.set_text("B面".into()),
-        };
+        label_ab_name.set_text(self.ab.title().into());
 
         let mut req_timer = self.base().get_node_as::<Timer>("ReqTimer");
-
         req_timer.connect(
             "timeout".into(),
             self.base().callable("on_req_timer_timeout"),
@@ -147,61 +142,78 @@ impl VoltageView {
         let config = get_global_config();
 
         //TODO 根据 AB 区 获取参数
-        let _config = match self.ab {
-            AB::Apanel => {}
-            AB::Bpanel => {}
+        let voltage = match self.ab {
+            AB::Apanel => config.voltage_a.clone(),
+            AB::Bpanel => config.voltage_b.clone(),
         };
+
+        let mut label_ab_name = self
+            .base()
+            .get_node_as::<Label>(UniqueName::AbName.as_ref());
+        label_ab_name.set_text(self.ab.title().into());
 
         let mut timer = self
             .base()
             .get_node_as::<Timer>(UniqueName::ReqTimer.as_ref());
 
-        let data = match get_voltage_data(&config.voltage) {
-            Ok(i) => i,
-            Err(e) => {
-                timer.stop();
+        godot_print!("voltage init -- {:?}", voltage);
 
-                let mut start_btn = self
-                    .base()
-                    .get_node_as::<Button>(UniqueName::StartToggle.as_ref());
-                start_btn.set_text("开始".into());
+        let data: Vec<VoltageData> = (voltage.slave_start..=voltage.slave_end)
+            .into_iter()
+            .map(|slave| {
+                let data = match get_voltage_data(&voltage, slave) {
+                    Ok(d) => d,
+                    Err(e) => {
+                        timer.stop();
 
-                godot_print!(" Write failed {:?}: {:?}", config.voltage, e);
-                return;
-            }
-        };
+                        let mut start_btn = self
+                            .base()
+                            .get_node_as::<Button>(UniqueName::StartToggle.as_ref());
+                        start_btn.set_text("开始".into());
 
-        self.data = Some(data.clone());
+                        godot_print!(" Write failed {:?}: {:?}", voltage, e);
+                        VoltageData::new(0, Vec::new())
+                    }
+                };
 
+                data.clone()
+            })
+            .collect();
+
+        // self.data = Some(data.clone());
         // godot_print!(" Write failed {:?}", data);
 
         let mut content = self
             .base_mut()
             .get_node_as::<Control>(UniqueName::Container.as_ref());
-        let has = content.get_child_count() == 15;
+        let has = content.get_child_count() == (VOLTAGE_CHANNEL * data.len()) as i32;
 
-        for (i, data) in data.data.iter().enumerate() {
-            let name = format!("i{i}").to_godot();
-            let mut channel = if !has {
-                let mut channel_scene = self.channel_scene.instantiate_as::<VoltageChannelView>();
-                content.add_child(channel_scene.clone().upcast());
-                channel_scene.set_name(name);
-                channel_scene
-            } else {
-                let channel_scene = content.get_node_as::<VoltageChannelView>(name);
-                channel_scene
-            };
+        for (j, data) in data.iter().enumerate() {
+            for (i, data) in data.data.iter().enumerate() {
+                let name = format!("i{}", i + j).to_godot();
+                let mut channel = if !has {
+                    let mut channel_scene =
+                        self.channel_scene.instantiate_as::<VoltageChannelView>();
+                    content.add_child(channel_scene.clone().upcast());
+                    channel_scene.set_name(name);
+                    channel_scene
+                } else {
+                    let channel_scene = content.get_node_as::<VoltageChannelView>(name);
+                    channel_scene
+                };
 
-            {
-                let color = get_mb_state(data, &config.voltage.verify).color();
-                let mut channel = channel.bind_mut();
+                {
+                    let color = get_mb_state(data, &voltage.verify).color();
+                    let mut channel = channel.bind_mut();
 
-                channel.set_color(color);
-                channel.set_data(data);
-                channel.update_ui();
+                    channel.set_index(j);
+                    channel.set_color(color);
+                    channel.set_data(data);
+                    channel.update_ui();
+                }
+
+                channel.emit_signal("update_data".into(), &[]);
             }
-
-            channel.emit_signal("update_data".into(), &[]);
         }
 
         self.base_mut().emit_signal("mb_read_over".into(), &[]);

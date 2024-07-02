@@ -1,13 +1,31 @@
 use mb::{protocol::default_port_name, voltage::Verify};
 use serde::{Deserialize, Serialize};
 
+use crate::dirs;
+
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct Config {
-    pub voltage: VoltageConfig,
+    /// 老化柜名称
+    pub pro_name: String,
+
+    pub enable_a_panel: bool,
+    pub enable_b_panel: bool,
+
+    pub voltage_a: VoltageConfig,
+    pub voltage_b: VoltageConfig,
+
     pub temperature: TemperatureConfig,
     pub relay: RelayConfig,
-    pub use_a: bool,
-    pub use_b: bool,
+
+    /// 电源
+    pub power_a: PowerConfig,
+    pub power_b: PowerConfig,
+
+    /// 不良品判定
+    pub defective: DefectiveConfig,
+
+    /// 历史数据
+    pub history: HistoryConfig,
 }
 
 // 端口
@@ -33,9 +51,10 @@ impl Default for SerialPortConfig {
 pub struct VoltageConfig {
     pub name: String,
     pub serial_port: SerialPortConfig,
+
     // 站
-    pub slave_a: Vec<u8>,
-    pub slave_b: Vec<u8>,
+    pub slave_start: u8,
+    pub slave_end: u8,
 
     // 验证
     pub verify: Verify,
@@ -53,6 +72,13 @@ pub struct TemperatureConfig {
 // 继电器
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct RelayConfig {
+    pub name: String,
+    pub serial_port: SerialPortConfig,
+    pub slave: u8,
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct PowerConfig {
     pub name: String,
     pub serial_port: SerialPortConfig,
     pub slave: u8,
@@ -82,8 +108,10 @@ impl Baudrate {
         Baudrate::R57600,
         Baudrate::R115200,
     ];
+}
 
-    pub fn to_u32(&self) -> u32 {
+impl Into<u32> for Baudrate {
+    fn into(self) -> u32 {
         match self {
             Baudrate::R1200 => 1200,
             Baudrate::R2400 => 2400,
@@ -129,5 +157,50 @@ impl std::fmt::Display for Baudrate {
                 Baudrate::R115200 => "115200",
             }
         )
+    }
+}
+
+/// 不良品设置
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct DefectiveConfig {
+    pub rule: DefectiveRule,
+    pub dur: u32,
+}
+
+#[derive(Debug, PartialEq, PartialOrd, Default, Copy, Clone, Serialize, Deserialize)]
+pub enum DefectiveRule {
+    #[default]
+    RealTime,
+    InTime,
+}
+
+impl DefectiveRule {
+    pub const ALL: [DefectiveRule; 2] = [DefectiveRule::RealTime, DefectiveRule::InTime];
+
+    pub fn title(self) -> String {
+        match self {
+            DefectiveRule::RealTime => "实时".to_owned(),
+            DefectiveRule::InTime => "时间段".to_owned(),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct HistoryConfig {
+    /// 记录时间频率
+    pub log_dur: u32,
+    /// 延时计算良品率
+    pub defective_lazy_dur: u32,
+    /// 导出路径
+    pub export_dir: String,
+}
+
+impl Default for HistoryConfig {
+    fn default() -> Self {
+        Self {
+            log_dur: 5,
+            defective_lazy_dur: 0,
+            export_dir: dirs::doc_dir().to_string_lossy().to_string(),
+        }
     }
 }

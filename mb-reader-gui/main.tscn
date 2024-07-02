@@ -43,7 +43,7 @@ text = "打开
 [node name="HBoxContainer3" type="HBoxContainer" parent="PanelContainer/VSplitContainer/Panel1/HBoxContainer"]
 layout_mode = 2
 
-[node name="LoginStage" type="Label" parent="PanelContainer/VSplitContainer/Panel1/HBoxContainer/HBoxContainer3"]
+[node name="LoginUserName" type="Label" parent="PanelContainer/VSplitContainer/Panel1/HBoxContainer/HBoxContainer3"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "未登录"
@@ -79,33 +79,36 @@ theme_override_styles/panel = ExtResource("2_qfy1n")
 [node name="HSplitContainer" type="HSplitContainer" parent="PanelContainer/VSplitContainer/Panel3"]
 layout_mode = 2
 
-[node name="A面" type="PanelContainer" parent="PanelContainer/VSplitContainer/Panel3/HSplitContainer"]
+[node name="Apanel" type="PanelContainer" parent="PanelContainer/VSplitContainer/Panel3/HSplitContainer"]
+unique_name_in_owner = true
 custom_minimum_size = Vector2(500, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="MarginContainer" type="MarginContainer" parent="PanelContainer/VSplitContainer/Panel3/HSplitContainer/A面"]
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainer/VSplitContainer/Panel3/HSplitContainer/Apanel"]
 layout_mode = 2
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 10
 
-[node name="voltage_a" parent="PanelContainer/VSplitContainer/Panel3/HSplitContainer/A面/MarginContainer" instance=ExtResource("1_6pq7q")]
+[node name="VoltageA" parent="PanelContainer/VSplitContainer/Panel3/HSplitContainer/Apanel/MarginContainer" instance=ExtResource("1_6pq7q")]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="B面" type="PanelContainer" parent="PanelContainer/VSplitContainer/Panel3/HSplitContainer"]
+[node name="Bpanel" type="PanelContainer" parent="PanelContainer/VSplitContainer/Panel3/HSplitContainer"]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="MarginContainer" type="MarginContainer" parent="PanelContainer/VSplitContainer/Panel3/HSplitContainer/B面"]
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainer/VSplitContainer/Panel3/HSplitContainer/Bpanel"]
 layout_mode = 2
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 10
 
-[node name="Voltage_b" parent="PanelContainer/VSplitContainer/Panel3/HSplitContainer/B面/MarginContainer" instance=ExtResource("1_6pq7q")]
+[node name="VoltageB" parent="PanelContainer/VSplitContainer/Panel3/HSplitContainer/Bpanel/MarginContainer" instance=ExtResource("1_6pq7q")]
+ab = "Bpanel"
 unique_name_in_owner = true
 layout_mode = 2

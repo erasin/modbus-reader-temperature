@@ -2,7 +2,7 @@
 
 use mb::{
     protocol::Builder,
-    relay::{Relay, RelayData, RelayMode},
+    relay::{RelayData, RelayMode},
     temperature::{TemperatureData, TemperatureMode},
     utils::print_hex,
     voltage::{Voltage, VoltageData},

@@ -1,7 +1,9 @@
 use std::time::Duration;
 
 use mb::utils::print_hex;
-use mb_mock::{relay::RelayMock, temperature::TempMock, voltage::VoltageMock, Mock};
+use mb_mock::{
+    power::PowerMock, relay::RelayMock, temperature::TempMock, voltage::VoltageMock, Mock,
+};
 
 fn main() -> std::io::Result<()> {
     let port_name = "/dev/ttyUSB1";
@@ -25,12 +27,11 @@ fn main() -> std::io::Result<()> {
                 let mock: Box<dyn Mock> = match &buffer[0] {
                     0x01 => Box::new(TempMock::from(buffer)),
                     0x02 => Box::new(RelayMock::from(buffer)),
+                    0x03 => Box::new(PowerMock::from(buffer)),
+                    0x04 => Box::new(PowerMock::from(buffer)),
 
-                    0x03 => Box::new(VoltageMock::from(buffer)),
-                    0x04 => Box::new(VoltageMock::from(buffer)),
+                    // 4 之后都是电流电压
                     0x05 => Box::new(VoltageMock::from(buffer)),
-                    0x06 => Box::new(VoltageMock::from(buffer)),
-
                     _ => Box::new(VoltageMock::from(buffer)),
                 };
 

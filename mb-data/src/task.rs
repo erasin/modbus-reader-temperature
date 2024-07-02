@@ -1,6 +1,5 @@
 //! task 序列，任务列表
-
-use std::{default, time::Duration};
+use std::time::Duration;
 
 use mb::voltage::Verify;
 use serde::{Deserialize, Serialize};
@@ -33,9 +32,7 @@ pub enum AB {
 }
 
 impl AB {
-    pub fn all() -> [AB; 2] {
-        [AB::A, AB::B]
-    }
+    pub const ALL: [AB; 2] = [AB::A, AB::B];
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]

@@ -1,10 +1,8 @@
 [gd_scene format=3 uid="uid://b0gf8fyloqa0x"]
 
 [node name="OpenXls" type="FileDialog"]
-title = "Open a File"
+title = "Open a Directory"
 initial_position = 1
 size = Vector2i(291, 159)
-ok_button_text = "打开"
-file_mode = 0
-access = 1
-filters = PackedStringArray("*.xls", "*.xlsx")
+ok_button_text = "选择当前文件夹"
+file_mode = 2

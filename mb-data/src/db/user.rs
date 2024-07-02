@@ -20,11 +20,11 @@ impl TableUser {
         Ok(())
     }
 
-    pub fn get(db: &Database) -> Result<UserConfig> {
+    pub fn get<T: Into<String>>(db: &Database, key: T) -> Result<UserConfig> {
         let read_txn = db.begin_read()?;
         let table = read_txn.open_table(TABLE)?;
 
-        let query = table.get("config".to_string())?;
+        let query = table.get(key.into())?;
         let data = match query {
             Some(value) => {
                 let data: UserConfig = serde_json::from_slice(value.value())?;

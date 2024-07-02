@@ -3,7 +3,7 @@ use godot::{
     obj::WithBaseField,
     prelude::*,
 };
-use mb::voltage::VoltageChannel;
+use mb::voltage::{VoltageChannel, VOLTAGE_CHANNEL};
 use strum::AsRefStr;
 
 use crate::colors::ColorPlate;
@@ -13,6 +13,8 @@ use crate::colors::ColorPlate;
 pub struct VoltageChannelView {
     #[var]
     color: Color,
+    // slave index
+    index: usize,
     data: VoltageChannel,
     base: Base<PanelContainer>,
 }
@@ -22,6 +24,7 @@ impl IPanelContainer for VoltageChannelView {
     fn init(base: Base<PanelContainer>) -> Self {
         // godot_print!("item init");
         Self {
+            index: 0,
             data: VoltageChannel::default(),
             color: ColorPlate::White.into(),
             base,
@@ -48,6 +51,10 @@ impl VoltageChannelView {
         self.data = data.clone();
     }
 
+    pub fn set_index(&mut self, index: usize) {
+        self.index = index;
+    }
+
     pub fn update_ui(&mut self) {
         let mut index_label = self
             .base()
@@ -67,7 +74,8 @@ impl VoltageChannelView {
         // voltage_label.set_text(data.at("voltage").to());
         // current_label.set_text(data.at("current").to());
 
-        index_label.set_text(format!("{:2}", self.data.index + 1).into());
+        index_label
+            .set_text(format!("{:2}", self.data.index + 1 + self.index * VOLTAGE_CHANNEL).into());
         voltage_label.set_text(format!("{:.2}V", self.data.voltage).into());
         current_label.set_text(format!("{:2} mA", self.data.current).into());
 

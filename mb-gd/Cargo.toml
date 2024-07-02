@@ -16,3 +16,4 @@ mb = {path = "../mb"}
 mb-data = {path = "../mb-data"}
 fern = "0.6"
 strum.workspace = true
+csv = "1.3"

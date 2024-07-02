@@ -9,13 +9,13 @@ use mb_data::config::{RelayConfig, TemperatureConfig, VoltageConfig};
 use crate::data::AB;
 
 /// 获取电压电流
-pub fn get_voltage_data(config: &VoltageConfig) -> Result<VoltageData> {
+pub fn get_voltage_data(config: &VoltageConfig, slave: u8) -> Result<VoltageData> {
     let port_name = config.serial_port.port.clone();
-    let baudrate = config.serial_port.baudrate.to_u32();
+    let baudrate = config.serial_port.baudrate.into();
     // let slave = config.voltage.salve_a;
 
     let builder = Builder::new(port_name, baudrate);
-    let request = Voltage::request(0x03);
+    let request = Voltage::request(slave);
     let response = builder.call(&request)?;
     response.try_into()
 }
@@ -23,7 +23,7 @@ pub fn get_voltage_data(config: &VoltageConfig) -> Result<VoltageData> {
 // 获取温度
 pub fn get_temperature(config: &TemperatureConfig, ab: AB) -> Result<TemperatureData> {
     let port_name = config.serial_port.port.clone();
-    let baudrate = config.serial_port.baudrate.to_u32();
+    let baudrate = config.serial_port.baudrate.into();
     let slave = config.slave;
 
     let mode = if ab.is_a() {
@@ -41,7 +41,7 @@ pub fn get_temperature(config: &TemperatureConfig, ab: AB) -> Result<Temperature
 // 设置取温度
 pub fn set_temperature(config: &TemperatureConfig, ab: AB, temp: u16) -> Result<TemperatureData> {
     let port_name = config.serial_port.port.clone();
-    let baudrate = config.serial_port.baudrate.to_u32();
+    let baudrate = config.serial_port.baudrate.into();
     let slave = config.slave;
 
     let mode = if ab.is_a() {
@@ -60,7 +60,7 @@ pub fn set_temperature(config: &TemperatureConfig, ab: AB, temp: u16) -> Result<
 
 pub fn get_relay(config: &RelayConfig, ab: AB) -> Result<RelayData> {
     let port_name = config.serial_port.port.clone();
-    let baudrate = config.serial_port.baudrate.to_u32();
+    let baudrate = config.serial_port.baudrate.into();
     let slave = config.slave;
 
     let builder = Builder::new(port_name, baudrate);
@@ -72,7 +72,7 @@ pub fn get_relay(config: &RelayConfig, ab: AB) -> Result<RelayData> {
 // 设定继电器
 pub fn set_relay(config: &RelayConfig, ab: AB, mode: &RelayMode) -> Result<RelayData> {
     let port_name = config.serial_port.port.clone();
-    let baudrate = config.serial_port.baudrate.to_u32();
+    let baudrate = config.serial_port.baudrate.into();
     let slave = config.slave;
 
     let builder = Builder::new(port_name, baudrate);

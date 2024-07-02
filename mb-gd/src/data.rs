@@ -12,6 +12,13 @@ pub enum AB {
 }
 
 impl AB {
+    pub fn title(self) -> String {
+        match self {
+            AB::Apanel => "A面".to_owned(),
+            AB::Bpanel => "B面".to_owned(),
+        }
+    }
+
     pub fn is_a(&self) -> bool {
         *self == AB::Apanel
     }

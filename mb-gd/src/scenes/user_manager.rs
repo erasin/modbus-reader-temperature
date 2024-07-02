@@ -1,10 +1,10 @@
 use godot::{
-    engine::{Button, IPanelContainer, LineEdit, OptionButton, PanelContainer},
+    engine::{BoxContainer, CheckBox, IPanelContainer, PanelContainer},
     prelude::*,
 };
-use strum::AsRefStr;
+use strum::{AsRefStr, IntoEnumIterator, VariantArray};
 
-use mb_data::user::UserConfig;
+use mb_data::user::{UserConfig, UserPurview};
 
 #[derive(GodotClass)]
 #[class(init,base=PanelContainer)]
@@ -21,9 +21,30 @@ impl IPanelContainer for UserManagerView {
         godot_print!("user manager ready");
 
         // 添加权限list and connect
+        let mut purview = self
+            .base()
+            .get_node_as::<BoxContainer>(UniqueName::Purview.as_ref());
+
+        UserPurview::iter().into_iter().for_each(|up| {
+            let mut cb = CheckBox::new_alloc();
+            cb.set_text(up.to_string().into());
+            purview.add_child(cb.upcast());
+        });
 
         // 设置用户list
     }
+
+    // 手动释放
+    // fn exit_tree(&mut self) {
+    //     let purview = self
+    //         .base()
+    //         .get_node_as::<BoxContainer>(UniqueName::Purview.as_ref());
+
+    //     purview
+    //         .get_children()
+    //         .iter_shared()
+    //         .for_each(|node| node.free());
+    // }
 }
 
 #[godot_api]

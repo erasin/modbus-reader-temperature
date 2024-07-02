@@ -4,7 +4,7 @@
 
 [node name="Channel" type="VoltageChannelView"]
 offset_right = 32.0
-offset_bottom = 120.0
+offset_bottom = 55.0
 size_flags_horizontal = 4
 
 [node name="MarginContainer" type="PanelContainer" parent="."]
@@ -16,30 +16,13 @@ alignment = 1
 
 [node name="Index" type="Label" parent="MarginContainer/box"]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(30, 0)
 layout_mode = 2
 size_flags_horizontal = 8
 size_flags_vertical = 1
 text = "1"
 horizontal_alignment = 1
 vertical_alignment = 1
-
-[node name="Voltage" type="Label" parent="MarginContainer/box"]
-unique_name_in_owner = true
-visible = false
-layout_mode = 2
-size_flags_horizontal = 8
-size_flags_vertical = 1
-text = "电压"
-horizontal_alignment = 2
-
-[node name="Current" type="Label" parent="MarginContainer/box"]
-unique_name_in_owner = true
-visible = false
-layout_mode = 2
-size_flags_horizontal = 8
-size_flags_vertical = 1
-text = "电流"
-horizontal_alignment = 2
 
 [node name="State" type="TextureRect" parent="MarginContainer/box"]
 unique_name_in_owner = true
@@ -50,3 +33,21 @@ size_flags_horizontal = 8
 size_flags_vertical = 4
 texture = ExtResource("2_ndblk")
 expand_mode = 2
+
+[node name="Voltage" type="Label" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 1
+text = "电压"
+horizontal_alignment = 2
+
+[node name="Current" type="Label" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 1
+text = "电流"
+horizontal_alignment = 2

@@ -10,7 +10,7 @@ pub mod voltage;
 use crate::dirs::data_dir;
 
 pub fn get_db() -> &'static Mutex<Database> {
-    log::debug!("------ log db------------");
+    // log::debug!("------ log db------------");
     static DB: OnceLock<Mutex<Database>> = OnceLock::new();
     DB.get_or_init(|| init_db().unwrap())
 }
@@ -19,7 +19,7 @@ pub fn get_db() -> &'static Mutex<Database> {
 const DATA_TABLE: TableDefinition<u64, String> = TableDefinition::new("test");
 
 fn init_db() -> Result<Mutex<Database>> {
-    log::debug!("------ log db------------2");
+    // log::debug!("------ log db------------2");
     let db_file = data_dir().join("data.db");
     let db = Database::create(db_file)?;
     let write_txn = db.begin_write()?;

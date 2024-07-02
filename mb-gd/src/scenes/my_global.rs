@@ -2,7 +2,7 @@ use godot::{
     builtin::StringName,
     engine::{Engine, IObject, Object},
     log::godot_print,
-    obj::{Base, Gd},
+    obj::{Base, Gd, WithBaseField},
     register::{godot_api, GodotClass},
 };
 
@@ -45,6 +45,12 @@ impl IObject for MyGlobal {
 
 #[godot_api]
 impl MyGlobal {
+    #[signal]
+    fn config_update();
+
+    #[signal]
+    fn login_update();
+
     #[func]
     pub fn foo(&mut self) {
         godot_print!("my singleton foo ..., {}", time_now().to_string());
@@ -75,10 +81,16 @@ impl MyGlobal {
         // from db
         if self.config.is_none() {
             let db = get_db().lock().unwrap();
-            let conf = match TableGlobal::get_config(&db) {
+            let mut conf = match TableGlobal::get_config(&db) {
                 Ok(c) => c,
                 Err(_) => Config::default(),
             };
+
+            // 需要开启一个面板
+            if !conf.enable_a_panel && !conf.enable_b_panel {
+                conf.enable_a_panel = true;
+            }
+
             self.config = Some(conf);
         }
 
@@ -87,7 +99,16 @@ impl MyGlobal {
     }
 
     pub fn set_config(&mut self, config: Config) {
+        let db = get_db().lock().unwrap();
+        match TableGlobal::set_config(&db, &config) {
+            Ok(_) => {}
+            Err(e) => {
+                log::error!("保存配置错误 {e}");
+            }
+        };
+
         self.config = Some(config);
+        self.base_mut().emit_signal("config_update".into(), &[]);
     }
 
     pub fn get_sub_window(&self) -> u8 {
@@ -97,6 +118,19 @@ impl MyGlobal {
 
     pub fn set_sub_window(&mut self, state: u8) {
         self.sub_window = state;
+    }
+
+    pub fn get_login(&self) -> Option<UserConfig> {
+        self.user_state.clone()
+    }
+
+    pub fn set_login(&mut self, user: UserConfig) {
+        self.user_state = Some(user);
+        self.base_mut().emit_signal("login_update".into(), &[]);
+    }
+    pub fn set_logout(&mut self) {
+        self.user_state = None;
+        self.base_mut().emit_signal("login_update".into(), &[]);
     }
 }
 

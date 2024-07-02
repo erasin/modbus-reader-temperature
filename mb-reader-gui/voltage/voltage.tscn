@@ -13,7 +13,6 @@ grow_vertical = 2
 
 [node name="ReqTimer" type="Timer" parent="."]
 unique_name_in_owner = true
-wait_time = 2.0
 
 [node name="HboxContainer" type="HBoxContainer" parent="."]
 layout_mode = 2

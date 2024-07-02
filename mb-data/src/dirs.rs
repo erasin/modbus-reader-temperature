@@ -11,6 +11,15 @@ fn base_dir() -> Result<impl AppStrategy> {
     })?)
 }
 
+pub fn doc_dir() -> PathBuf {
+    let strategy = base_dir().unwrap();
+    let data_dir = strategy.home_dir().to_path_buf();
+    if !data_dir.exists() {
+        fs::create_dir_all(data_dir.clone()).unwrap();
+    }
+    data_dir
+}
+
 pub fn data_dir() -> PathBuf {
     let strategy = base_dir().unwrap();
     let data_dir = strategy.data_dir();

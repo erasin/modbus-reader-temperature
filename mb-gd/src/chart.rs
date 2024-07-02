@@ -78,7 +78,7 @@ impl IControl for ChartView {
                     //     "mg:{mouse_position:?}\np1:{point:?}\np2:{point2:?}\nsp:{screen_point:?}"
                     // );
                     if mouse_position.distance_to(screen_point) < 95.0 {
-                        godot_print!("---dis---");
+                        // godot_print!("---dis---");
                         let value = format!("({}, {})", point.x, point.y);
                         self.hovered_point = Some((point, value));
                         break;

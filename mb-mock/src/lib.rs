@@ -1,5 +1,6 @@
 use mb::protocol::{FunRequest, FunResponse};
 
+pub mod power;
 pub mod relay;
 pub mod temperature;
 pub mod voltage;

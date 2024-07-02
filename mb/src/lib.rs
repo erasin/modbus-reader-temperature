@@ -4,6 +4,7 @@
 pub type Result<T> = std::result::Result<T, Box<dyn std::error::Error + Send + Sync>>;
 
 pub mod error;
+pub mod power;
 pub mod protocol;
 pub mod relay;
 pub mod temperature;
