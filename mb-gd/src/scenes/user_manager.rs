@@ -8,7 +8,7 @@ use strum::{AsRefStr, IntoEnumIterator, VariantArray};
 
 use mb_data::{
     db::{get_db, user::TableUser},
-    user::{UserConfig, UserPurview, UserPurviewIter},
+    user::{UserConfig, UserPurview},
 };
 
 #[derive(GodotClass)]

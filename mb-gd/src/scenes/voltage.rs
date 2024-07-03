@@ -156,13 +156,17 @@ impl VoltageView {
             .base()
             .get_node_as::<Timer>(UniqueName::ReqTimer.as_ref());
 
-        godot_print!("voltage init -- {:?}", voltage);
+        // godot_print!("voltage init -- {:?}", voltage);
 
         let data: Vec<VoltageData> = (voltage.slave_start..=voltage.slave_end)
             .into_iter()
             .map(|slave| {
                 let data = match get_voltage_data(&voltage, slave) {
-                    Ok(d) => d,
+                    Ok(d) => {
+                        let mut data = d;
+                        data.update_channel_state(&voltage.verify);
+                        data
+                    }
                     Err(e) => {
                         timer.stop();
 
@@ -172,7 +176,7 @@ impl VoltageView {
                         start_btn.set_text("开始".into());
 
                         godot_print!(" Write failed {:?}: {:?}", voltage, e);
-                        VoltageData::new(0, Vec::new())
+                        VoltageData::new(0, 0, Vec::new())
                     }
                 };
 
@@ -190,7 +194,9 @@ impl VoltageView {
 
         for (j, data) in data.iter().enumerate() {
             for (i, data) in data.data.iter().enumerate() {
-                let name = format!("i{}", i + j).to_godot();
+                let index = i + j * VOLTAGE_CHANNEL;
+                let name = format!("i{}", index).to_godot();
+                // godot_print!(" Write failed {:?} {i} {j}", name);
                 let mut channel = if !has {
                     let mut channel_scene =
                         self.channel_scene.instantiate_as::<VoltageChannelView>();
@@ -203,10 +209,11 @@ impl VoltageView {
                 };
 
                 {
-                    let color = get_mb_state(data, &voltage.verify).color();
+                    // let color = get_mb_state(data, &voltage.verify).color();
+                    let color = data.state.color();
                     let mut channel = channel.bind_mut();
 
-                    channel.set_index(j);
+                    channel.set_index(index);
                     channel.set_color(color);
                     channel.set_data(data);
                     channel.update_ui();

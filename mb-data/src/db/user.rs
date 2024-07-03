@@ -5,7 +5,7 @@ use crate::{error::Error, user::UserConfig};
 
 pub const TABLE: TableDefinition<String, &[u8]> = TableDefinition::new("user");
 
-pub struct TableUser {}
+pub struct TableUser;
 
 impl TableUser {
     pub fn set(db: &Database, data: &UserConfig) -> Result<()> {

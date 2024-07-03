@@ -1,6 +1,6 @@
 use crate::Mock;
 use mb::{
-    power::{Power, PowerMode},
+    power::{f32_u16, Power, PowerMode},
     protocol::Function,
 };
 
@@ -17,7 +17,8 @@ impl PowerMock {
 
 impl From<&[u8]> for PowerMock {
     fn from(value: &[u8]) -> Self {
-        PowerMock::new(value[0], PowerMode::GetOnOff)
+        // match value[1] {}
+        PowerMock::new(value[0], PowerMode::GetVoltage)
     }
 }
 
@@ -29,7 +30,8 @@ impl Mock for PowerMock {
     fn response(&self) -> Function {
         let mode = self.mode.params();
 
-        let response = Function::new(self.slave, mode.0, vec![60 * 10]);
+        let data = f32_u16(60.);
+        let response = Function::new(self.slave, mode.0, data.to_vec());
 
         response
     }

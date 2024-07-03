@@ -3,11 +3,9 @@
 //! b 115200
 
 use serde::{Deserialize, Serialize};
-use strum::{EnumIter, VariantArray};
 
 use crate::error::Error;
 use crate::protocol::{FunRequest, FunResponse, Function, FunctionCode};
-
 use crate::utils::current_timestamp;
 
 /// 电压电流
@@ -34,16 +32,31 @@ impl Voltage {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct VoltageData {
     pub time: u64,
+    pub slave: u8,
     pub data: Vec<VoltageChannel>,
 }
 
 impl VoltageData {
-    pub fn new(dur: u64, data: Vec<VoltageChannel>) -> Self {
-        Self { time: dur, data }
+    pub fn new(dur: u64, slave: u8, data: Vec<VoltageChannel>) -> Self {
+        Self {
+            time: dur,
+            slave,
+            data,
+        }
+    }
+
+    pub fn set_slave(&mut self, slave: u8) {
+        self.slave = slave;
     }
 
     pub fn set_time(&mut self, dur: u64) {
         self.time = dur;
+    }
+
+    pub fn update_channel_state(&mut self, verify: &Verify) {
+        self.data.iter_mut().for_each(|c| {
+            c.state = get_mb_state(c, verify);
+        });
     }
 }
 
@@ -51,6 +64,7 @@ impl TryFrom<FunResponse> for VoltageData {
     type Error = Box<dyn std::error::Error + Send + Sync>;
 
     fn try_from(data: FunResponse) -> std::result::Result<Self, Self::Error> {
+        let slave = data.slave();
         let data = data.data();
 
         if data.len() == 0 {
@@ -68,7 +82,9 @@ impl TryFrom<FunResponse> for VoltageData {
             .try_into()
             .unwrap_or([0.0; 30]);
 
-        let data = VoltageData::from(chs);
+        let mut data = VoltageData::from(chs);
+        data.set_slave(slave);
+
         Ok(data)
     }
 }
@@ -79,6 +95,7 @@ pub struct VoltageChannel {
     pub index: usize,
     pub voltage: f32,
     pub current: f32,
+    pub state: VoltageState,
 }
 
 /// 15对 电压&电流 值
@@ -95,14 +112,15 @@ impl From<VoltageF32> for VoltageData {
             if chunk.len() == 2 {
                 let ch = VoltageChannel {
                     index: i,
-                    voltage: chunk[0] / 1000.0, // 电压 / 1000. 单位 V
-                    current: chunk[1],          // TODO 处理电流单位 mA ？
+                    voltage: chunk[0] / 1000.0,     // 电压 / 1000. 单位 V
+                    current: chunk[1],              // TODO 处理电流单位 mA ？
+                    state: VoltageState::Qualified, // 默认正常
                 };
                 ch_list[i] = ch;
             }
         }
 
-        VoltageData::new(dur, ch_list.to_vec())
+        VoltageData::new(dur, 0, ch_list.to_vec())
     }
 }
 
@@ -122,51 +140,37 @@ impl Into<VoltageF32> for VoltageData {
     }
 }
 
-#[derive(Debug, Clone, Default, PartialEq, Eq, EnumIter, VariantArray)]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    Serialize,
+    Deserialize,
+    Default,
+    PartialEq,
+    Eq,
+    strum::EnumIter,
+    strum::VariantArray,
+    strum::Display,
+)]
 pub enum VoltageState {
     #[default]
+    #[strum(to_string = "未连接")]
     NoConnected,
+    #[strum(to_string = "空位")]
     Vacancy,
+    #[strum(to_string = "合格")]
     Qualified,
+    #[strum(to_string = "欠压")]
     UnderVoltage,
+    #[strum(to_string = "欠流")]
     OverVoltage,
+    #[strum(to_string = "过压")]
     UnderCurrent,
+    #[strum(to_string = "过流")]
     OverCurrent,
+    #[strum(to_string = "无输出")]
     NoOutput,
-}
-
-// impl VoltageState {
-//     pub fn vec() -> [VoltageState; 8] {
-//         [
-//             VoltageState::NoConnected,
-//             VoltageState::Vacancy,
-//             VoltageState::Qualified,
-//             VoltageState::UnderVoltage,
-//             VoltageState::OverVoltage,
-//             VoltageState::UnderCurrent,
-//             VoltageState::OverCurrent,
-//             VoltageState::NoOutput,
-//         ]
-//     }
-// }
-
-impl std::fmt::Display for VoltageState {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "{}",
-            match self {
-                VoltageState::NoConnected => "未连接",
-                VoltageState::Vacancy => "空位",
-                VoltageState::Qualified => "合格",
-                VoltageState::UnderVoltage => "欠压",
-                VoltageState::UnderCurrent => "欠流",
-                VoltageState::OverVoltage => "过压",
-                VoltageState::OverCurrent => "过流",
-                VoltageState::NoOutput => "无输出",
-            }
-        )
-    }
 }
 
 /// 获取电压状态

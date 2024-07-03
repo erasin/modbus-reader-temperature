@@ -69,13 +69,7 @@ impl VoltageChannelView {
             .base()
             .get_node_as::<Control>(UniqueName::State.to_string());
 
-        // let data = self.data.to_godot();
-        // index_label.set_text(data.at("index").to());
-        // voltage_label.set_text(data.at("voltage").to());
-        // current_label.set_text(data.at("current").to());
-
-        index_label
-            .set_text(format!("{:2}", self.data.index + 1 + self.index * VOLTAGE_CHANNEL).into());
+        index_label.set_text(format!("{:2}", self.index + 1).into());
         voltage_label.set_text(format!("{:.2}V", self.data.voltage).into());
         current_label.set_text(format!("{:2} mA", self.data.current).into());
 

@@ -2,6 +2,7 @@
 
 use core::fmt;
 use serialport::{SerialPort, SerialPortType};
+use std::ops::DerefMut;
 use std::{thread, time::Duration};
 
 use crate::error::Error;
@@ -77,7 +78,8 @@ fn read_full_response(port: &mut Box<dyn SerialPort>, buffer: &mut Vec<u8>) -> R
 pub struct Function {
     slave: u8,
     code: FunctionCode,
-    data: Vec<u16>,
+    data_u16: Vec<u16>,
+    data_u8: Vec<u8>,
 }
 
 pub type FunRequest = Function;
@@ -85,7 +87,12 @@ pub type FunResponse = Function;
 
 impl Function {
     pub fn new(slave: u8, code: FunctionCode, data: Vec<u16>) -> Self {
-        Self { slave, code, data }
+        Self {
+            slave,
+            code,
+            data_u16: data.clone(),
+            data_u8: data.iter().flat_map(|&u| u.to_be_bytes()).collect(),
+        }
     }
 
     pub fn slave(&self) -> u8 {
@@ -97,7 +104,11 @@ impl Function {
     }
 
     pub fn data(&self) -> Vec<u16> {
-        self.data.clone()
+        self.data_u16.clone()
+    }
+
+    pub fn data_u8(&self) -> Vec<u8> {
+        self.data_u8.clone()
     }
 
     // 解析Modbus响应数据，将其转换为 Function
@@ -121,7 +132,8 @@ impl Function {
         let fp = Function {
             slave: response[0],
             code: FunctionCode::new(response[1]),
-            data: result,
+            data_u16: result,
+            data_u8: response[3..3 + byte_count].to_vec(),
         };
 
         Ok(fp)
@@ -149,7 +161,8 @@ impl Function {
         let fp = Function {
             slave: request[0],
             code: FunctionCode::new(request[1]),
-            data: result,
+            data_u16: result,
+            data_u8: request[2..2 + byte_count].to_vec(),
         };
 
         Ok(fp)
@@ -157,10 +170,12 @@ impl Function {
 
     /// 生成请求数据
     pub fn request_data(&self) -> Vec<u8> {
-        let len = self.data.len() * 2;
+        let len = self.data_u16.len() * 2;
         let mut data: Vec<u8> = Vec::with_capacity(len);
 
-        for &i in &self.data {
+        for &i in &self.data_u16 {
+            // let mut b = i.to_be_bytes().to_vec();
+            // data.append(&mut b);
             data.push((i >> 8) as u8); // 高位字节
             data.push(i as u8); // 低位字节
         }
@@ -178,10 +193,10 @@ impl Function {
 
     /// 生成返回数据
     pub fn response_data(&self) -> Vec<u8> {
-        let len = self.data.len() * 2;
+        let len = self.data_u16.len() * 2;
         let mut data: Vec<u8> = Vec::with_capacity(len);
 
-        for &i in &self.data {
+        for &i in &self.data_u16 {
             data.push((i >> 8) as u8); // 高位字节
             data.push(i as u8); // 低位字节
         }

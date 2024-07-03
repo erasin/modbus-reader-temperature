@@ -3,7 +3,7 @@
 use crate::{
     error::Error,
     protocol::{FunRequest, FunResponse, Function, FunctionCode},
-    utils::current_timestamp,
+    utils::{current_timestamp, print_hex},
 };
 
 pub struct Power;
@@ -11,7 +11,7 @@ pub struct Power;
 impl Power {
     pub fn request(slave: u8, mode: &PowerMode) -> FunRequest {
         let mode = mode.params();
-        Function::new(slave, mode.0, mode.1.to_vec())
+        Function::new(slave, mode.0, mode.1)
     }
 }
 
@@ -34,27 +34,51 @@ pub enum PowerMode {
     /// 远程启动
     SetOnOff,
     /// 设定电压
-    SetVoltage(u16),
+    SetVoltage(f32),
     /// 设定电流
-    SetCurrent(u16),
+    SetCurrent(f32),
 }
 
 impl PowerMode {
-    pub fn params(&self) -> (FunctionCode, [u16; 2]) {
+    pub fn params(&self) -> (FunctionCode, Vec<u16>) {
         match self {
-            PowerMode::Temp => (FunctionCode::ReadHoldingRegisters, [2, 0]),
-            PowerMode::Voltage => (FunctionCode::ReadHoldingRegisters, [4, 0]),
-            PowerMode::Current => (FunctionCode::ReadHoldingRegisters, [6, 0xC000]),
+            PowerMode::Temp => (FunctionCode::ReadHoldingRegisters, [2, 0].to_vec()),
+            PowerMode::Voltage => (FunctionCode::ReadHoldingRegisters, [4, 0].to_vec()),
+            PowerMode::Current => (FunctionCode::ReadHoldingRegisters, [6, 0xC000].to_vec()),
 
-            PowerMode::GetOnOff => (FunctionCode::ReadHoldingRegisters, [9, 0x0003]),
-            PowerMode::GetVoltage => (FunctionCode::ReadHoldingRegisters, [0x000A, 0]),
-            PowerMode::GetCurrent => (FunctionCode::ReadHoldingRegisters, [0x000C, 0]),
+            PowerMode::GetOnOff => (FunctionCode::ReadHoldingRegisters, [9, 0x0003].to_vec()),
+            PowerMode::GetVoltage => (FunctionCode::ReadHoldingRegisters, [0x000A, 0].to_vec()),
+            PowerMode::GetCurrent => (FunctionCode::ReadHoldingRegisters, [0x000C, 0].to_vec()),
 
-            PowerMode::SetOnOff => (FunctionCode::WriteMultipleRegisters, [9, 0x0003]),
-            PowerMode::SetVoltage(n) => (FunctionCode::WriteMultipleRegisters, [0x000A, *n]),
-            PowerMode::SetCurrent(n) => (FunctionCode::WriteMultipleRegisters, [0x000C, *n]),
+            PowerMode::SetOnOff => (FunctionCode::WriteMultipleRegisters, [9, 0x0003].to_vec()),
+            PowerMode::SetVoltage(n) => {
+                let f = f32_u16(*n);
+                let mut data = Vec::with_capacity(3);
+                data.push(0x000A);
+                data.push(f[0]);
+                data.push(f[1]);
+                (FunctionCode::WriteMultipleRegisters, data)
+            }
+            PowerMode::SetCurrent(n) => {
+                let f = f32_u16(*n);
+                let mut data = Vec::with_capacity(3);
+                data.push(0x000C);
+                data.push(f[0]);
+                data.push(f[1]);
+                (FunctionCode::WriteMultipleRegisters, data)
+            }
         }
     }
+}
+
+pub fn f32_u16(v: f32) -> [u16; 2] {
+    let b = v.to_bits();
+    let bytes = b.to_be_bytes();
+    let u16_array: [u16; 2] = [
+        u16::from_be_bytes(bytes[0..2].try_into().unwrap()),
+        u16::from_be_bytes(bytes[2..4].try_into().unwrap()),
+    ];
+    u16_array
 }
 
 /// 温度
@@ -68,17 +92,27 @@ impl TryFrom<FunResponse> for PowerData {
     type Error = Box<dyn std::error::Error + Send + Sync>;
 
     fn try_from(value: FunResponse) -> std::result::Result<Self, Self::Error> {
-        let data: Vec<f32> = value
-            .data()
-            .iter()
-            .map(|&r| r as f32 * 0.1)
-            .collect::<Vec<f32>>();
-        let value = data.get(0).ok_or(Box::new(Error::DataNull))?;
+        let bytes = value.data_u8();
+
+        let data: Vec<f32> = bytes
+            .as_slice()
+            .chunks(4)
+            .filter_map(|bs| {
+                if bs.len() == 4 {
+                    let b: [u8; 4] = bs.try_into().unwrap();
+                    Some(f32::from_be_bytes(b))
+                } else {
+                    None
+                }
+            })
+            .collect();
+
+        let data = data.get(0).ok_or(Box::new(Error::DataNull))?;
 
         let dur = current_timestamp();
         let temp = PowerData {
             time: dur,
-            value: *value,
+            value: *data,
         };
         Ok(temp)
     }
