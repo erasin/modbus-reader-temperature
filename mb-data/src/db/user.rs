@@ -1,5 +1,5 @@
 use mb::Result;
-use redb::{Database, TableDefinition};
+use redb::{Database, ReadableTable, TableDefinition};
 
 use crate::{error::Error, user::UserConfig};
 
@@ -34,5 +34,30 @@ impl TableUser {
         };
 
         Ok(data)
+    }
+
+    pub fn delete<T: Into<String>>(db: &Database, key: T) -> Result<()> {
+        let write_txn = db.begin_write()?;
+        {
+            let mut table = write_txn.open_table(TABLE)?;
+            table.remove(key.into())?;
+        }
+        write_txn.commit()?;
+
+        Ok(())
+    }
+
+    pub fn list(db: &Database) -> Result<Vec<UserConfig>> {
+        let read_txn = db.begin_read()?;
+        let table = read_txn.open_table(TABLE)?;
+
+        let mut users = Vec::new();
+        for entry in table.iter()? {
+            let (_, value) = entry?;
+            let user: UserConfig = serde_json::from_slice(value.value())?;
+            users.push(user);
+        }
+
+        Ok(users)
     }
 }

@@ -60,7 +60,7 @@ impl IPanelContainer for MainView {
         );
 
         self.ab_init();
-        self.user_init();
+        self.user_state_update();
 
         // let mut voltage_a = self
         //     .base()
@@ -93,7 +93,7 @@ impl MainView {
 
     #[func]
     fn on_global_login_update(&mut self) {
-        self.user_init()
+        self.user_state_update()
     }
 
     #[func]
@@ -110,18 +110,13 @@ impl MainView {
     }
 
     #[func]
-
     fn on_login(&mut self) {
         let mut g = MyGlobal::singleton();
-        if !g.bind().get_login().is_none() {
+        let has_login = g.bind().get_login().is_some();
+        if has_login {
             // 退出登录
             g.bind_mut().set_logout();
-
-            let mut login_btn = self
-                .base()
-                .get_node_as::<Button>(UniqueName::LoginBtn.as_ref());
-            login_btn.set_text("登录".into());
-
+            self.user_state_update();
             return;
         };
 
@@ -246,18 +241,24 @@ impl MainView {
             .set_visible(config.enable_b_panel);
     }
 
-    fn user_init(&mut self) {
+    fn user_state_update(&mut self) {
+        let mut login_btn = self
+            .base()
+            .get_node_as::<Button>(UniqueName::LoginBtn.as_ref());
+        let mut label = self
+            .base()
+            .get_node_as::<Label>(UniqueName::LoginUserName.as_ref());
+
         let g = MyGlobal::singleton();
-        if let Some(user) = g.bind().get_login() {
-            self.base()
-                .get_node_as::<Label>(UniqueName::LoginUserName.as_ref())
-                .set_text(user.name.into());
-
-            let mut login_btn = self
-                .base()
-                .get_node_as::<Button>(UniqueName::LoginBtn.as_ref());
-
-            login_btn.set_text("退出".into());
+        match g.bind().get_login() {
+            Some(user) => {
+                label.set_text(user.name.into());
+                login_btn.set_text("退出".into());
+            }
+            None => {
+                label.set_text("".into());
+                login_btn.set_text("登录".into());
+            }
         };
     }
 }

@@ -1,7 +1,8 @@
 //! 用户定义
 
+use mb::utils::current_timestamp;
 use serde::{Deserialize, Serialize};
-use strum::{EnumIter, VariantArray};
+use strum::VariantArray;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct UserConfig {
@@ -12,12 +13,12 @@ pub struct UserConfig {
 }
 
 impl UserConfig {
-    pub fn new(name: String, pwd: String) -> Self {
+    pub fn new<T: Into<String>>(name: T, pwd: T, purview: Vec<UserPurview>) -> Self {
         Self {
-            name,
-            pwd,
-            created_at: 0,
-            purview: Vec::new(),
+            name: name.into(),
+            pwd: pwd.into(),
+            created_at: current_timestamp(),
+            purview,
         }
     }
 
@@ -40,7 +41,17 @@ impl Default for UserConfig {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, EnumIter, strum::Display, VariantArray)]
+#[derive(
+    Debug,
+    Clone,
+    Serialize,
+    Deserialize,
+    strum::EnumIter,
+    strum::Display,
+    strum::VariantArray,
+    PartialEq,
+    Eq,
+)]
 pub enum UserPurview {
     #[strum(to_string = "用户管理")]
     UserManager,

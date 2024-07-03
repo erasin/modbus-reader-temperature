@@ -2,7 +2,7 @@ use godot::{
     engine::{
         file_dialog::{Access, FileMode},
         window::WindowInitialPosition,
-        Button, CheckBox, FileDialog, IPanelContainer, Label, Label3D, LineEdit, OptionButton,
+        Button, CheckBox, FileDialog, IPanelContainer, Label, LineEdit, OptionButton,
         PanelContainer,
     },
     prelude::*,
@@ -11,10 +11,7 @@ use mb::protocol::get_ports;
 use strum::AsRefStr;
 
 use crate::scenes::my_global::{get_global_config, set_global_config};
-use mb_data::{
-    config::{Baudrate, Config, DefectiveRule},
-    dirs,
-};
+use mb_data::config::{Baudrate, Config, DefectiveRule};
 
 #[derive(GodotClass)]
 #[class(init,base=PanelContainer)]
@@ -378,7 +375,7 @@ impl SettingView {
 
         let mut dur_input = self
             .base()
-            .get_node_as::<LineEdit>(UniqueName::DefectiveRule.as_ref());
+            .get_node_as::<LineEdit>(UniqueName::DefectiveDur.as_ref());
 
         dur_input.set_editable(self.config.defective.rule == DefectiveRule::InTime);
 

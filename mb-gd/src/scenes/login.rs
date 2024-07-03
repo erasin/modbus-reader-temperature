@@ -1,5 +1,5 @@
 use godot::{
-    engine::{Button, IPanelContainer, Label, LineEdit, PanelContainer, Popup},
+    engine::{Button, IPanelContainer, Label, LineEdit, PanelContainer},
     prelude::*,
 };
 use strum::AsRefStr;
@@ -9,7 +9,7 @@ use mb_data::{
     user::UserConfig,
 };
 
-use super::my_global::{self, get_global_config, MyGlobal};
+use super::my_global::MyGlobal;
 
 #[derive(GodotClass)]
 #[class(init,base=PanelContainer)]
@@ -61,13 +61,16 @@ impl LoginView {
 
         // let user = UserConfig::new(user_name, user_pwd);
 
-        let db = get_db().lock().unwrap();
-        let user = match TableUser::get(&db, user_name.clone()) {
-            Ok(user) => user,
-            Err(e) => {
-                log::error!("用户 {user_name} 登录错误：{e}");
-                UserConfig::default()
-            }
+        let user = {
+            let db = get_db().lock().unwrap();
+            let user = match TableUser::get(&db, user_name.clone()) {
+                Ok(user) => user,
+                Err(e) => {
+                    log::error!("用户 {user_name} 登录错误：{e}");
+                    UserConfig::default()
+                }
+            };
+            user
         };
 
         if user_name != user.name || !user.check_pwd(user_pwd) {
@@ -78,6 +81,7 @@ impl LoginView {
         // ok
         let mut my_global = MyGlobal::singleton();
         my_global.bind_mut().set_login(user);
+        my_global.emit_signal("login_update".into(), &[]);
 
         // close
         if let Some(mut win) = self.base_mut().get_window() {

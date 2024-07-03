@@ -126,11 +126,10 @@ impl MyGlobal {
 
     pub fn set_login(&mut self, user: UserConfig) {
         self.user_state = Some(user);
-        self.base_mut().emit_signal("login_update".into(), &[]);
     }
+
     pub fn set_logout(&mut self) {
         self.user_state = None;
-        self.base_mut().emit_signal("login_update".into(), &[]);
     }
 }
 
