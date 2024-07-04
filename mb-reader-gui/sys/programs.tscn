@@ -305,7 +305,8 @@ horizontal_alignment = 2
 unique_name_in_owner = true
 custom_minimum_size = Vector2(100, 0)
 layout_mode = 2
-placeholder_text = "0"
+placeholder_text = "1"
+alignment = 1
 
 [node name="PanelContainer2" type="PanelContainer" parent="MarginContainer/HBoxContainer/MarginContainer/编辑器"]
 layout_mode = 2
@@ -331,18 +332,61 @@ layout_mode = 2
 theme_override_styles/normal = ExtResource("2_mau8k")
 text = "时序参数："
 
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/HBoxContainer/MarginContainer/编辑器/PanelContainer3/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/HBoxContainer/MarginContainer/编辑器/PanelContainer3/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
+text = "电压："
+horizontal_alignment = 2
+
+[node name="ItemPowerVoltage" type="OptionButton" parent="MarginContainer/HBoxContainer/MarginContainer/编辑器/PanelContainer3/VBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+
 [node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer/HBoxContainer/MarginContainer/编辑器/PanelContainer3/VBoxContainer"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="MarginContainer/HBoxContainer/MarginContainer/编辑器/PanelContainer3/VBoxContainer/HBoxContainer2"]
+[node name="时长" type="Label" parent="MarginContainer/HBoxContainer/MarginContainer/编辑器/PanelContainer3/VBoxContainer/HBoxContainer2"]
 custom_minimum_size = Vector2(80, 0)
 layout_mode = 2
-text = "温度："
+text = "时长："
 horizontal_alignment = 2
 
-[node name="Temp" type="LineEdit" parent="MarginContainer/HBoxContainer/MarginContainer/编辑器/PanelContainer3/VBoxContainer/HBoxContainer2"]
-custom_minimum_size = Vector2(100, 0)
+[node name="ItemHours" type="LineEdit" parent="MarginContainer/HBoxContainer/MarginContainer/编辑器/PanelContainer3/VBoxContainer/HBoxContainer2"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(50, 0)
 layout_mode = 2
+placeholder_text = "0"
+alignment = 1
+
+[node name="Label2" type="Label" parent="MarginContainer/HBoxContainer/MarginContainer/编辑器/PanelContainer3/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+text = "时"
+
+[node name="ItemMinutes" type="LineEdit" parent="MarginContainer/HBoxContainer/MarginContainer/编辑器/PanelContainer3/VBoxContainer/HBoxContainer2"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+placeholder_text = "0"
+alignment = 1
+
+[node name="Label3" type="Label" parent="MarginContainer/HBoxContainer/MarginContainer/编辑器/PanelContainer3/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+text = "分"
+
+[node name="ItemSeconds" type="LineEdit" parent="MarginContainer/HBoxContainer/MarginContainer/编辑器/PanelContainer3/VBoxContainer/HBoxContainer2"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+placeholder_text = "0"
+alignment = 1
+
+[node name="Label4" type="Label" parent="MarginContainer/HBoxContainer/MarginContainer/编辑器/PanelContainer3/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+text = "秒"
 
 [node name="PanelContainer4" type="PanelContainer" parent="MarginContainer/HBoxContainer/MarginContainer/编辑器"]
 layout_mode = 2
@@ -368,7 +412,14 @@ text = "编辑时序项目"
 [node name="ItemDelete" type="Button" parent="MarginContainer/HBoxContainer/MarginContainer/编辑器/PanelContainer4/VBoxContainer/HBoxContainer2"]
 unique_name_in_owner = true
 layout_mode = 2
+theme_override_colors/font_color = Color(0.788235, 0, 0, 1)
 text = "删除时序项目"
+
+[node name="ItemClear" type="Button" parent="MarginContainer/HBoxContainer/MarginContainer/编辑器/PanelContainer4/VBoxContainer/HBoxContainer2"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.788235, 0, 0, 1)
+text = "清空时序"
 
 [node name="列表" type="VBoxContainer" parent="MarginContainer/HBoxContainer"]
 layout_mode = 2
@@ -402,6 +453,7 @@ text = "保存程序"
 [node name="TaskDelete" type="Button" parent="MarginContainer/HBoxContainer/列表/PanelContainer/VBoxContainer/HBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
+theme_override_colors/font_color = Color(0.788235, 0, 0, 1)
 text = "删除程序"
 
 [node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer/HBoxContainer/列表/PanelContainer/VBoxContainer"]

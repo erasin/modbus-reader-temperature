@@ -241,7 +241,7 @@ impl SettingView {
         let dur = text
             .parse::<u8>()
             .unwrap_or_default()
-            .clamp(u8::MIN + 1, u8::MAX);
+            .clamp(u8::MIN, u8::MAX);
         self.config.voltage_a.slave_start = dur;
         let len = text.len();
         number.set_text(text.into());
@@ -258,7 +258,7 @@ impl SettingView {
         let dur = text
             .parse::<u8>()
             .unwrap_or_default()
-            .clamp(u8::MIN + 1, u8::MAX);
+            .clamp(u8::MIN, u8::MAX);
         self.config.voltage_a.slave_end = dur;
         let len = text.len();
         number.set_text(text.into());
@@ -275,7 +275,7 @@ impl SettingView {
         let dur = text
             .parse::<u8>()
             .unwrap_or_default()
-            .clamp(u8::MIN + 1, u8::MAX);
+            .clamp(u8::MIN, u8::MAX);
         self.config.voltage_b.slave_start = dur;
         let len = text.len();
         number.set_text(text.into());
@@ -292,7 +292,7 @@ impl SettingView {
         let dur = text
             .parse::<u8>()
             .unwrap_or_default()
-            .clamp(u8::MIN + 1, u8::MAX);
+            .clamp(u8::MIN, u8::MAX);
         self.config.voltage_b.slave_end = dur;
         let len = text.len();
         number.set_text(text.into());
@@ -309,7 +309,7 @@ impl SettingView {
         let dur = text
             .parse::<u8>()
             .unwrap_or_default()
-            .clamp(u8::MIN + 1, u8::MAX);
+            .clamp(u8::MIN, u8::MAX);
         self.config.temperature.slave = dur;
         let len = text.len();
         number.set_text(text.into());
@@ -326,7 +326,7 @@ impl SettingView {
         let dur = text
             .parse::<u8>()
             .unwrap_or_default()
-            .clamp(u8::MIN + 1, u8::MAX);
+            .clamp(u8::MIN, u8::MAX);
         self.config.relay.slave = dur;
         let len = text.len();
         number.set_text(text.into());
@@ -343,7 +343,7 @@ impl SettingView {
         let dur = text
             .parse::<u8>()
             .unwrap_or_default()
-            .clamp(u8::MIN + 1, u8::MAX);
+            .clamp(u8::MIN, u8::MAX);
         self.config.power_a.slave = dur;
         let len = text.len();
         number.set_text(text.into());
@@ -360,7 +360,7 @@ impl SettingView {
         let dur = text
             .parse::<u8>()
             .unwrap_or_default()
-            .clamp(u8::MIN + 1, u8::MAX);
+            .clamp(u8::MIN, u8::MAX);
         self.config.power_b.slave = dur;
         let len = text.len();
         number.set_text(text.into());

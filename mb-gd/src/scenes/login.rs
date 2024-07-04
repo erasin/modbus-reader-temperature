@@ -46,9 +46,7 @@ impl LoginView {
 
     #[func]
     fn on_submit(&mut self) {
-        let name_node = self
-            .base()
-            .get_node_as::<LineEdit>(UniqueName::Name.as_ref());
+        let name_node = self.get_name_node();
 
         let pwd_node = self
             .base()
@@ -90,7 +88,12 @@ impl LoginView {
     }
 }
 
-impl LoginView {}
+impl LoginView {
+    fn get_name_node(&mut self) -> Gd<LineEdit> {
+        self.base()
+            .get_node_as::<LineEdit>(UniqueName::Name.as_ref())
+    }
+}
 
 #[derive(AsRefStr, Debug)]
 #[strum(prefix = "%")]

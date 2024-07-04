@@ -4,6 +4,7 @@ use mb::Result;
 use redb::{Database, TableDefinition};
 
 pub mod config;
+pub mod task;
 pub mod user;
 pub mod voltage;
 

@@ -1,13 +1,17 @@
+use std::time::Duration;
+
 use godot::{
-    engine::{Button, IPanelContainer, ItemList, LineEdit, OptionButton, PanelContainer},
+    engine::{Button, IPanelContainer, ItemList, Label, LineEdit, OptionButton, PanelContainer},
     obj::WithBaseField,
     prelude::*,
 };
+use mb::utils::{hms_from_duration, hms_from_duration_string, time_from_hms};
 use strum::{AsRefStr, VariantArray};
 
 use mb_data::{
     config::Config,
-    task::{PowerMode, Task, AB},
+    db::{get_db, task::TableTask},
+    task::{PowerMode, Task, TaskItem, AB},
 };
 
 use crate::{
@@ -23,8 +27,13 @@ pub struct ProgramsView {
     #[var]
     task_list_str: Array<GString>,
 
-    task: Task,
     config: Config,
+    /// 当前 A/B面的 list
+    list: Vec<Task>,
+    /// 当前编辑的 task
+    task: Task,
+    /// 当前编辑的 item
+    item: TaskItem,
 
     base: Base<PanelContainer>,
 }
@@ -60,6 +69,9 @@ impl IPanelContainer for ProgramsView {
         if !self.config.enable_b_panel {
             check_b_btn.set_visible(false);
         }
+
+        self.task.task_loop = 1;
+        self.task.power.voltage = 220;
 
         let mut temp_node = self
             .base()
@@ -144,12 +156,38 @@ impl IPanelContainer for ProgramsView {
             self.base().callable("on_task_item_selected"),
         );
 
-        let mut task_list_node = self
+        // ItemPowerVoltage
+        let mut item_power_voltage_node = self
             .base()
-            .get_node_as::<ItemList>(UniqueName::TaskList.as_ref());
-        task_list_node.connect(
+            .get_node_as::<OptionButton>(UniqueName::ItemPowerVoltage.as_ref());
+        item_power_voltage_node.connect(
             "item_selected".into(),
-            self.base().callable("on_task_list_selected"),
+            self.base().callable("on_item_power_voltage_selected"),
+        );
+        self.item_power_voltage_update();
+
+        let mut item_hours_node = self
+            .base()
+            .get_node_as::<LineEdit>(UniqueName::ItemHours.as_ref());
+        item_hours_node.connect(
+            "text_changed".into(),
+            self.base().callable("on_item_hours_number"),
+        );
+
+        let mut item_minutes_node = self
+            .base()
+            .get_node_as::<LineEdit>(UniqueName::ItemMinutes.as_ref());
+        item_minutes_node.connect(
+            "text_changed".into(),
+            self.base().callable("on_item_minutes_number"),
+        );
+
+        let mut item_seconds_node = self
+            .base()
+            .get_node_as::<LineEdit>(UniqueName::ItemSeconds.as_ref());
+        item_seconds_node.connect(
+            "text_changed".into(),
+            self.base().callable("on_item_seconds_number"),
         );
 
         let mut item_save_node = self
@@ -166,6 +204,19 @@ impl IPanelContainer for ProgramsView {
             .base()
             .get_node_as::<Button>(UniqueName::ItemDelete.as_ref());
         item_delete_node.connect("pressed".into(), self.base().callable("on_item_delete"));
+
+        let mut item_clear_node = self
+            .base()
+            .get_node_as::<Button>(UniqueName::ItemClear.as_ref());
+        item_clear_node.connect("pressed".into(), self.base().callable("on_item_clear"));
+
+        let mut task_list_node = self
+            .base()
+            .get_node_as::<ItemList>(UniqueName::TaskList.as_ref());
+        task_list_node.connect(
+            "item_selected".into(),
+            self.base().callable("on_task_list_selected"),
+        );
 
         let mut task_save_node = self
             .base()
@@ -354,6 +405,7 @@ impl ProgramsView {
         let len = text.len();
         number.set_text(text.into());
         number.set_caret_column(len as i32);
+        self.item_power_voltage_update();
     }
 
     #[func]
@@ -392,16 +444,83 @@ impl ProgramsView {
         let len = text.len();
         number.set_text(text.into());
         number.set_caret_column(len as i32);
+
+        self.task_total_time();
     }
 
     #[func]
-    fn on_item_save(&mut self) {}
+    fn on_item_power_voltage_selected(&mut self, index: u32) {
+        godot_print!("power {index}");
+
+        if index == 0 {
+            self.item.power_on = false;
+            self.item.voltage = 0;
+        } else {
+            self.item.power_on = true;
+            self.item.voltage = self.task.power.voltage;
+        }
+    }
+
+    #[func]
+    fn on_item_hours_number(&mut self, text: String) {
+        let mut number = self
+            .base()
+            .get_node_as::<LineEdit>(UniqueName::ItemHours.as_ref());
+
+        let text = string_number_only(text);
+        let len = text.len();
+        number.set_text(text.into());
+        number.set_caret_column(len as i32);
+
+        // 更新时间
+        self.item_total_time();
+    }
+
+    #[func]
+    fn on_item_minutes_number(&mut self, text: String) {
+        let mut number = self
+            .base()
+            .get_node_as::<LineEdit>(UniqueName::ItemMinutes.as_ref());
+
+        let text = string_number_only(text);
+        let len = text.len();
+        number.set_text(text.into());
+        number.set_caret_column(len as i32);
+
+        // 更新时间
+        self.item_total_time();
+    }
+
+    #[func]
+    fn on_item_seconds_number(&mut self, text: String) {
+        let mut number = self
+            .base()
+            .get_node_as::<LineEdit>(UniqueName::ItemSeconds.as_ref());
+
+        let text = string_number_only(text);
+        let len = text.len();
+        number.set_text(text.into());
+        number.set_caret_column(len as i32);
+
+        // 更新时间
+        self.item_total_time();
+    }
+
+    #[func]
+    fn on_item_save(&mut self) {
+        self.task.items.push(self.item.clone());
+        self.task_items_update();
+        self.task_total_time();
+    }
 
     #[func]
     fn on_item_edit(&mut self) {}
 
     #[func]
     fn on_item_delete(&mut self) {}
+
+    #[func]
+    fn on_item_clear(&mut self) {}
 
     #[func]
     fn on_task_save(&mut self) {}
@@ -427,16 +546,117 @@ impl ProgramsView {
 }
 
 impl ProgramsView {
-    // 温度
-    fn temperautor_init() {}
+    fn item_power_voltage_update(&mut self) {
+        let mut item_power_voltage_node = self
+            .base()
+            .get_node_as::<OptionButton>(UniqueName::ItemPowerVoltage.as_ref());
 
-    fn task_list_update(&mut self) {}
+        item_power_voltage_node.clear();
+        let voltage = self.task.power.voltage;
+        item_power_voltage_node.add_item("OFF".into());
+        item_power_voltage_node.add_item(format!("{voltage}V").into());
+    }
+
+    // 计算时间
+    fn item_total_time(&mut self) {
+        let item_hours_node = self
+            .base()
+            .get_node_as::<LineEdit>(UniqueName::ItemHours.as_ref());
+        let text = item_hours_node.get_text();
+        let text = string_number_only(text.to_string());
+        let hours = text
+            .parse::<u32>()
+            .unwrap_or_default()
+            .clamp(u32::MIN, u32::MAX) as u64;
+
+        let item_minutes_node = self
+            .base()
+            .get_node_as::<LineEdit>(UniqueName::ItemMinutes.as_ref());
+
+        let text = item_minutes_node.get_text();
+        let text = string_number_only(text.to_string());
+        let minutes = text
+            .parse::<u32>()
+            .unwrap_or_default()
+            .clamp(u32::MIN, u32::MAX) as u64;
+
+        let item_seconds_node = self
+            .base()
+            .get_node_as::<LineEdit>(UniqueName::ItemSeconds.as_ref());
+
+        let text = item_seconds_node.get_text();
+        let text = string_number_only(text.to_string());
+        let seconds = text
+            .parse::<u32>()
+            .unwrap_or_default()
+            .clamp(u32::MIN, u32::MAX) as u64;
+
+        let dur = time_from_hms(hours, minutes, seconds);
+
+        self.item.dur = dur;
+    }
+
+    fn task_total_time(&mut self) {
+        let dur = self
+            .task
+            .items
+            .iter()
+            .map(|item| item.dur)
+            .fold(Duration::from_secs(0), |sum, x| sum + x);
+
+        let dur = dur * self.task.task_loop;
+
+        let text = hms_from_duration_string(dur);
+
+        let mut count_time_node = self
+            .base()
+            .get_node_as::<Label>(UniqueName::CountTime.as_ref());
+        count_time_node.set_text(text.into());
+    }
+
+    fn task_list_update(&mut self) {
+        {
+            let db = get_db().lock().unwrap();
+            self.list = match TableTask::list(&db, &self.task.ab) {
+                Ok(list) => list,
+                Err(_) => Vec::new(),
+            };
+        }
+
+        self.task_list_str = Array::new();
+        self.list.iter().for_each(|task| {
+            self.task_list_str.push(task.title.clone().into());
+        });
+
+        // gdscript 中处理 add_item
+        self.base_mut().emit_signal("update_task_list".into(), &[]);
+    }
+
     fn task_items_update(&mut self) {
-        let data = [
-            ["编码", "电压", "项目", "老化时间"],
-            ["编码", "电压", "项目", "老化时间"],
-            ["编码", "电压", "项目", "老化时间"],
-        ];
+        let mut data = vec![[
+            "序号".to_owned(),
+            "电压".to_owned(),
+            "项目".to_owned(),
+            "老化时间".to_owned(),
+        ]];
+
+        self.task
+            .items
+            .iter()
+            .enumerate()
+            .map(|(index, task)| {
+                [
+                    index.to_string(),
+                    task.voltage.to_string(),
+                    match task.power_on {
+                        true => "老化中",
+                        false => "断电",
+                    }
+                    .to_owned(),
+                    hms_from_duration_string(task.dur),
+                ]
+            })
+            .for_each(|item| data.push(item));
 
         let s: Vec<String> = data
             .iter()
@@ -463,6 +683,7 @@ impl ProgramsView {
         self.base_mut()
             .emit_signal("update_task_item_list".into(), &[]);
     }
+
     fn task_load(&mut self) {}
 }
 
@@ -488,9 +709,15 @@ enum UniqueName {
     TaskLoop,
 
     TaskItems,
+    ItemPowerVoltage,
+    ItemHours,
+    ItemMinutes,
+    ItemSeconds,
+
     ItemSave,
     ItemEdit,
     ItemDelete,
+    ItemClear,
 
     TaskList,
     TaskSave,

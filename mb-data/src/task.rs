@@ -54,17 +54,9 @@ pub enum PowerMode {
 
 // 人物内容
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
-pub enum TaskItem {
-    #[default]
-    Null,
-    // 电源充饥
-    Power {
-        dur: Duration,
-        is_on: bool,
-    },
-    //
+pub struct TaskItem {
+    pub index: usize,
+    pub power_on: bool,
+    pub voltage: u32,
+    pub dur: Duration,
 }
-
-// fn test() {
-// time::Duration::days(1).whole_days()
-// }
