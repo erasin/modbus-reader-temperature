@@ -3,7 +3,7 @@
 use crate::{
     error::Error,
     protocol::{FunRequest, FunResponse, Function, FunctionCode},
-    utils::{current_timestamp, print_hex},
+    utils::current_timestamp,
 };
 
 pub struct Power;

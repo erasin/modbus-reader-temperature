@@ -9,19 +9,22 @@ use serde::{Deserialize, Serialize};
 pub struct Task {
     /// 序列名称
     pub title: String,
-
     /// ab 面
     pub ab: AB,
+
+    /// 温度
+    pub temperature: u16,
 
     /// 电流上下限制
     pub voltage_verify: Verify,
 
     /// 电源设置
-    pub acc: AccConfig,
+    pub power: PowerConfig,
 
     /// 时序表
-    pub list: Vec<TaskItem>,
-    pub list_count_time: Duration,
+    pub count_time: Duration,
+    pub task_loop: u32,
+    pub items: Vec<TaskItem>,
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
@@ -36,14 +39,14 @@ impl AB {
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
-pub struct AccConfig {
-    pub mode: AccMode,
-    pub voltage: Duration,
-    pub current: Duration,
+pub struct PowerConfig {
+    pub mode: PowerMode,
+    pub voltage: u32,
+    pub current: u32,
 }
 
-#[derive(Debug, Clone, Default, Serialize, Deserialize)]
-pub enum AccMode {
+#[derive(Debug, Clone, Default, Serialize, Deserialize, strum::AsRefStr, strum::VariantArray)]
+pub enum PowerMode {
     #[default]
     Ac,
     Dc,
@@ -55,7 +58,7 @@ pub enum TaskItem {
     #[default]
     Null,
     // 电源充饥
-    Acc {
+    Power {
         dur: Duration,
         is_on: bool,
     },

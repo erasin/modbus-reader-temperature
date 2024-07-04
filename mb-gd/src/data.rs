@@ -2,6 +2,7 @@
 
 use godot::prelude::*;
 use mb::voltage::VoltageChannel;
+use mb_data::task;
 
 #[derive(GodotConvert, Var, Export, Debug, Default, Clone, Copy, PartialEq, Eq)]
 #[godot(via = GString)]
@@ -28,11 +29,20 @@ impl AB {
     }
 }
 
-impl From<mb_data::task::AB> for AB {
-    fn from(value: mb_data::task::AB) -> Self {
+impl From<task::AB> for AB {
+    fn from(value: task::AB) -> Self {
         match value {
-            mb_data::task::AB::A => Self::Apanel,
-            mb_data::task::AB::B => Self::Bpanel,
+            task::AB::A => Self::Apanel,
+            task::AB::B => Self::Bpanel,
+        }
+    }
+}
+
+impl Into<task::AB> for AB {
+    fn into(self) -> task::AB {
+        match self {
+            AB::Apanel => task::AB::A,
+            AB::Bpanel => task::AB::B,
         }
     }
 }

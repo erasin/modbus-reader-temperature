@@ -3,7 +3,7 @@ use godot::{
     obj::WithBaseField,
     prelude::*,
 };
-use mb::voltage::{VoltageChannel, VOLTAGE_CHANNEL};
+use mb::voltage::VoltageChannel;
 use strum::AsRefStr;
 
 use crate::colors::ColorPlate;

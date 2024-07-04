@@ -10,7 +10,10 @@ use godot::{
 use mb::protocol::get_ports;
 use strum::AsRefStr;
 
-use crate::scenes::my_global::{get_global_config, set_global_config};
+use crate::{
+    scenes::my_global::{get_global_config, set_global_config},
+    utils::string_number_only,
+};
 use mb_data::config::{Baudrate, Config, DefectiveRule};
 
 #[derive(GodotClass)]
@@ -61,19 +64,19 @@ impl SettingView {
     }
 
     #[func]
-    fn on_enable_a_panel(&mut self, value: bool) {
-        self.config.enable_a_panel = value;
+    fn on_enable_a_panel(&mut self, toggle_on: bool) {
+        self.config.enable_a_panel = toggle_on;
         self.ab_init();
     }
 
     #[func]
-    fn on_enable_b_panel(&mut self, value: bool) {
-        self.config.enable_b_panel = value;
+    fn on_enable_b_panel(&mut self, toggle_on: bool) {
+        self.config.enable_b_panel = toggle_on;
         self.ab_init();
     }
 
     #[func]
-    fn on_voltage_a_port_item_selected(&mut self, index: i32) {
+    fn on_voltage_a_port_item_selected(&mut self, index: u32) {
         let ports = get_ports();
 
         let sel = match ports.get(index as usize) {
@@ -87,7 +90,7 @@ impl SettingView {
     }
 
     #[func]
-    fn on_voltage_a_baudrate_item_selected(&mut self, index: i32) {
+    fn on_voltage_a_baudrate_item_selected(&mut self, index: u32) {
         let sel = match Baudrate::ALL.get(index as usize) {
             Some(&b) => b,
             None => return,
@@ -99,7 +102,7 @@ impl SettingView {
     }
 
     #[func]
-    fn on_voltage_b_port_item_selected(&mut self, index: i32) {
+    fn on_voltage_b_port_item_selected(&mut self, index: u32) {
         let ports = get_ports();
 
         let sel = match ports.get(index as usize) {
@@ -113,7 +116,7 @@ impl SettingView {
     }
 
     #[func]
-    fn on_voltage_b_baudrate_item_selected(&mut self, index: i32) {
+    fn on_voltage_b_baudrate_item_selected(&mut self, index: u32) {
         let sel = match Baudrate::ALL.get(index as usize) {
             Some(&b) => b,
             None => return,
@@ -125,7 +128,7 @@ impl SettingView {
     }
 
     #[func]
-    fn on_temp_port_item_selected(&mut self, index: i32) {
+    fn on_temp_port_item_selected(&mut self, index: u32) {
         let ports = get_ports();
 
         let sel = match ports.get(index as usize) {
@@ -139,7 +142,7 @@ impl SettingView {
     }
 
     #[func]
-    fn on_temp_baudrate_item_selected(&mut self, index: i32) {
+    fn on_temp_baudrate_item_selected(&mut self, index: u32) {
         let sel = match Baudrate::ALL.get(index as usize) {
             Some(&b) => b,
             None => return,
@@ -151,7 +154,7 @@ impl SettingView {
     }
 
     #[func]
-    fn on_relay_port_item_selected(&mut self, index: i32) {
+    fn on_relay_port_item_selected(&mut self, index: u32) {
         let ports = get_ports();
 
         let sel = match ports.get(index as usize) {
@@ -165,7 +168,7 @@ impl SettingView {
     }
 
     #[func]
-    fn on_relay_baudrate_item_selected(&mut self, index: i32) {
+    fn on_relay_baudrate_item_selected(&mut self, index: u32) {
         let sel = match Baudrate::ALL.get(index as usize) {
             Some(&b) => b,
             None => return,
@@ -177,7 +180,7 @@ impl SettingView {
     }
 
     #[func]
-    fn on_power_a_port_item_selected(&mut self, index: i32) {
+    fn on_power_a_port_item_selected(&mut self, index: u32) {
         let ports = get_ports();
 
         let sel = match ports.get(index as usize) {
@@ -191,7 +194,7 @@ impl SettingView {
     }
 
     #[func]
-    fn on_power_a_baudrate_item_selected(&mut self, index: i32) {
+    fn on_power_a_baudrate_item_selected(&mut self, index: u32) {
         let sel = match Baudrate::ALL.get(index as usize) {
             Some(&b) => b,
             None => return,
@@ -203,7 +206,7 @@ impl SettingView {
     }
 
     #[func]
-    fn on_power_b_port_item_selected(&mut self, index: i32) {
+    fn on_power_b_port_item_selected(&mut self, index: u32) {
         let ports = get_ports();
 
         let sel = match ports.get(index as usize) {
@@ -217,7 +220,7 @@ impl SettingView {
     }
 
     #[func]
-    fn on_power_b_baudrate_item_selected(&mut self, index: i32) {
+    fn on_power_b_baudrate_item_selected(&mut self, index: u32) {
         let sel = match Baudrate::ALL.get(index as usize) {
             Some(&b) => b,
             None => return,
@@ -234,7 +237,7 @@ impl SettingView {
             .base()
             .get_node_as::<LineEdit>(UniqueName::VoltageAStartNum.to_string());
 
-        let text = number_only(text);
+        let text = string_number_only(text);
         let dur = text
             .parse::<u8>()
             .unwrap_or_default()
@@ -251,7 +254,7 @@ impl SettingView {
             .base()
             .get_node_as::<LineEdit>(UniqueName::VoltageAEndNum.to_string());
 
-        let text = number_only(text);
+        let text = string_number_only(text);
         let dur = text
             .parse::<u8>()
             .unwrap_or_default()
@@ -268,7 +271,7 @@ impl SettingView {
             .base()
             .get_node_as::<LineEdit>(UniqueName::VoltageBStartNum.to_string());
 
-        let text = number_only(text);
+        let text = string_number_only(text);
         let dur = text
             .parse::<u8>()
             .unwrap_or_default()
@@ -285,7 +288,7 @@ impl SettingView {
             .base()
             .get_node_as::<LineEdit>(UniqueName::VoltageBEndNum.to_string());
 
-        let text = number_only(text);
+        let text = string_number_only(text);
         let dur = text
             .parse::<u8>()
             .unwrap_or_default()
@@ -302,7 +305,7 @@ impl SettingView {
             .base()
             .get_node_as::<LineEdit>(UniqueName::TempSlave.to_string());
 
-        let text = number_only(text);
+        let text = string_number_only(text);
         let dur = text
             .parse::<u8>()
             .unwrap_or_default()
@@ -319,7 +322,7 @@ impl SettingView {
             .base()
             .get_node_as::<LineEdit>(UniqueName::RelaySlave.to_string());
 
-        let text = number_only(text);
+        let text = string_number_only(text);
         let dur = text
             .parse::<u8>()
             .unwrap_or_default()
@@ -336,7 +339,7 @@ impl SettingView {
             .base()
             .get_node_as::<LineEdit>(UniqueName::PowerASlave.to_string());
 
-        let text = number_only(text);
+        let text = string_number_only(text);
         let dur = text
             .parse::<u8>()
             .unwrap_or_default()
@@ -353,7 +356,7 @@ impl SettingView {
             .base()
             .get_node_as::<LineEdit>(UniqueName::PowerBSlave.to_string());
 
-        let text = number_only(text);
+        let text = string_number_only(text);
         let dur = text
             .parse::<u8>()
             .unwrap_or_default()
@@ -388,7 +391,7 @@ impl SettingView {
             .base()
             .get_node_as::<LineEdit>(UniqueName::DefectiveDur.to_string());
 
-        let text = number_only(text);
+        let text = string_number_only(text);
         let dur = text.parse::<u32>().unwrap_or_default();
         self.config.defective.dur = dur;
         let len = text.len();
@@ -402,7 +405,7 @@ impl SettingView {
             .base()
             .get_node_as::<LineEdit>(UniqueName::HistoryLogDur.to_string());
 
-        let text = number_only(text);
+        let text = string_number_only(text);
         let dur = text.parse::<u32>().unwrap_or_default();
         self.config.history.log_dur = dur;
         let len = text.len();
@@ -416,7 +419,7 @@ impl SettingView {
             .base()
             .get_node_as::<LineEdit>(UniqueName::HistoryLazyDur.to_string());
 
-        let text = number_only(text);
+        let text = string_number_only(text);
         let dur = text.parse::<u32>().unwrap_or_default();
         self.config.history.defective_lazy_dur = dur;
         let len = text.len();
@@ -830,12 +833,6 @@ impl SettingView {
         panel_a.set_visible(self.config.enable_a_panel);
         panel_b.set_visible(self.config.enable_b_panel);
     }
-}
-
-fn number_only(text: String) -> String {
-    text.chars()
-        .filter_map(|c| if c.is_digit(10) { Some(c) } else { None })
-        .collect()
 }
 
 #[derive(AsRefStr, Debug)]

@@ -24,347 +24,355 @@ layout_mode = 2
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+theme_override_constants/margin_top = 5
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer"]
 layout_mode = 2
 
-[node name="老化柜" type="PanelContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
+[node name="老化柜" type="PanelContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2
 theme_override_styles/panel = ExtResource("1_6fv7b")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/老化柜"]
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/老化柜"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/老化柜/VBoxContainer"]
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/老化柜/VBoxContainer"]
 layout_mode = 2
 theme_override_styles/normal = ExtResource("1_u6mbo")
 text = "老化柜名称"
 
-[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/老化柜/VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/老化柜/VBoxContainer"]
 layout_mode = 2
 
-[node name="启用" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/老化柜/VBoxContainer/HBoxContainer"]
+[node name="启用" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/老化柜/VBoxContainer/HBoxContainer"]
 custom_minimum_size = Vector2(80, 0)
 layout_mode = 2
 text = "名称："
 horizontal_alignment = 2
 
-[node name="ProName" type="LineEdit" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/老化柜/VBoxContainer/HBoxContainer"]
+[node name="ProName" type="LineEdit" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/老化柜/VBoxContainer/HBoxContainer"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
 placeholder_text = "名称"
 
-[node name="版面" type="PanelContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
+[node name="版面" type="PanelContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer"]
 custom_minimum_size = Vector2(14.56, 0)
 layout_mode = 2
 theme_override_styles/panel = ExtResource("1_6fv7b")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/版面"]
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/版面"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/版面/VBoxContainer"]
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/版面/VBoxContainer"]
 layout_mode = 2
 theme_override_styles/normal = ExtResource("1_u6mbo")
 text = "版面使用"
 
-[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/版面/VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/版面/VBoxContainer"]
 layout_mode = 2
 
-[node name="启用" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/版面/VBoxContainer/HBoxContainer"]
+[node name="启用" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/版面/VBoxContainer/HBoxContainer"]
 custom_minimum_size = Vector2(80, 0)
 layout_mode = 2
 text = "启用："
 horizontal_alignment = 2
 
-[node name="EnableApanel" type="CheckBox" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/版面/VBoxContainer/HBoxContainer"]
+[node name="EnableApanel" type="CheckBox" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/版面/VBoxContainer/HBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "A面"
 
-[node name="EnableBpanel" type="CheckBox" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/版面/VBoxContainer/HBoxContainer"]
+[node name="EnableBpanel" type="CheckBox" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/版面/VBoxContainer/HBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "B面"
 
-[node name="不良品判定" type="PanelContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
+[node name="不良品判定" type="PanelContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2
 theme_override_styles/panel = ExtResource("1_6fv7b")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/不良品判定"]
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/不良品判定"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/不良品判定/VBoxContainer"]
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/不良品判定/VBoxContainer"]
 layout_mode = 2
 theme_override_styles/normal = ExtResource("1_u6mbo")
 text = "不良品判定"
 
-[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/不良品判定/VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/不良品判定/VBoxContainer"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/不良品判定/VBoxContainer/HBoxContainer"]
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/不良品判定/VBoxContainer/HBoxContainer"]
 custom_minimum_size = Vector2(80, 0)
 layout_mode = 2
 text = "方式判定："
 horizontal_alignment = 2
 
-[node name="DefectiveRule" type="OptionButton" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/不良品判定/VBoxContainer/HBoxContainer"]
+[node name="DefectiveRule" type="OptionButton" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/不良品判定/VBoxContainer/HBoxContainer"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
 
-[node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/不良品判定/VBoxContainer"]
+[node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/不良品判定/VBoxContainer"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/不良品判定/VBoxContainer/HBoxContainer2"]
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/不良品判定/VBoxContainer/HBoxContainer2"]
 custom_minimum_size = Vector2(80, 0)
 layout_mode = 2
 text = "时间判定："
 horizontal_alignment = 2
 
-[node name="DefectiveDur" type="LineEdit" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/不良品判定/VBoxContainer/HBoxContainer2"]
+[node name="DefectiveDur" type="LineEdit" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/不良品判定/VBoxContainer/HBoxContainer2"]
 unique_name_in_owner = true
 layout_mode = 2
 placeholder_text = "60"
 alignment = 1
 
-[node name="Label2" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/不良品判定/VBoxContainer/HBoxContainer2"]
+[node name="Label2" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/不良品判定/VBoxContainer/HBoxContainer2"]
 layout_mode = 2
 text = "秒"
 
-[node name="HBoxContainer3" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/不良品判定/VBoxContainer"]
+[node name="HBoxContainer3" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/不良品判定/VBoxContainer"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/不良品判定/VBoxContainer/HBoxContainer3"]
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/不良品判定/VBoxContainer/HBoxContainer3"]
 custom_minimum_size = Vector2(80, 0)
 layout_mode = 2
 horizontal_alignment = 2
 
-[node name="温度" type="PanelContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
+[node name="温度" type="PanelContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2
 theme_override_styles/panel = ExtResource("1_6fv7b")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/温度"]
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/温度"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/温度/VBoxContainer"]
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/温度/VBoxContainer"]
 layout_mode = 2
 theme_override_styles/normal = ExtResource("1_u6mbo")
 text = "温度模块"
 
-[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/温度/VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/温度/VBoxContainer"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/温度/VBoxContainer/HBoxContainer"]
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/温度/VBoxContainer/HBoxContainer"]
 custom_minimum_size = Vector2(80, 0)
 layout_mode = 2
 text = "端口："
 horizontal_alignment = 2
 
-[node name="TempPort" type="OptionButton" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/温度/VBoxContainer/HBoxContainer"]
+[node name="TempPort" type="OptionButton" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/温度/VBoxContainer/HBoxContainer"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
 
-[node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/温度/VBoxContainer"]
+[node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/温度/VBoxContainer"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/温度/VBoxContainer/HBoxContainer2"]
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/温度/VBoxContainer/HBoxContainer2"]
 custom_minimum_size = Vector2(80, 0)
 layout_mode = 2
 text = "波特率："
 horizontal_alignment = 2
 
-[node name="TempBaudrate" type="OptionButton" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/温度/VBoxContainer/HBoxContainer2"]
+[node name="TempBaudrate" type="OptionButton" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/温度/VBoxContainer/HBoxContainer2"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
 
-[node name="HBoxContainer3" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/温度/VBoxContainer"]
+[node name="HBoxContainer3" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/温度/VBoxContainer"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/温度/VBoxContainer/HBoxContainer3"]
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/温度/VBoxContainer/HBoxContainer3"]
 custom_minimum_size = Vector2(80, 0)
 layout_mode = 2
 text = "通道："
 horizontal_alignment = 2
 
-[node name="TempSlave" type="LineEdit" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/温度/VBoxContainer/HBoxContainer3"]
+[node name="TempSlave" type="LineEdit" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/温度/VBoxContainer/HBoxContainer3"]
 unique_name_in_owner = true
 layout_mode = 2
 placeholder_text = "1"
 alignment = 1
 
-[node name="继电器" type="PanelContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
+[node name="继电器" type="PanelContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2
 theme_override_styles/panel = ExtResource("1_6fv7b")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/继电器"]
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/继电器"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/继电器/VBoxContainer"]
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/继电器/VBoxContainer"]
 layout_mode = 2
 theme_override_styles/normal = ExtResource("1_u6mbo")
 text = "开关模块"
 
-[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/继电器/VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/继电器/VBoxContainer"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/继电器/VBoxContainer/HBoxContainer"]
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/继电器/VBoxContainer/HBoxContainer"]
 custom_minimum_size = Vector2(80, 0)
 layout_mode = 2
 text = "端口："
 horizontal_alignment = 2
 
-[node name="RelayPort" type="OptionButton" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/继电器/VBoxContainer/HBoxContainer"]
+[node name="RelayPort" type="OptionButton" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/继电器/VBoxContainer/HBoxContainer"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
 
-[node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/继电器/VBoxContainer"]
+[node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/继电器/VBoxContainer"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/继电器/VBoxContainer/HBoxContainer2"]
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/继电器/VBoxContainer/HBoxContainer2"]
 custom_minimum_size = Vector2(80, 0)
 layout_mode = 2
 text = "波特率："
 horizontal_alignment = 2
 
-[node name="RelayBaudrate" type="OptionButton" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/继电器/VBoxContainer/HBoxContainer2"]
+[node name="RelayBaudrate" type="OptionButton" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/继电器/VBoxContainer/HBoxContainer2"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
 
-[node name="HBoxContainer3" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/继电器/VBoxContainer"]
+[node name="HBoxContainer3" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/继电器/VBoxContainer"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/继电器/VBoxContainer/HBoxContainer3"]
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/继电器/VBoxContainer/HBoxContainer3"]
 custom_minimum_size = Vector2(80, 0)
 layout_mode = 2
 text = "通道："
 horizontal_alignment = 2
 
-[node name="RelaySlave" type="LineEdit" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/继电器/VBoxContainer/HBoxContainer3"]
+[node name="RelaySlave" type="LineEdit" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/继电器/VBoxContainer/HBoxContainer3"]
 unique_name_in_owner = true
 layout_mode = 2
 placeholder_text = "1"
 alignment = 1
 
-[node name="VBoxContainer2" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+[node name="MarginContainer2" type="MarginContainer" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_right = 10
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer2"]
 layout_mode = 2
 
-[node name="PanelA" type="PanelContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2"]
+[node name="PanelA" type="PanelContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer2/VBoxContainer2"]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2/PanelA"]
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer2/VBoxContainer2/PanelA"]
 layout_mode = 2
 
-[node name="电源" type="PanelContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2/PanelA/VBoxContainer"]
+[node name="电源" type="PanelContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer2/VBoxContainer2/PanelA/VBoxContainer"]
 layout_mode = 2
 theme_override_styles/panel = ExtResource("1_6fv7b")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2/PanelA/VBoxContainer/电源"]
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer2/VBoxContainer2/PanelA/VBoxContainer/电源"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2/PanelA/VBoxContainer/电源/VBoxContainer"]
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer2/VBoxContainer2/PanelA/VBoxContainer/电源/VBoxContainer"]
 layout_mode = 2
 theme_override_styles/normal = ExtResource("1_u6mbo")
 text = "电源模块A"
 
-[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2/PanelA/VBoxContainer/电源/VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer2/VBoxContainer2/PanelA/VBoxContainer/电源/VBoxContainer"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2/PanelA/VBoxContainer/电源/VBoxContainer/HBoxContainer"]
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer2/VBoxContainer2/PanelA/VBoxContainer/电源/VBoxContainer/HBoxContainer"]
 custom_minimum_size = Vector2(80, 0)
 layout_mode = 2
 text = "端口："
 horizontal_alignment = 2
 
-[node name="PowerAPort" type="OptionButton" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2/PanelA/VBoxContainer/电源/VBoxContainer/HBoxContainer"]
+[node name="PowerAPort" type="OptionButton" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer2/VBoxContainer2/PanelA/VBoxContainer/电源/VBoxContainer/HBoxContainer"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
 
-[node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2/PanelA/VBoxContainer/电源/VBoxContainer"]
+[node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer2/VBoxContainer2/PanelA/VBoxContainer/电源/VBoxContainer"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2/PanelA/VBoxContainer/电源/VBoxContainer/HBoxContainer2"]
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer2/VBoxContainer2/PanelA/VBoxContainer/电源/VBoxContainer/HBoxContainer2"]
 custom_minimum_size = Vector2(80, 0)
 layout_mode = 2
 text = "波特率："
 horizontal_alignment = 2
 
-[node name="PowerABaudrate" type="OptionButton" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2/PanelA/VBoxContainer/电源/VBoxContainer/HBoxContainer2"]
+[node name="PowerABaudrate" type="OptionButton" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer2/VBoxContainer2/PanelA/VBoxContainer/电源/VBoxContainer/HBoxContainer2"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
 
-[node name="HBoxContainer3" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2/PanelA/VBoxContainer/电源/VBoxContainer"]
+[node name="HBoxContainer3" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer2/VBoxContainer2/PanelA/VBoxContainer/电源/VBoxContainer"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2/PanelA/VBoxContainer/电源/VBoxContainer/HBoxContainer3"]
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer2/VBoxContainer2/PanelA/VBoxContainer/电源/VBoxContainer/HBoxContainer3"]
 custom_minimum_size = Vector2(80, 0)
 layout_mode = 2
 text = "通道："
 horizontal_alignment = 2
 
-[node name="PowerASlave" type="LineEdit" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2/PanelA/VBoxContainer/电源/VBoxContainer/HBoxContainer3"]
+[node name="PowerASlave" type="LineEdit" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer2/VBoxContainer2/PanelA/VBoxContainer/电源/VBoxContainer/HBoxContainer3"]
 unique_name_in_owner = true
 layout_mode = 2
 placeholder_text = "1"
 alignment = 1
 
-[node name="电压电流" type="PanelContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2/PanelA/VBoxContainer"]
-custom_minimum_size = Vector2(14.56, 0)
+[node name="电压电流" type="PanelContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer2/VBoxContainer2/PanelA/VBoxContainer"]
 layout_mode = 2
 theme_override_styles/panel = ExtResource("1_6fv7b")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2/PanelA/VBoxContainer/电压电流"]
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer2/VBoxContainer2/PanelA/VBoxContainer/电压电流"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2/PanelA/VBoxContainer/电压电流/VBoxContainer"]
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer2/VBoxContainer2/PanelA/VBoxContainer/电压电流/VBoxContainer"]
 layout_mode = 2
 theme_override_styles/normal = ExtResource("1_u6mbo")
 text = "电压电流模块A"
 
-[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2/PanelA/VBoxContainer/电压电流/VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer2/VBoxContainer2/PanelA/VBoxContainer/电压电流/VBoxContainer"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2/PanelA/VBoxContainer/电压电流/VBoxContainer/HBoxContainer"]
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer2/VBoxContainer2/PanelA/VBoxContainer/电压电流/VBoxContainer/HBoxContainer"]
 custom_minimum_size = Vector2(80, 0)
 layout_mode = 2
 text = "端口："
 horizontal_alignment = 2
 
-[node name="VoltageAPort" type="OptionButton" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2/PanelA/VBoxContainer/电压电流/VBoxContainer/HBoxContainer"]
+[node name="VoltageAPort" type="OptionButton" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer2/VBoxContainer2/PanelA/VBoxContainer/电压电流/VBoxContainer/HBoxContainer"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
 
-[node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2/PanelA/VBoxContainer/电压电流/VBoxContainer"]
+[node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer2/VBoxContainer2/PanelA/VBoxContainer/电压电流/VBoxContainer"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2/PanelA/VBoxContainer/电压电流/VBoxContainer/HBoxContainer2"]
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer2/VBoxContainer2/PanelA/VBoxContainer/电压电流/VBoxContainer/HBoxContainer2"]
 custom_minimum_size = Vector2(80, 0)
 layout_mode = 2
 text = "波特率："
 horizontal_alignment = 2
 
-[node name="VoltageABaudrate" type="OptionButton" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2/PanelA/VBoxContainer/电压电流/VBoxContainer/HBoxContainer2"]
+[node name="VoltageABaudrate" type="OptionButton" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer2/VBoxContainer2/PanelA/VBoxContainer/电压电流/VBoxContainer/HBoxContainer2"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
 
-[node name="VoltageSlaveA" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2/PanelA/VBoxContainer/电压电流/VBoxContainer"]
+[node name="VoltageSlaveA" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer2/VBoxContainer2/PanelA/VBoxContainer/电压电流/VBoxContainer"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2/PanelA/VBoxContainer/电压电流/VBoxContainer/VoltageSlaveA"]
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer2/VBoxContainer2/PanelA/VBoxContainer/电压电流/VBoxContainer/VoltageSlaveA"]
 custom_minimum_size = Vector2(80, 0)
 layout_mode = 2
 text = "A面通道："
 horizontal_alignment = 2
 
-[node name="VoltageAStartNum" type="LineEdit" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2/PanelA/VBoxContainer/电压电流/VBoxContainer/VoltageSlaveA"]
+[node name="VoltageAStartNum" type="LineEdit" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer2/VBoxContainer2/PanelA/VBoxContainer/电压电流/VBoxContainer/VoltageSlaveA"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(50, 0)
 layout_mode = 2
@@ -374,11 +382,11 @@ alignment = 1
 max_length = 3
 virtual_keyboard_type = 2
 
-[node name="Label2" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2/PanelA/VBoxContainer/电压电流/VBoxContainer/VoltageSlaveA"]
+[node name="Label2" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer2/VBoxContainer2/PanelA/VBoxContainer/电压电流/VBoxContainer/VoltageSlaveA"]
 layout_mode = 2
 text = "至"
 
-[node name="VoltageAEndNum" type="LineEdit" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2/PanelA/VBoxContainer/电压电流/VBoxContainer/VoltageSlaveA"]
+[node name="VoltageAEndNum" type="LineEdit" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer2/VBoxContainer2/PanelA/VBoxContainer/电压电流/VBoxContainer/VoltageSlaveA"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(50, 0)
 layout_mode = 2
@@ -387,119 +395,118 @@ alignment = 1
 max_length = 3
 virtual_keyboard_type = 2
 
-[node name="PanelB" type="PanelContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2"]
+[node name="PanelB" type="PanelContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer2/VBoxContainer2"]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="BoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2/PanelB"]
+[node name="BoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer2/VBoxContainer2/PanelB"]
 layout_mode = 2
 
-[node name="电源" type="PanelContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2/PanelB/BoxContainer"]
+[node name="电源" type="PanelContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer2/VBoxContainer2/PanelB/BoxContainer"]
 layout_mode = 2
 theme_override_styles/panel = ExtResource("1_6fv7b")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2/PanelB/BoxContainer/电源"]
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer2/VBoxContainer2/PanelB/BoxContainer/电源"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2/PanelB/BoxContainer/电源/VBoxContainer"]
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer2/VBoxContainer2/PanelB/BoxContainer/电源/VBoxContainer"]
 layout_mode = 2
 theme_override_styles/normal = ExtResource("1_u6mbo")
 text = "电源模块B"
 
-[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2/PanelB/BoxContainer/电源/VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer2/VBoxContainer2/PanelB/BoxContainer/电源/VBoxContainer"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2/PanelB/BoxContainer/电源/VBoxContainer/HBoxContainer"]
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer2/VBoxContainer2/PanelB/BoxContainer/电源/VBoxContainer/HBoxContainer"]
 custom_minimum_size = Vector2(80, 0)
 layout_mode = 2
 text = "端口："
 horizontal_alignment = 2
 
-[node name="PowerBPort" type="OptionButton" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2/PanelB/BoxContainer/电源/VBoxContainer/HBoxContainer"]
+[node name="PowerBPort" type="OptionButton" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer2/VBoxContainer2/PanelB/BoxContainer/电源/VBoxContainer/HBoxContainer"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
 
-[node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2/PanelB/BoxContainer/电源/VBoxContainer"]
+[node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer2/VBoxContainer2/PanelB/BoxContainer/电源/VBoxContainer"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2/PanelB/BoxContainer/电源/VBoxContainer/HBoxContainer2"]
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer2/VBoxContainer2/PanelB/BoxContainer/电源/VBoxContainer/HBoxContainer2"]
 custom_minimum_size = Vector2(80, 0)
 layout_mode = 2
 text = "波特率："
 horizontal_alignment = 2
 
-[node name="PowerBBaudrate" type="OptionButton" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2/PanelB/BoxContainer/电源/VBoxContainer/HBoxContainer2"]
+[node name="PowerBBaudrate" type="OptionButton" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer2/VBoxContainer2/PanelB/BoxContainer/电源/VBoxContainer/HBoxContainer2"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
 
-[node name="HBoxContainer3" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2/PanelB/BoxContainer/电源/VBoxContainer"]
+[node name="HBoxContainer3" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer2/VBoxContainer2/PanelB/BoxContainer/电源/VBoxContainer"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2/PanelB/BoxContainer/电源/VBoxContainer/HBoxContainer3"]
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer2/VBoxContainer2/PanelB/BoxContainer/电源/VBoxContainer/HBoxContainer3"]
 custom_minimum_size = Vector2(80, 0)
 layout_mode = 2
 text = "通道："
 horizontal_alignment = 2
 
-[node name="PowerBSlave" type="LineEdit" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2/PanelB/BoxContainer/电源/VBoxContainer/HBoxContainer3"]
+[node name="PowerBSlave" type="LineEdit" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer2/VBoxContainer2/PanelB/BoxContainer/电源/VBoxContainer/HBoxContainer3"]
 unique_name_in_owner = true
 layout_mode = 2
 placeholder_text = "1"
 alignment = 1
 
-[node name="电压电流" type="PanelContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2/PanelB/BoxContainer"]
-custom_minimum_size = Vector2(14.56, 0)
+[node name="电压电流" type="PanelContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer2/VBoxContainer2/PanelB/BoxContainer"]
 layout_mode = 2
 theme_override_styles/panel = ExtResource("1_6fv7b")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2/PanelB/BoxContainer/电压电流"]
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer2/VBoxContainer2/PanelB/BoxContainer/电压电流"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2/PanelB/BoxContainer/电压电流/VBoxContainer"]
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer2/VBoxContainer2/PanelB/BoxContainer/电压电流/VBoxContainer"]
 layout_mode = 2
 theme_override_styles/normal = ExtResource("1_u6mbo")
 text = "电压电流模块B"
 
-[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2/PanelB/BoxContainer/电压电流/VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer2/VBoxContainer2/PanelB/BoxContainer/电压电流/VBoxContainer"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2/PanelB/BoxContainer/电压电流/VBoxContainer/HBoxContainer"]
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer2/VBoxContainer2/PanelB/BoxContainer/电压电流/VBoxContainer/HBoxContainer"]
 custom_minimum_size = Vector2(80, 0)
 layout_mode = 2
 text = "端口："
 horizontal_alignment = 2
 
-[node name="VoltageBPort" type="OptionButton" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2/PanelB/BoxContainer/电压电流/VBoxContainer/HBoxContainer"]
+[node name="VoltageBPort" type="OptionButton" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer2/VBoxContainer2/PanelB/BoxContainer/电压电流/VBoxContainer/HBoxContainer"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
 
-[node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2/PanelB/BoxContainer/电压电流/VBoxContainer"]
+[node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer2/VBoxContainer2/PanelB/BoxContainer/电压电流/VBoxContainer"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2/PanelB/BoxContainer/电压电流/VBoxContainer/HBoxContainer2"]
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer2/VBoxContainer2/PanelB/BoxContainer/电压电流/VBoxContainer/HBoxContainer2"]
 custom_minimum_size = Vector2(80, 0)
 layout_mode = 2
 text = "波特率："
 horizontal_alignment = 2
 
-[node name="VoltageBBaudrate" type="OptionButton" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2/PanelB/BoxContainer/电压电流/VBoxContainer/HBoxContainer2"]
+[node name="VoltageBBaudrate" type="OptionButton" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer2/VBoxContainer2/PanelB/BoxContainer/电压电流/VBoxContainer/HBoxContainer2"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
 
-[node name="VoltageSlaveB" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2/PanelB/BoxContainer/电压电流/VBoxContainer"]
+[node name="VoltageSlaveB" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer2/VBoxContainer2/PanelB/BoxContainer/电压电流/VBoxContainer"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2/PanelB/BoxContainer/电压电流/VBoxContainer/VoltageSlaveB"]
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer2/VBoxContainer2/PanelB/BoxContainer/电压电流/VBoxContainer/VoltageSlaveB"]
 custom_minimum_size = Vector2(80, 0)
 layout_mode = 2
 text = "B面通道："
 horizontal_alignment = 2
 
-[node name="VoltageBStartNum" type="LineEdit" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2/PanelB/BoxContainer/电压电流/VBoxContainer/VoltageSlaveB"]
+[node name="VoltageBStartNum" type="LineEdit" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer2/VBoxContainer2/PanelB/BoxContainer/电压电流/VBoxContainer/VoltageSlaveB"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(50, 0)
 layout_mode = 2
@@ -509,11 +516,11 @@ alignment = 1
 max_length = 3
 virtual_keyboard_type = 2
 
-[node name="Label2" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2/PanelB/BoxContainer/电压电流/VBoxContainer/VoltageSlaveB"]
+[node name="Label2" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer2/VBoxContainer2/PanelB/BoxContainer/电压电流/VBoxContainer/VoltageSlaveB"]
 layout_mode = 2
 text = "至"
 
-[node name="VoltageBEndNum" type="LineEdit" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2/PanelB/BoxContainer/电压电流/VBoxContainer/VoltageSlaveB"]
+[node name="VoltageBEndNum" type="LineEdit" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer2/VBoxContainer2/PanelB/BoxContainer/电压电流/VBoxContainer/VoltageSlaveB"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(50, 0)
 layout_mode = 2
@@ -522,83 +529,87 @@ alignment = 1
 max_length = 3
 virtual_keyboard_type = 2
 
-[node name="VBoxContainer3" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+[node name="MarginContainer3" type="MarginContainer" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+theme_override_constants/margin_top = 5
+
+[node name="VBoxContainer3" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer3"]
 layout_mode = 2
 
-[node name="历史数据" type="PanelContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer3"]
+[node name="历史数据" type="PanelContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer3/VBoxContainer3"]
 custom_minimum_size = Vector2(260, 0)
 layout_mode = 2
 theme_override_styles/panel = ExtResource("1_6fv7b")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer3/历史数据"]
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer3/VBoxContainer3/历史数据"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer3/历史数据/VBoxContainer"]
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer3/VBoxContainer3/历史数据/VBoxContainer"]
 layout_mode = 2
 theme_override_styles/normal = ExtResource("1_u6mbo")
 text = "历史数据"
 
-[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer3/历史数据/VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer3/VBoxContainer3/历史数据/VBoxContainer"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer3/历史数据/VBoxContainer/HBoxContainer"]
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer3/VBoxContainer3/历史数据/VBoxContainer/HBoxContainer"]
 custom_minimum_size = Vector2(80, 0)
 layout_mode = 2
 text = "记录频率："
 horizontal_alignment = 2
 
-[node name="HistoryLogDur" type="LineEdit" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer3/历史数据/VBoxContainer/HBoxContainer"]
+[node name="HistoryLogDur" type="LineEdit" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer3/VBoxContainer3/历史数据/VBoxContainer/HBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 placeholder_text = "1"
 alignment = 1
 
-[node name="Label2" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer3/历史数据/VBoxContainer/HBoxContainer"]
+[node name="Label2" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer3/VBoxContainer3/历史数据/VBoxContainer/HBoxContainer"]
 layout_mode = 2
 text = "秒"
 
-[node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer3/历史数据/VBoxContainer"]
+[node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer3/VBoxContainer3/历史数据/VBoxContainer"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer3/历史数据/VBoxContainer/HBoxContainer2"]
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer3/VBoxContainer3/历史数据/VBoxContainer/HBoxContainer2"]
 custom_minimum_size = Vector2(80, 0)
 layout_mode = 2
 text = "老化延时："
 horizontal_alignment = 2
 
-[node name="HistoryLazyDur" type="LineEdit" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer3/历史数据/VBoxContainer/HBoxContainer2"]
+[node name="HistoryLazyDur" type="LineEdit" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer3/VBoxContainer3/历史数据/VBoxContainer/HBoxContainer2"]
 unique_name_in_owner = true
 layout_mode = 2
 placeholder_text = "1"
 alignment = 1
 
-[node name="Label2" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer3/历史数据/VBoxContainer/HBoxContainer2"]
+[node name="Label2" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer3/VBoxContainer3/历史数据/VBoxContainer/HBoxContainer2"]
 layout_mode = 2
 text = "秒"
 
-[node name="HBoxContainer3" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer3/历史数据/VBoxContainer"]
+[node name="HBoxContainer3" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer3/VBoxContainer3/历史数据/VBoxContainer"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer3/历史数据/VBoxContainer/HBoxContainer3"]
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer3/VBoxContainer3/历史数据/VBoxContainer/HBoxContainer3"]
 custom_minimum_size = Vector2(80, 0)
 layout_mode = 2
 text = "保存路径："
 horizontal_alignment = 2
 
-[node name="HistoryExportDirBtn" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer3/历史数据/VBoxContainer/HBoxContainer3"]
+[node name="HistoryExportDirBtn" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer3/VBoxContainer3/历史数据/VBoxContainer/HBoxContainer3"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "选择路径"
 
-[node name="HBoxContainer4" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer3/历史数据/VBoxContainer"]
+[node name="HBoxContainer4" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer3/VBoxContainer3/历史数据/VBoxContainer"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer3/历史数据/VBoxContainer/HBoxContainer4"]
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer3/VBoxContainer3/历史数据/VBoxContainer/HBoxContainer4"]
 custom_minimum_size = Vector2(80, 0)
 layout_mode = 2
 horizontal_alignment = 2
 
-[node name="HistoryExportDir" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer3/历史数据/VBoxContainer/HBoxContainer4"]
+[node name="HistoryExportDir" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer3/VBoxContainer3/历史数据/VBoxContainer/HBoxContainer4"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "路径"

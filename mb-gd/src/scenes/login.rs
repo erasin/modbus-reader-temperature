@@ -25,16 +25,15 @@ impl IPanelContainer for LoginView {
     fn ready(&mut self) {
         godot_print!("user ready");
 
-        let mut pwd = self
+        let mut pwd_node = self
             .base()
             .get_node_as::<LineEdit>(UniqueName::Pwd.as_ref());
-        pwd.connect("text_submitted".into(), self.base().callable("on_pwd"));
+        pwd_node.connect("text_submitted".into(), self.base().callable("on_pwd"));
 
-        let mut submit = self
+        let mut submit_btn = self
             .base()
             .get_node_as::<Button>(UniqueName::Submit.as_ref());
-
-        submit.connect("pressed".into(), self.base().callable("on_submit"));
+        submit_btn.connect("pressed".into(), self.base().callable("on_submit"));
     }
 }
 
@@ -47,17 +46,18 @@ impl LoginView {
 
     #[func]
     fn on_submit(&mut self) {
-        let name = self
+        let name_node = self
             .base()
             .get_node_as::<LineEdit>(UniqueName::Name.as_ref());
 
-        let pwd = self
+        let pwd_node = self
             .base()
             .get_node_as::<LineEdit>(UniqueName::Pwd.as_ref());
-        let mut err = self.base().get_node_as::<Label>(UniqueName::Error.as_ref());
 
-        let user_name = name.get_text().to_string().trim().to_string();
-        let user_pwd = pwd.get_text().to_string().trim().to_string();
+        let mut err_node = self.base().get_node_as::<Label>(UniqueName::Error.as_ref());
+
+        let user_name = name_node.get_text().to_string().trim().to_string();
+        let user_pwd = pwd_node.get_text().to_string().trim().to_string();
 
         // let user = UserConfig::new(user_name, user_pwd);
 
@@ -74,7 +74,7 @@ impl LoginView {
         };
 
         if user_name != user.name || !user.check_pwd(user_pwd) {
-            err.set_text("账户或密码错误，请重试！".into_godot());
+            err_node.set_text("账户或密码错误，请重试！".into_godot());
             return;
         }
 

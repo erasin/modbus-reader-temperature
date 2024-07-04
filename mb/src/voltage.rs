@@ -113,7 +113,7 @@ impl From<VoltageF32> for VoltageData {
                 let ch = VoltageChannel {
                     index: i,
                     voltage: chunk[0] / 1000.0,     // 电压 / 1000. 单位 V
-                    current: chunk[1],              // TODO 处理电流单位 mA ？
+                    current: chunk[1] / 1000.0,     // TODO 处理电流单位 mA ？
                     state: VoltageState::Qualified, // 默认正常
                 };
                 ch_list[i] = ch;

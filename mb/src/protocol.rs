@@ -2,7 +2,6 @@
 
 use core::fmt;
 use serialport::{SerialPort, SerialPortType};
-use std::ops::DerefMut;
 use std::{thread, time::Duration};
 
 use crate::error::Error;

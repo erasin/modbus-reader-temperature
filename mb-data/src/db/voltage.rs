@@ -1,9 +1,8 @@
 use mb::voltage::VoltageData;
 use mb::Result;
 use redb::{Database, ReadableTable, TableDefinition};
-use time::ext::NumericalDuration;
 
-use crate::{error::Error, utils::time_now};
+use crate::error::Error;
 
 const TABLE: TableDefinition<String, &[u8]> = TableDefinition::new("voltage");
 

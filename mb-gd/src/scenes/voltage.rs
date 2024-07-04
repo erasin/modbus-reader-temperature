@@ -4,7 +4,7 @@ use godot::{
     obj::WithBaseField,
     prelude::*,
 };
-use mb::voltage::{get_mb_state, VoltageData, VoltageState, VOLTAGE_CHANNEL};
+use mb::voltage::{VoltageData, VoltageState, VOLTAGE_CHANNEL};
 use state_tag::VoltageStateTagView;
 use strum::{AsRefStr, IntoEnumIterator};
 

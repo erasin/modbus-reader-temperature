@@ -9,6 +9,7 @@ use godot::{
 use mb_data::{
     config::Config,
     db::{config::TableGlobal, get_db},
+    task::Task,
     user::UserConfig,
     utils::{get_time_offset, time_now},
 };
@@ -22,6 +23,10 @@ pub struct MyGlobal {
     config: Option<Config>,
     pub user_state: Option<UserConfig>,
     sub_window: u8,
+
+    // TODO task
+    task_a: Option<Task>,
+    task_b: Option<Task>,
 
     base: Base<Object>,
 }
@@ -38,6 +43,8 @@ impl IObject for MyGlobal {
             config: None,
             user_state: None,
             sub_window: 0b0000,
+            task_a: None,
+            task_b: None,
             base,
         }
     }

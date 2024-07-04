@@ -29,21 +29,21 @@ impl IPanelContainer for UserManagerView {
         godot_print!("user manager ready");
 
         // 添加权限list and connect
-        let mut purview = self
+        let mut purview_node = self
             .base()
             .get_node_as::<BoxContainer>(UniqueName::Purview.as_ref());
 
         UserPurview::iter().into_iter().for_each(|up| {
             let mut cb = CheckBox::new_alloc();
             cb.set_text(up.to_string().into());
-            purview.add_child(cb.upcast());
+            purview_node.add_child(cb.upcast());
         });
 
-        let mut user_list = self
+        let mut user_list_node = self
             .base()
             .get_node_as::<ItemList>(UniqueName::UserList.as_ref());
 
-        user_list.connect(
+        user_list_node.connect(
             "item_selected".into(),
             self.base().callable("on_user_item_selected"),
         );
@@ -86,36 +86,36 @@ impl UserManagerView {
 
     #[func]
     fn on_submit(&mut self) {
-        let mut err = self.base().get_node_as::<Label>(UniqueName::Error.as_ref());
-        err.set_text("".into());
+        let mut err_node = self.base().get_node_as::<Label>(UniqueName::Error.as_ref());
+        err_node.set_text("".into());
 
-        let name = self
+        let name_node = self
             .base()
             .get_node_as::<LineEdit>(UniqueName::Name.as_ref());
-        let user_name = name.get_text().to_string().trim().to_string();
+        let user_name = name_node.get_text().to_string().trim().to_string();
 
         if user_name.is_empty() {
-            err.set_text("用户名不可为空！".into());
+            err_node.set_text("用户名不可为空！".into());
             return;
         }
 
-        let user_pwd = self
+        let user_pwd_node = self
             .base()
             .get_node_as::<LineEdit>(UniqueName::Pwd.as_ref());
-        let user_pwd = user_pwd.get_text().to_string().trim().to_string();
+        let user_pwd = user_pwd_node.get_text().to_string().trim().to_string();
 
         if user_pwd.is_empty() {
-            err.set_text("密码不可为空！".into());
+            err_node.set_text("密码不可为空！".into());
             return;
         }
 
         let mut user_purview: Vec<UserPurview> = Vec::new();
 
-        let purview = self
+        let purview_node = self
             .base()
             .get_node_as::<BoxContainer>(UniqueName::Purview.as_ref());
 
-        purview
+        purview_node
             .get_children()
             .iter_shared()
             .enumerate()
