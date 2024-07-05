@@ -1,6 +1,6 @@
 use channel::VoltageChannelView;
 use godot::{
-    engine::{Button, Control, IPanelContainer, Label, PanelContainer, Timer},
+    engine::{Button, Control, GridContainer, IPanelContainer, Label, PanelContainer, Timer},
     obj::WithBaseField,
     prelude::*,
 };
@@ -9,7 +9,7 @@ use state_tag::VoltageStateTagView;
 use strum::{AsRefStr, IntoEnumIterator};
 
 use crate::{
-    chart::ChartView, colors::IntoColor, data::AB, mb_sync::get_voltage_data,
+    chart::ChartView, colors::IntoColor, data::AB, define_get_nodes, mb_sync::get_voltage_data,
     scenes::my_global::get_global_config,
 };
 
@@ -44,9 +44,7 @@ impl IPanelContainer for VoltageView {
         self.channel_scene = load("res://voltage/channel.tscn");
         self.tag_scene = load("res://voltage/state_tag.tscn");
 
-        let mut label_ab_name = self
-            .base()
-            .get_node_as::<Label>(UniqueName::AbName.as_ref());
+        let mut label_ab_name = self.get_ab_name_node();
         label_ab_name.set_text(self.ab.title().into());
 
         let mut req_timer = self.base().get_node_as::<Timer>("ReqTimer");
@@ -56,9 +54,7 @@ impl IPanelContainer for VoltageView {
         );
 
         // 标签显示
-        let mut tags_container = self
-            .base_mut()
-            .get_node_as::<Control>(UniqueName::Tags.as_ref());
+        let mut tags_container = self.get_tags_node();
         for s in VoltageState::iter() {
             let mut tag_scene = self.tag_scene.instantiate_as::<VoltageStateTagView>();
             tags_container.add_child(tag_scene.clone().upcast());
@@ -70,18 +66,13 @@ impl IPanelContainer for VoltageView {
         }
 
         // 开启
-        let mut start_btn = self
-            .base()
-            .get_node_as::<Button>(UniqueName::StartToggle.as_ref());
+        let mut start_btn = self.get_start_toggle_node();
         start_btn.connect(
             "pressed".into(),
             self.base().callable("on_start_toggle_sync"),
         );
 
-        let mut chart = self
-            .base()
-            .get_node_as::<ChartView>(UniqueName::Chart.as_ref());
-
+        let mut chart = self.get_chart_node();
         {
             let mut chart = chart.bind_mut();
 
@@ -120,13 +111,8 @@ impl VoltageView {
     #[func]
     fn on_start_toggle_sync(&mut self) {
         godot_print!("--- start pull");
-        let mut start_btn = self
-            .base()
-            .get_node_as::<Button>(UniqueName::StartToggle.as_ref());
-
-        let mut timer = self
-            .base()
-            .get_node_as::<Timer>(UniqueName::ReqTimer.as_ref());
+        let mut start_btn = self.get_start_toggle_node();
+        let mut timer = self.get_req_timer_node();
         if timer.is_stopped() {
             timer.start();
             start_btn.set_text("停止".into());
@@ -138,23 +124,19 @@ impl VoltageView {
 }
 
 impl VoltageView {
-    pub fn mb_read(&mut self) {
+    fn mb_read(&mut self) {
         let config = get_global_config();
 
-        //TODO 根据 AB 区 获取参数
+        //根据 AB 区 获取参数
         let voltage = match self.ab {
             AB::Apanel => config.voltage_a.clone(),
             AB::Bpanel => config.voltage_b.clone(),
         };
 
-        let mut label_ab_name = self
-            .base()
-            .get_node_as::<Label>(UniqueName::AbName.as_ref());
+        let mut label_ab_name = self.get_ab_name_node();
         label_ab_name.set_text(self.ab.title().into());
 
-        let mut timer = self
-            .base()
-            .get_node_as::<Timer>(UniqueName::ReqTimer.as_ref());
+        let mut timer = self.get_req_timer_node();
 
         // godot_print!("voltage init -- {:?}", voltage);
 
@@ -170,9 +152,7 @@ impl VoltageView {
                     Err(e) => {
                         timer.stop();
 
-                        let mut start_btn = self
-                            .base()
-                            .get_node_as::<Button>(UniqueName::StartToggle.as_ref());
+                        let mut start_btn = self.get_start_toggle_node();
                         start_btn.set_text("开始".into());
 
                         godot_print!(" Write failed {:?}: {:?}", voltage, e);
@@ -187,9 +167,7 @@ impl VoltageView {
         // self.data = Some(data.clone());
         // godot_print!(" Write failed {:?}", data);
 
-        let mut content = self
-            .base_mut()
-            .get_node_as::<Control>(UniqueName::Container.as_ref());
+        let mut content = self.get_container_node();
         let has = content.get_child_count() == (VOLTAGE_CHANNEL * data.len()) as i32;
 
         for (j, data) in data.iter().enumerate() {
@@ -225,6 +203,29 @@ impl VoltageView {
 
         self.base_mut().emit_signal("mb_read_over".into(), &[]);
     }
+
+    define_get_nodes![
+        (get_tags_node, UniqueName::Tags, Control),
+        (get_req_timer_node, UniqueName::ReqTimer, Timer),
+        (get_container_node, UniqueName::Container, GridContainer),
+        (get_start_toggle_node, UniqueName::StartToggle, Button),
+        (get_ageing_toggle_node, UniqueName::AgeingToggle, Button),
+        (get_vcc_toggle_node, UniqueName::VccToggle, Button),
+        (get_pro_name_node, UniqueName::ProName, Label),
+        (get_start_time_node, UniqueName::StartTime, Label),
+        (get_count_down_time_node, UniqueName::CountDownTime, Label),
+        (get_ageing_time_node, UniqueName::AgeingTime, Label),
+        (get_acc_state_node, UniqueName::AccState, Label),
+        (get_count_num_node, UniqueName::CountNum, Label),
+        (get_count_good_node, UniqueName::CountGood, Label),
+        (get_count_defective_node, UniqueName::CountDefective, Label),
+        (get_ab_name_node, UniqueName::AbName, Label),
+        (get_state_run_node, UniqueName::StateRun, Label),
+        (get_state_error_node, UniqueName::StateError, Label),
+        (get_state_ageing_node, UniqueName::StateAgeing, Label),
+        (get_state_acc_node, UniqueName::StateAcc, Label),
+        (get_chart_node, UniqueName::Chart, ChartView),
+    ];
 }
 
 #[derive(AsRefStr, Debug)]

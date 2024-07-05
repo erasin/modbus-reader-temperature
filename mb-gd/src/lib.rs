@@ -8,6 +8,7 @@ mod chart;
 mod colors;
 mod data;
 mod error;
+mod macros;
 mod mb_sync;
 mod scenes;
 mod utils;

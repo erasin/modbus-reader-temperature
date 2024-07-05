@@ -87,7 +87,7 @@ fn generate_response_voltage() -> Vec<u16> {
                 0 => rng.gen_range(0..20),
                 1 => rng.gen_range(20..100),
                 _ => rng.gen_range(100..500),
-            };
+            } * 1000;
 
             (voltage as u16, current as u16)
         })

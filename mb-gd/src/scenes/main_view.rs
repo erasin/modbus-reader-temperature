@@ -10,7 +10,7 @@ use godot::{
 use mb_data::dirs;
 use strum::AsRefStr;
 
-use crate::scenes::my_global::get_global_config;
+use crate::{define_get_nodes, scenes::my_global::get_global_config};
 
 use super::{
     my_global::MyGlobal,
@@ -32,21 +32,16 @@ impl IPanelContainer for MainView {
         self.sub_window = load("res://sub_window.tscn");
         self.file_dialog = load("res://sys/file_dialog.tscn");
 
-        let mut login_btn = self
-            .base()
-            .get_node_as::<Button>(UniqueName::LoginBtn.as_ref());
+        let mut login_btn = self.get_login_btn_node();
         login_btn.connect("pressed".into(), self.base().callable("on_login"));
 
-        self.base()
-            .get_node_as::<Button>(UniqueName::SystemSetBtn.as_ref())
+        self.get_system_set_btn_node()
             .connect("pressed".into(), self.base().callable("on_setting"));
 
-        self.base()
-            .get_node_as::<Button>(UniqueName::UserManagerBtn.as_ref())
+        self.get_user_manager_btn_node()
             .connect("pressed".into(), self.base().callable("on_user_manager"));
 
-        self.base()
-            .get_node_as::<Button>(UniqueName::ProgramsBtn.as_ref())
+        self.get_programs_btn_node()
             .connect("pressed".into(), self.base().callable("on_programs"));
 
         let mut my_global = MyGlobal::singleton();
@@ -73,10 +68,10 @@ impl IPanelContainer for MainView {
         // voltage_b.bind_mut().set_ab(AB::Bpanel.to_godot());
 
         // TODO remove
-        let mut open_btn = self.base().get_node_as::<Button>(UniqueName::Open.as_ref());
+        let mut open_btn = self.get_open_node();
         open_btn.connect("pressed".into(), self.base().callable("open_xls"));
 
-        let mut save_btn = self.base().get_node_as::<Button>(UniqueName::Save.as_ref());
+        let mut save_btn = self.get_save_node();
         save_btn.connect("pressed".into(), self.base().callable("save_xls"));
     }
 }
@@ -232,22 +227,13 @@ impl MainView {
     fn ab_init(&mut self) {
         let config = get_global_config();
 
-        self.base()
-            .get_node_as::<PanelContainer>(UniqueName::Apanel.as_ref())
-            .set_visible(config.enable_a_panel);
-
-        self.base()
-            .get_node_as::<PanelContainer>(UniqueName::Bpanel.as_ref())
-            .set_visible(config.enable_b_panel);
+        self.get_apanel_node().set_visible(config.enable_a_panel);
+        self.get_bpanel_node().set_visible(config.enable_b_panel);
     }
 
     fn user_state_update(&mut self) {
-        let mut login_btn = self
-            .base()
-            .get_node_as::<Button>(UniqueName::LoginBtn.as_ref());
-        let mut label = self
-            .base()
-            .get_node_as::<Label>(UniqueName::LoginUserName.as_ref());
+        let mut login_btn = self.get_login_btn_node();
+        let mut label = self.get_login_user_name_node();
 
         let g = MyGlobal::singleton();
         match g.bind().get_login() {
@@ -261,6 +247,24 @@ impl MainView {
             }
         };
     }
+
+    define_get_nodes![
+        (get_login_user_name_node, UniqueName::LoginUserName, Label),
+        (get_login_btn_node, UniqueName::LoginBtn, Button),
+        (get_apanel_node, UniqueName::Apanel, PanelContainer),
+        (get_bpanel_node, UniqueName::Bpanel, PanelContainer),
+        (get_voltage_a_node, UniqueName::VoltageA, Button),
+        (get_voltage_b_node, UniqueName::VoltageB, Button),
+        (get_system_set_btn_node, UniqueName::SystemSetBtn, Button),
+        (get_programs_btn_node, UniqueName::ProgramsBtn, Button),
+        (
+            get_user_manager_btn_node,
+            UniqueName::UserManagerBtn,
+            Button
+        ),
+        (get_open_node, UniqueName::Open, Button),
+        (get_save_node, UniqueName::Save, Button),
+    ];
 }
 
 #[derive(AsRefStr, Debug)]

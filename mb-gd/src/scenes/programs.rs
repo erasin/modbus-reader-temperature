@@ -5,7 +5,7 @@ use godot::{
     obj::WithBaseField,
     prelude::*,
 };
-use mb::utils::{hms_from_duration, hms_from_duration_string, time_from_hms};
+use mb::utils::{hms_from_duration_string, time_from_hms};
 use strum::{AsRefStr, VariantArray};
 
 use mb_data::{
@@ -15,6 +15,7 @@ use mb_data::{
 };
 
 use crate::{
+    define_get_nodes,
     scenes::my_global::get_global_config,
     utils::{string_cut, string_number_only},
 };
@@ -44,16 +45,10 @@ impl IPanelContainer for ProgramsView {
         godot_print!("programs ready");
         self.config = get_global_config();
 
-        let mut check_a_btn = self
-            .base()
-            .get_node_as::<Button>(UniqueName::CheckA.as_ref());
-
+        let mut check_a_btn = self.get_check_a_node();
         check_a_btn.connect("pressed".into(), self.base().callable("on_check_a"));
 
-        let mut check_b_btn = self
-            .base()
-            .get_node_as::<Button>(UniqueName::CheckB.as_ref());
-
+        let mut check_b_btn = self.get_check_b_node();
         check_b_btn.connect("pressed".into(), self.base().callable("on_check_b"));
 
         // read config
@@ -73,169 +68,120 @@ impl IPanelContainer for ProgramsView {
         self.task.task_loop = 1;
         self.task.power.voltage = 220;
 
-        let mut temp_node = self
-            .base()
-            .get_node_as::<LineEdit>(UniqueName::Temp.as_ref());
-
+        let mut temp_node = self.get_temp_node();
         temp_node.connect(
             "text_changed".into(),
             self.base().callable("on_temp_number"),
         );
 
-        let mut voltage_top_node = self
-            .base()
-            .get_node_as::<LineEdit>(UniqueName::VoltageTop.as_ref());
-
+        let mut voltage_top_node = self.get_voltage_top_node();
         voltage_top_node.connect(
             "text_changed".into(),
             self.base().callable("on_voltage_top_number"),
         );
 
-        let mut voltage_down_node = self
-            .base()
-            .get_node_as::<LineEdit>(UniqueName::VoltageDown.as_ref());
-
+        let mut voltage_down_node = self.get_voltage_down_node();
         voltage_down_node.connect(
             "text_changed".into(),
             self.base().callable("on_voltage_down_number"),
         );
 
-        let mut current_top_node = self
-            .base()
-            .get_node_as::<LineEdit>(UniqueName::CurrentTop.as_ref());
+        let mut current_top_node = self.get_current_top_node();
         current_top_node.connect(
             "text_changed".into(),
             self.base().callable("on_current_top_number"),
         );
 
-        let mut current_down_node = self
-            .base()
-            .get_node_as::<LineEdit>(UniqueName::CurrentDown.as_ref());
+        let mut current_down_node = self.get_current_down_node();
         current_down_node.connect(
             "text_changed".into(),
             self.base().callable("on_current_down_number"),
         );
 
-        let mut power_mode_node = self
-            .base()
-            .get_node_as::<OptionButton>(UniqueName::PowerType.as_ref());
+        let mut power_mode_node = self.get_power_type_node();
         power_mode_node.connect(
             "item_selected".into(),
             self.base().callable("on_power_mode_selected"),
         );
 
-        let mut power_voltage_node = self
-            .base()
-            .get_node_as::<LineEdit>(UniqueName::PowerVoltage.as_ref());
+        let mut power_voltage_node = self.get_power_voltage_node();
         power_voltage_node.connect(
             "text_changed".into(),
             self.base().callable("on_power_voltage_number"),
         );
 
-        let mut power_current_node = self
-            .base()
-            .get_node_as::<LineEdit>(UniqueName::PowerCurrent.as_ref());
+        let mut power_current_node = self.get_power_current_node();
         power_current_node.connect(
             "text_changed".into(),
             self.base().callable("on_power_current_number"),
         );
 
-        let mut task_loop_node = self
-            .base()
-            .get_node_as::<LineEdit>(UniqueName::TaskLoop.as_ref());
+        let mut task_loop_node = self.get_task_loop_node();
         task_loop_node.connect(
             "text_changed".into(),
             self.base().callable("on_task_loop_number"),
         );
 
-        let mut task_items_node = self
-            .base()
-            .get_node_as::<ItemList>(UniqueName::TaskItems.as_ref());
+        let mut task_items_node = self.get_task_list_node();
         task_items_node.connect(
             "item_selected".into(),
             self.base().callable("on_task_item_selected"),
         );
 
         // ItemPowerVoltage
-        let mut item_power_voltage_node = self
-            .base()
-            .get_node_as::<OptionButton>(UniqueName::ItemPowerVoltage.as_ref());
+        let mut item_power_voltage_node = self.get_item_power_voltage_node();
         item_power_voltage_node.connect(
             "item_selected".into(),
             self.base().callable("on_item_power_voltage_selected"),
         );
         self.item_power_voltage_update();
 
-        let mut item_hours_node = self
-            .base()
-            .get_node_as::<LineEdit>(UniqueName::ItemHours.as_ref());
+        let mut item_hours_node = self.get_item_hours_node();
         item_hours_node.connect(
             "text_changed".into(),
             self.base().callable("on_item_hours_number"),
         );
 
-        let mut item_minutes_node = self
-            .base()
-            .get_node_as::<LineEdit>(UniqueName::ItemMinutes.as_ref());
+        let mut item_minutes_node = self.get_item_minutes_node();
         item_minutes_node.connect(
             "text_changed".into(),
             self.base().callable("on_item_minutes_number"),
         );
 
-        let mut item_seconds_node = self
-            .base()
-            .get_node_as::<LineEdit>(UniqueName::ItemSeconds.as_ref());
+        let mut item_seconds_node = self.get_item_seconds_node();
         item_seconds_node.connect(
             "text_changed".into(),
             self.base().callable("on_item_seconds_number"),
         );
 
-        let mut item_save_node = self
-            .base()
-            .get_node_as::<Button>(UniqueName::ItemSave.as_ref());
+        let mut item_save_node = self.get_item_save_node();
         item_save_node.connect("pressed".into(), self.base().callable("on_item_save"));
 
-        let mut item_edit_node = self
-            .base()
-            .get_node_as::<Button>(UniqueName::ItemEdit.as_ref());
+        let mut item_edit_node = self.get_item_edit_node();
         item_edit_node.connect("pressed".into(), self.base().callable("on_item_edit"));
 
-        let mut item_delete_node = self
-            .base()
-            .get_node_as::<Button>(UniqueName::ItemDelete.as_ref());
+        let mut item_delete_node = self.get_item_delete_node();
         item_delete_node.connect("pressed".into(), self.base().callable("on_item_delete"));
 
-        let mut item_clear_node = self
-            .base()
-            .get_node_as::<Button>(UniqueName::ItemClear.as_ref());
+        let mut item_clear_node = self.get_item_clear_node();
         item_clear_node.connect("pressed".into(), self.base().callable("on_item_clear"));
 
-        let mut task_list_node = self
-            .base()
-            .get_node_as::<ItemList>(UniqueName::TaskList.as_ref());
+        let mut task_list_node = self.get_task_list_node();
         task_list_node.connect(
             "item_selected".into(),
             self.base().callable("on_task_list_selected"),
         );
 
-        let mut task_save_node = self
-            .base()
-            .get_node_as::<Button>(UniqueName::TaskSave.as_ref());
+        let mut task_save_node = self.get_task_save_node();
         task_save_node.connect("pressed".into(), self.base().callable("on_task_save"));
 
-        let mut task_edit_node = self
-            .base()
-            .get_node_as::<Button>(UniqueName::TaskEdit.as_ref());
+        let mut task_edit_node = self.get_task_edit_node();
         task_edit_node.connect("pressed".into(), self.base().callable("on_task_edit"));
 
-        let mut task_delete_node = self
-            .base()
-            .get_node_as::<Button>(UniqueName::TaskDelete.as_ref());
+        let mut task_delete_node = self.get_task_delete_node();
         task_delete_node.connect("pressed".into(), self.base().callable("on_task_delete"));
 
-        let mut task_load_node = self
-            .base()
-            .get_node_as::<Button>(UniqueName::TaskLoad.as_ref());
+        let mut task_load_node = self.get_task_load_node();
         task_load_node.connect("pressed".into(), self.base().callable("on_task_load"));
 
         self.task_items_update();
@@ -255,16 +201,10 @@ impl ProgramsView {
     fn on_check_a(&mut self) {
         self.task.ab = AB::A;
 
-        let mut check_a_btn = self
-            .base()
-            .get_node_as::<Button>(UniqueName::CheckA.as_ref());
-
+        let mut check_a_btn = self.get_check_a_node();
         check_a_btn.set_disabled(true);
 
-        let mut check_b_btn = self
-            .base()
-            .get_node_as::<Button>(UniqueName::CheckB.as_ref());
-
+        let mut check_b_btn = self.get_check_b_node();
         check_b_btn.set_disabled(false);
     }
 
@@ -272,24 +212,16 @@ impl ProgramsView {
     fn on_check_b(&mut self) {
         self.task.ab = AB::B;
 
-        let mut check_a_btn = self
-            .base()
-            .get_node_as::<Button>(UniqueName::CheckA.as_ref());
-
+        let mut check_a_btn = self.get_check_a_node();
         check_a_btn.set_disabled(false);
 
-        let mut check_b_btn = self
-            .base()
-            .get_node_as::<Button>(UniqueName::CheckB.as_ref());
-
+        let mut check_b_btn = self.get_check_b_node();
         check_b_btn.set_disabled(true);
     }
 
     #[func]
     fn on_temp_number(&mut self, text: String) {
-        let mut number = self
-            .base()
-            .get_node_as::<LineEdit>(UniqueName::Temp.as_ref());
+        let mut number = self.get_temp_node();
 
         let text = string_number_only(text);
         let dur = text
@@ -306,9 +238,7 @@ impl ProgramsView {
 
     #[func]
     fn on_voltage_top_number(&mut self, text: String) {
-        let mut number = self
-            .base()
-            .get_node_as::<LineEdit>(UniqueName::VoltageTop.as_ref());
+        let mut number = self.get_voltage_top_node();
 
         let text = string_number_only(text);
         let dur = text
@@ -325,9 +255,7 @@ impl ProgramsView {
 
     #[func]
     fn on_voltage_down_number(&mut self, text: String) {
-        let mut number = self
-            .base()
-            .get_node_as::<LineEdit>(UniqueName::VoltageDown.as_ref());
+        let mut number = self.get_voltage_down_node();
 
         let text = string_number_only(text);
         let dur = text
@@ -344,9 +272,7 @@ impl ProgramsView {
 
     #[func]
     fn on_current_top_number(&mut self, text: String) {
-        let mut number = self
-            .base()
-            .get_node_as::<LineEdit>(UniqueName::CurrentTop.as_ref());
+        let mut number = self.get_current_top_node();
 
         let text = string_number_only(text);
         let dur = text
@@ -363,9 +289,7 @@ impl ProgramsView {
 
     #[func]
     fn on_current_down_number(&mut self, text: String) {
-        let mut number = self
-            .base()
-            .get_node_as::<LineEdit>(UniqueName::CurrentDown.as_ref());
+        let mut number = self.get_current_down_node();
 
         let text = string_number_only(text);
         let dur = text
@@ -390,9 +314,7 @@ impl ProgramsView {
 
     #[func]
     fn on_power_voltage_number(&mut self, text: String) {
-        let mut number = self
-            .base()
-            .get_node_as::<LineEdit>(UniqueName::PowerVoltage.as_ref());
+        let mut number = self.get_power_voltage_node();
 
         let text = string_number_only(text);
         let dur = text
@@ -410,9 +332,7 @@ impl ProgramsView {
 
     #[func]
     fn on_power_current_number(&mut self, text: String) {
-        let mut number = self
-            .base()
-            .get_node_as::<LineEdit>(UniqueName::PowerCurrent.as_ref());
+        let mut number = self.get_power_current_node();
 
         let text = string_number_only(text);
         let dur = text
@@ -429,9 +349,7 @@ impl ProgramsView {
 
     #[func]
     fn on_task_loop_number(&mut self, text: String) {
-        let mut number = self
-            .base()
-            .get_node_as::<LineEdit>(UniqueName::TaskLoop.as_ref());
+        let mut number = self.get_task_loop_node();
 
         let text = string_number_only(text);
         let dur = text
@@ -463,9 +381,7 @@ impl ProgramsView {
 
     #[func]
     fn on_item_hours_number(&mut self, text: String) {
-        let mut number = self
-            .base()
-            .get_node_as::<LineEdit>(UniqueName::ItemHours.as_ref());
+        let mut number = self.get_item_hours_node();
 
         let text = string_number_only(text);
         let len = text.len();
@@ -478,9 +394,7 @@ impl ProgramsView {
 
     #[func]
     fn on_item_minutes_number(&mut self, text: String) {
-        let mut number = self
-            .base()
-            .get_node_as::<LineEdit>(UniqueName::ItemMinutes.as_ref());
+        let mut number = self.get_item_minutes_node();
 
         let text = string_number_only(text);
         let len = text.len();
@@ -493,9 +407,7 @@ impl ProgramsView {
 
     #[func]
     fn on_item_seconds_number(&mut self, text: String) {
-        let mut number = self
-            .base()
-            .get_node_as::<LineEdit>(UniqueName::ItemSeconds.as_ref());
+        let mut number = self.get_item_seconds_node();
 
         let text = string_number_only(text);
         let len = text.len();
@@ -547,9 +459,7 @@ impl ProgramsView {
 
 impl ProgramsView {
     fn item_power_voltage_update(&mut self) {
-        let mut item_power_voltage_node = self
-            .base()
-            .get_node_as::<OptionButton>(UniqueName::ItemPowerVoltage.as_ref());
+        let mut item_power_voltage_node = self.get_item_power_voltage_node();
 
         item_power_voltage_node.clear();
         let voltage = self.task.power.voltage;
@@ -559,9 +469,7 @@ impl ProgramsView {
 
     // 计算时间
     fn item_total_time(&mut self) {
-        let item_hours_node = self
-            .base()
-            .get_node_as::<LineEdit>(UniqueName::ItemHours.as_ref());
+        let item_hours_node = self.get_item_hours_node();
         let text = item_hours_node.get_text();
         let text = string_number_only(text.to_string());
         let hours = text
@@ -569,10 +477,7 @@ impl ProgramsView {
             .unwrap_or_default()
             .clamp(u32::MIN, u32::MAX) as u64;
 
-        let item_minutes_node = self
-            .base()
-            .get_node_as::<LineEdit>(UniqueName::ItemMinutes.as_ref());
-
+        let item_minutes_node = self.get_item_minutes_node();
         let text = item_minutes_node.get_text();
         let text = string_number_only(text.to_string());
         let minutes = text
@@ -580,10 +485,7 @@ impl ProgramsView {
             .unwrap_or_default()
             .clamp(u32::MIN, u32::MAX) as u64;
 
-        let item_seconds_node = self
-            .base()
-            .get_node_as::<LineEdit>(UniqueName::ItemSeconds.as_ref());
-
+        let item_seconds_node = self.get_item_seconds_node();
         let text = item_seconds_node.get_text();
         let text = string_number_only(text.to_string());
         let seconds = text
@@ -608,9 +510,7 @@ impl ProgramsView {
 
         let text = hms_from_duration_string(dur);
 
-        let mut count_time_node = self
-            .base()
-            .get_node_as::<Label>(UniqueName::CountTime.as_ref());
+        let mut count_time_node = self.get_count_time_node();
         count_time_node.set_text(text.into());
     }
 
@@ -685,6 +585,41 @@ impl ProgramsView {
     }
 
     fn task_load(&mut self) {}
+
+    // get node
+    define_get_nodes![
+        (get_check_a_node, UniqueName::CheckA, Button),
+        (get_check_b_node, UniqueName::CheckB, Button),
+        (get_task_name_node, UniqueName::TaskName, LineEdit),
+        (get_temp_node, UniqueName::Temp, LineEdit),
+        (get_voltage_top_node, UniqueName::VoltageTop, LineEdit),
+        (get_voltage_down_node, UniqueName::VoltageDown, LineEdit),
+        (get_current_top_node, UniqueName::CurrentTop, LineEdit),
+        (get_current_down_node, UniqueName::CurrentDown, LineEdit),
+        (get_power_type_node, UniqueName::PowerType, OptionButton),
+        (get_power_voltage_node, UniqueName::PowerVoltage, LineEdit),
+        (get_power_current_node, UniqueName::PowerCurrent, LineEdit),
+        (get_count_time_node, UniqueName::CountTime, Label),
+        (get_task_loop_node, UniqueName::TaskLoop, LineEdit),
+        (get_task_items_node, UniqueName::TaskItems, ItemList),
+        (
+            get_item_power_voltage_node,
+            UniqueName::ItemPowerVoltage,
+            OptionButton
+        ),
+        (get_item_hours_node, UniqueName::ItemHours, LineEdit),
+        (get_item_minutes_node, UniqueName::ItemMinutes, LineEdit),
+        (get_item_seconds_node, UniqueName::ItemSeconds, LineEdit),
+        (get_item_save_node, UniqueName::ItemSave, Button),
+        (get_item_edit_node, UniqueName::ItemEdit, Button),
+        (get_item_delete_node, UniqueName::ItemDelete, Button),
+        (get_item_clear_node, UniqueName::ItemClear, Button),
+        (get_task_list_node, UniqueName::TaskList, ItemList),
+        (get_task_save_node, UniqueName::TaskSave, Button),
+        (get_task_edit_node, UniqueName::TaskEdit, Button),
+        (get_task_delete_node, UniqueName::TaskDelete, Button),
+        (get_task_load_node, UniqueName::TaskLoad, Button),
+    ];
 }
 
 #[derive(AsRefStr, Debug)]

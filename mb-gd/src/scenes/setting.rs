@@ -11,6 +11,7 @@ use mb::protocol::get_ports;
 use strum::AsRefStr;
 
 use crate::{
+    define_get_nodes,
     scenes::my_global::{get_global_config, set_global_config},
     utils::string_number_only,
 };
@@ -51,9 +52,7 @@ impl SettingView {
 
     #[func]
     fn on_pro_name(&mut self, text: String) {
-        let mut pro_name = self
-            .base()
-            .get_node_as::<LineEdit>(UniqueName::ProName.to_string());
+        let mut pro_name = self.get_pro_name_node();
         let text = text.trim();
 
         self.config.pro_name = text.to_owned();
@@ -233,9 +232,7 @@ impl SettingView {
 
     #[func]
     fn on_number_a_start(&mut self, text: String) {
-        let mut number = self
-            .base()
-            .get_node_as::<LineEdit>(UniqueName::VoltageAStartNum.to_string());
+        let mut number = self.get_voltage_a_start_num_node();
 
         let text = string_number_only(text);
         let dur = text
@@ -250,9 +247,7 @@ impl SettingView {
 
     #[func]
     fn on_number_a_end(&mut self, text: String) {
-        let mut number = self
-            .base()
-            .get_node_as::<LineEdit>(UniqueName::VoltageAEndNum.to_string());
+        let mut number = self.get_voltage_a_end_num_node();
 
         let text = string_number_only(text);
         let dur = text
@@ -267,9 +262,7 @@ impl SettingView {
 
     #[func]
     fn on_number_b_start(&mut self, text: String) {
-        let mut number = self
-            .base()
-            .get_node_as::<LineEdit>(UniqueName::VoltageBStartNum.to_string());
+        let mut number = self.get_voltage_b_start_num_node();
 
         let text = string_number_only(text);
         let dur = text
@@ -284,9 +277,7 @@ impl SettingView {
 
     #[func]
     fn on_number_b_end(&mut self, text: String) {
-        let mut number = self
-            .base()
-            .get_node_as::<LineEdit>(UniqueName::VoltageBEndNum.to_string());
+        let mut number = self.get_voltage_b_end_num_node();
 
         let text = string_number_only(text);
         let dur = text
@@ -301,9 +292,7 @@ impl SettingView {
 
     #[func]
     fn on_temp_slave(&mut self, text: String) {
-        let mut number = self
-            .base()
-            .get_node_as::<LineEdit>(UniqueName::TempSlave.to_string());
+        let mut number = self.get_temp_slave_node();
 
         let text = string_number_only(text);
         let dur = text
@@ -318,9 +307,7 @@ impl SettingView {
 
     #[func]
     fn on_relay_slave(&mut self, text: String) {
-        let mut number = self
-            .base()
-            .get_node_as::<LineEdit>(UniqueName::RelaySlave.to_string());
+        let mut number = self.get_relay_slave_node();
 
         let text = string_number_only(text);
         let dur = text
@@ -335,9 +322,7 @@ impl SettingView {
 
     #[func]
     fn on_power_a_slave(&mut self, text: String) {
-        let mut number = self
-            .base()
-            .get_node_as::<LineEdit>(UniqueName::PowerASlave.to_string());
+        let mut number = self.get_power_a_slave_node();
 
         let text = string_number_only(text);
         let dur = text
@@ -352,9 +337,7 @@ impl SettingView {
 
     #[func]
     fn on_power_b_slave(&mut self, text: String) {
-        let mut number = self
-            .base()
-            .get_node_as::<LineEdit>(UniqueName::PowerBSlave.to_string());
+        let mut number = self.get_power_b_slave_node();
 
         let text = string_number_only(text);
         let dur = text
@@ -387,9 +370,7 @@ impl SettingView {
 
     #[func]
     fn on_defective_dur(&mut self, text: String) {
-        let mut number = self
-            .base()
-            .get_node_as::<LineEdit>(UniqueName::DefectiveDur.to_string());
+        let mut number = self.get_defective_dur_node();
 
         let text = string_number_only(text);
         let dur = text.parse::<u32>().unwrap_or_default();
@@ -401,9 +382,7 @@ impl SettingView {
 
     #[func]
     fn on_history_log_dur(&mut self, text: String) {
-        let mut number = self
-            .base()
-            .get_node_as::<LineEdit>(UniqueName::HistoryLogDur.to_string());
+        let mut number = self.get_history_log_dur_node();
 
         let text = string_number_only(text);
         let dur = text.parse::<u32>().unwrap_or_default();
@@ -415,9 +394,7 @@ impl SettingView {
 
     #[func]
     fn on_history_lazy_dur(&mut self, text: String) {
-        let mut number = self
-            .base()
-            .get_node_as::<LineEdit>(UniqueName::HistoryLazyDur.to_string());
+        let mut number = self.get_history_lazy_dur_node();
 
         let text = string_number_only(text);
         let dur = text.parse::<u32>().unwrap_or_default();
@@ -472,50 +449,28 @@ impl SettingView {
 
 impl SettingView {
     pub fn init_data(&mut self) {
-        let mut pro_name = self
-            .base()
-            .get_node_as::<LineEdit>(UniqueName::ProName.as_ref());
+        let mut pro_name = self.get_pro_name_node();
         pro_name.connect("text_changed".into(), self.base().callable("on_pro_name"));
         pro_name.set_text(self.config.pro_name.clone().into());
+        pro_name.grab_focus();
 
         // -- a b --
-        let mut enable_a_panel = self
-            .base()
-            .get_node_as::<CheckBox>(UniqueName::EnableApanel.to_string());
+        let mut enable_a_panel = self.get_enable_apanel_node();
         enable_a_panel.set_pressed(self.config.enable_a_panel);
         enable_a_panel.connect("toggled".into(), self.base().callable("on_enable_a_panel"));
 
-        let mut enable_b_panel = self
-            .base()
-            .get_node_as::<CheckBox>(UniqueName::EnableBpanel.to_string());
+        let mut enable_b_panel = self.get_enable_bpanel_node();
         enable_b_panel.set_pressed(self.config.enable_b_panel);
         enable_b_panel.connect("toggled".into(), self.base().callable("on_enable_b_panel"));
 
         // -- port ---
 
-        let mut voltage_a_port_btn = self
-            .base()
-            .get_node_as::<OptionButton>(UniqueName::VoltageAPort.to_string());
-
-        let mut voltage_b_port_btn = self
-            .base()
-            .get_node_as::<OptionButton>(UniqueName::VoltageBPort.to_string());
-
-        let mut temp_port_btn = self
-            .base()
-            .get_node_as::<OptionButton>(UniqueName::TempPort.as_ref());
-
-        let mut relay_port_btn = self
-            .base()
-            .get_node_as::<OptionButton>(UniqueName::RelayPort.as_ref());
-
-        let mut power_a_port_btn = self
-            .base()
-            .get_node_as::<OptionButton>(UniqueName::PowerAPort.as_ref());
-
-        let mut power_b_port_btn = self
-            .base()
-            .get_node_as::<OptionButton>(UniqueName::PowerBPort.as_ref());
+        let mut voltage_a_port_btn = self.get_voltage_a_port_node();
+        let mut voltage_b_port_btn = self.get_voltage_b_port_node();
+        let mut temp_port_btn = self.get_temp_port_node();
+        let mut relay_port_btn = self.get_relay_port_node();
+        let mut power_a_port_btn = self.get_power_a_port_node();
+        let mut power_b_port_btn = self.get_power_b_port_node();
 
         let ports = get_ports();
 
@@ -596,29 +551,12 @@ impl SettingView {
 
         // --- baudrate ---
 
-        let mut voltage_a_baudrate_btn = self
-            .base()
-            .get_node_as::<OptionButton>(UniqueName::VoltageABaudrate.as_ref());
-
-        let mut voltage_b_baudrate_btn = self
-            .base()
-            .get_node_as::<OptionButton>(UniqueName::VoltageBBaudrate.as_ref());
-
-        let mut temp_baudrate_btn = self
-            .base()
-            .get_node_as::<OptionButton>(UniqueName::TempBaudrate.as_ref());
-
-        let mut relay_baudrate_btn = self
-            .base()
-            .get_node_as::<OptionButton>(UniqueName::RelayBaudrate.as_ref());
-
-        let mut power_a_baudrate_btn = self
-            .base()
-            .get_node_as::<OptionButton>(UniqueName::PowerABaudrate.as_ref());
-
-        let mut power_b_baudrate_btn = self
-            .base()
-            .get_node_as::<OptionButton>(UniqueName::PowerBBaudrate.as_ref());
+        let mut voltage_a_baudrate_btn = self.get_voltage_a_baudrate_node();
+        let mut voltage_b_baudrate_btn = self.get_voltage_b_baudrate_node();
+        let mut temp_baudrate_btn = self.get_temp_baudrate_node();
+        let mut relay_baudrate_btn = self.get_relay_baudrate_node();
+        let mut power_a_baudrate_btn = self.get_power_a_baudrate_node();
+        let mut power_b_baudrate_btn = self.get_power_b_baudrate_node();
 
         for (index, &item) in Baudrate::ALL.iter().enumerate() {
             voltage_a_baudrate_btn.add_item(item.to_string().to_godot());
@@ -677,71 +615,54 @@ impl SettingView {
 
         // --- slave ---
 
-        let mut number_a_start = self
-            .base()
-            .get_node_as::<LineEdit>(UniqueName::VoltageAStartNum.to_string());
+        let mut number_a_start = self.get_voltage_a_start_num_node();
         number_a_start.set_text(self.config.voltage_a.slave_start.to_string().into());
         number_a_start.connect(
             "text_changed".into(),
             self.base().callable("on_number_a_start"),
         );
 
-        let mut number_a_end = self
-            .base()
-            .get_node_as::<LineEdit>(UniqueName::VoltageAEndNum.to_string());
+        let mut number_a_end = self.get_voltage_a_end_num_node();
         number_a_end.set_text(self.config.voltage_a.slave_end.to_string().into());
         number_a_end.connect(
             "text_changed".into(),
             self.base().callable("on_number_a_end"),
         );
 
-        let mut number_b_start = self
-            .base()
-            .get_node_as::<LineEdit>(UniqueName::VoltageBStartNum.to_string());
+        let mut number_b_start = self.get_voltage_b_start_num_node();
         number_b_start.set_text(self.config.voltage_b.slave_start.to_string().into());
         number_b_start.connect(
             "text_changed".into(),
             self.base().callable("on_number_b_start"),
         );
 
-        let mut number_b_end = self
-            .base()
-            .get_node_as::<LineEdit>(UniqueName::VoltageBEndNum.to_string());
+        let mut number_b_end = self.get_voltage_b_end_num_node();
         number_b_end.set_text(self.config.voltage_b.slave_end.to_string().into());
         number_b_end.connect(
             "text_changed".into(),
             self.base().callable("on_number_b_end"),
         );
 
-        let mut temp_slave = self
-            .base()
-            .get_node_as::<LineEdit>(UniqueName::TempSlave.to_string());
+        let mut temp_slave = self.get_temp_slave_node();
         temp_slave.set_text(self.config.temperature.slave.to_string().into());
         temp_slave.connect("text_changed".into(), self.base().callable("on_temp_slave"));
 
-        let mut relay_slave = self
-            .base()
-            .get_node_as::<LineEdit>(UniqueName::RelaySlave.to_string());
+        let mut relay_slave = self.get_relay_slave_node();
         relay_slave.set_text(self.config.relay.slave.to_string().into());
         relay_slave.connect(
             "text_changed".into(),
             self.base().callable("on_relay_slave"),
         );
 
-        let mut power_a_slave = self
-            .base()
-            .get_node_as::<LineEdit>(UniqueName::PowerASlave.to_string());
+        let mut power_a_slave = self.get_power_a_slave_node();
         power_a_slave.set_text(self.config.power_a.slave.to_string().into());
         power_a_slave.connect(
             "text_changed".into(),
             self.base().callable("on_power_a_slave"),
         );
 
-        let mut power_b_slave = self
-            .base()
-            .get_node_as::<LineEdit>(UniqueName::PowerBSlave.to_string());
+        let mut power_b_slave = self.get_power_b_slave_node();
         power_b_slave.set_text(self.config.power_b.slave.to_string().into());
-
         power_b_slave.connect(
             "text_changed".into(),
             self.base().callable("on_power_b_slave"),
@@ -749,10 +670,7 @@ impl SettingView {
 
         // --- submit ---
 
-        let mut submit_btn = self
-            .base()
-            .get_node_as::<Button>(UniqueName::Submit.to_string());
-
+        let mut submit_btn = self.get_submit_node();
         submit_btn.connect("pressed".into(), self.base().callable("on_submit"));
     }
 
@@ -823,16 +741,114 @@ impl SettingView {
     }
 
     fn ab_init(&mut self) {
-        let mut panel_a = self
-            .base()
-            .get_node_as::<PanelContainer>(UniqueName::PanelA.as_ref());
-        let mut panel_b = self
-            .base()
-            .get_node_as::<PanelContainer>(UniqueName::PanelB.as_ref());
-
+        let mut panel_a = self.get_panel_a_node();
+        let mut panel_b = self.get_panel_b_node();
         panel_a.set_visible(self.config.enable_a_panel);
         panel_b.set_visible(self.config.enable_b_panel);
     }
+
+    define_get_nodes![
+        (get_pro_name_node, UniqueName::ProName, LineEdit),
+        (get_enable_apanel_node, UniqueName::EnableApanel, CheckBox),
+        (get_enable_bpanel_node, UniqueName::EnableBpanel, CheckBox),
+        (get_panel_a_node, UniqueName::PanelA, PanelContainer),
+        (get_panel_b_node, UniqueName::PanelB, PanelContainer),
+        (
+            get_voltage_a_port_node,
+            UniqueName::VoltageAPort,
+            OptionButton
+        ),
+        (
+            get_voltage_a_baudrate_node,
+            UniqueName::VoltageABaudrate,
+            OptionButton
+        ),
+        (
+            get_voltage_a_start_num_node,
+            UniqueName::VoltageAStartNum,
+            LineEdit
+        ),
+        (
+            get_voltage_a_end_num_node,
+            UniqueName::VoltageAEndNum,
+            LineEdit
+        ),
+        (
+            get_voltage_b_port_node,
+            UniqueName::VoltageBPort,
+            OptionButton
+        ),
+        (
+            get_voltage_b_baudrate_node,
+            UniqueName::VoltageBBaudrate,
+            OptionButton
+        ),
+        (
+            get_voltage_b_start_num_node,
+            UniqueName::VoltageBStartNum,
+            LineEdit
+        ),
+        (
+            get_voltage_b_end_num_node,
+            UniqueName::VoltageBEndNum,
+            LineEdit
+        ),
+        (get_temp_port_node, UniqueName::TempPort, OptionButton),
+        (
+            get_temp_baudrate_node,
+            UniqueName::TempBaudrate,
+            OptionButton
+        ),
+        (get_temp_slave_node, UniqueName::TempSlave, LineEdit),
+        (get_relay_port_node, UniqueName::RelayPort, OptionButton),
+        (
+            get_relay_baudrate_node,
+            UniqueName::RelayBaudrate,
+            OptionButton
+        ),
+        (get_relay_slave_node, UniqueName::RelaySlave, LineEdit),
+        (get_power_a_port_node, UniqueName::PowerAPort, OptionButton),
+        (
+            get_power_a_baudrate_node,
+            UniqueName::PowerABaudrate,
+            OptionButton
+        ),
+        (get_power_a_slave_node, UniqueName::PowerASlave, LineEdit),
+        (get_power_b_port_node, UniqueName::PowerBPort, OptionButton),
+        (
+            get_power_b_baudrate_node,
+            UniqueName::PowerBBaudrate,
+            OptionButton
+        ),
+        (get_power_b_slave_node, UniqueName::PowerBSlave, LineEdit),
+        (
+            get_defective_rule_node,
+            UniqueName::DefectiveRule,
+            OptionButton
+        ),
+        (get_defective_dur_node, UniqueName::DefectiveDur, LineEdit),
+        (
+            get_history_log_dur_node,
+            UniqueName::HistoryLogDur,
+            LineEdit
+        ),
+        (
+            get_history_lazy_dur_node,
+            UniqueName::HistoryLazyDur,
+            LineEdit
+        ),
+        (
+            get_history_export_dir_btn_node,
+            UniqueName::HistoryExportDirBtn,
+            Button
+        ),
+        (
+            get_history_export_dir_node,
+            UniqueName::HistoryExportDir,
+            Label
+        ),
+        (get_submit_node, UniqueName::Submit, Button),
+    ];
 }
 
 #[derive(AsRefStr, Debug)]

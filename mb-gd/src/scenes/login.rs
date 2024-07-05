@@ -9,6 +9,8 @@ use mb_data::{
     user::UserConfig,
 };
 
+use crate::define_get_nodes;
+
 use super::my_global::MyGlobal;
 
 #[derive(GodotClass)]
@@ -24,16 +26,13 @@ pub struct LoginView {
 impl IPanelContainer for LoginView {
     fn ready(&mut self) {
         godot_print!("user ready");
+        self.get_name_node().grab_focus();
 
-        let mut pwd_node = self
-            .base()
-            .get_node_as::<LineEdit>(UniqueName::Pwd.as_ref());
-        pwd_node.connect("text_submitted".into(), self.base().callable("on_pwd"));
+        self.get_pwd_node()
+            .connect("text_submitted".into(), self.base().callable("on_pwd"));
 
-        let mut submit_btn = self
-            .base()
-            .get_node_as::<Button>(UniqueName::Submit.as_ref());
-        submit_btn.connect("pressed".into(), self.base().callable("on_submit"));
+        self.get_submit_node()
+            .connect("pressed".into(), self.base().callable("on_submit"));
     }
 }
 
@@ -47,12 +46,8 @@ impl LoginView {
     #[func]
     fn on_submit(&mut self) {
         let name_node = self.get_name_node();
-
-        let pwd_node = self
-            .base()
-            .get_node_as::<LineEdit>(UniqueName::Pwd.as_ref());
-
-        let mut err_node = self.base().get_node_as::<Label>(UniqueName::Error.as_ref());
+        let pwd_node = self.get_pwd_node();
+        let mut err_node = self.get_error_node();
 
         let user_name = name_node.get_text().to_string().trim().to_string();
         let user_pwd = pwd_node.get_text().to_string().trim().to_string();
@@ -89,10 +84,12 @@ impl LoginView {
 }
 
 impl LoginView {
-    fn get_name_node(&mut self) -> Gd<LineEdit> {
-        self.base()
-            .get_node_as::<LineEdit>(UniqueName::Name.as_ref())
-    }
+    define_get_nodes![
+        (get_name_node, UniqueName::Name, LineEdit),
+        (get_pwd_node, UniqueName::Pwd, LineEdit),
+        (get_submit_node, UniqueName::Submit, Button),
+        (get_error_node, UniqueName::Error, Label),
+    ];
 }
 
 #[derive(AsRefStr, Debug)]
