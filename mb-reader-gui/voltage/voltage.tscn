@@ -83,7 +83,7 @@ unique_name_in_owner = true
 layout_mode = 2
 text = "老化"
 
-[node name="VccToggle" type="Button" parent="HboxContainer/功能区/VBoxContainer/按钮/VBoxContainer"]
+[node name="PowerToggle" type="Button" parent="HboxContainer/功能区/VBoxContainer/按钮/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "电源开启"
@@ -147,7 +147,7 @@ layout_mode = 2
 text = "输入电源："
 horizontal_alignment = 2
 
-[node name="AccState" type="Label" parent="HboxContainer/功能区/VBoxContainer/时间/VBoxContainer/HBoxContainer5"]
+[node name="PowerState" type="Label" parent="HboxContainer/功能区/VBoxContainer/时间/VBoxContainer/HBoxContainer5"]
 unique_name_in_owner = true
 layout_mode = 2
 
@@ -270,7 +270,7 @@ alignment = 2
 layout_mode = 2
 text = "Acc电源:"
 
-[node name="StateAcc" type="TextureRect" parent="HboxContainer/功能区/VBoxContainer/状态/VBoxContainer/HBoxContainer5"]
+[node name="StatePower" type="TextureRect" parent="HboxContainer/功能区/VBoxContainer/状态/VBoxContainer/HBoxContainer5"]
 unique_name_in_owner = true
 layout_mode = 2
 texture = ExtResource("2_gtrl5")

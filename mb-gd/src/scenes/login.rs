@@ -74,7 +74,7 @@ impl LoginView {
         // ok
         let mut my_global = MyGlobal::singleton();
         my_global.bind_mut().set_login(user);
-        my_global.emit_signal("login_update".into(), &[]);
+        // my_global.emit_signal("login_updated".into(), &[]);
 
         // close
         if let Some(mut win) = self.base_mut().get_window() {

@@ -46,11 +46,11 @@ impl IPanelContainer for MainView {
 
         let mut my_global = MyGlobal::singleton();
         my_global.connect(
-            "config_update".into(),
+            "config_updated".into(),
             self.base().callable("on_global_config_update"),
         );
         my_global.connect(
-            "login_update".into(),
+            "login_updated".into(),
             self.base().callable("on_global_login_update"),
         );
 
@@ -106,11 +106,11 @@ impl MainView {
 
     #[func]
     fn on_login(&mut self) {
-        let mut g = MyGlobal::singleton();
-        let has_login = g.bind().get_login().is_some();
+        let mut my_global = MyGlobal::singleton();
+        let has_login = my_global.bind().get_login().is_some();
         if has_login {
             // 退出登录
-            g.bind_mut().set_logout();
+            my_global.bind_mut().set_logout();
             self.user_state_update();
             return;
         };

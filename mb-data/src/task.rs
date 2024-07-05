@@ -27,7 +27,7 @@ pub struct Task {
     pub items: Vec<TaskItem>,
 }
 
-#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Default, Serialize, Deserialize)]
 pub enum AB {
     #[default]
     A,
@@ -38,14 +38,16 @@ impl AB {
     pub const ALL: [AB; 2] = [AB::A, AB::B];
 }
 
-#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Default, Serialize, Deserialize)]
 pub struct PowerConfig {
     pub mode: PowerMode,
     pub voltage: u32,
     pub current: u32,
 }
 
-#[derive(Debug, Clone, Default, Serialize, Deserialize, strum::AsRefStr, strum::VariantArray)]
+#[derive(
+    Debug, Clone, Copy, Default, Serialize, Deserialize, strum::AsRefStr, strum::VariantArray,
+)]
 pub enum PowerMode {
     #[default]
     Ac,
@@ -53,7 +55,7 @@ pub enum PowerMode {
 }
 
 // 人物内容
-#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Default, Serialize, Deserialize)]
 pub struct TaskItem {
     pub index: usize,
     pub power_on: bool,

@@ -2,6 +2,7 @@ use godot::{
     builtin::StringName,
     engine::{Engine, IObject, Object},
     log::godot_print,
+    meta::ToGodot,
     obj::{Base, Gd, WithBaseField},
     register::{godot_api, GodotClass},
 };
@@ -14,7 +15,7 @@ use mb_data::{
     utils::{get_time_offset, time_now},
 };
 
-use crate::utils::init_logging;
+use crate::{data::AB, utils::init_logging};
 
 /// 单例：用于全局数据存储
 #[derive(GodotClass)]
@@ -53,10 +54,13 @@ impl IObject for MyGlobal {
 #[godot_api]
 impl MyGlobal {
     #[signal]
-    fn config_update();
+    fn config_updated();
 
     #[signal]
-    fn login_update();
+    fn login_updated();
+
+    #[signal]
+    fn task_updated(ab: AB);
 
     #[func]
     pub fn foo(&mut self) {
@@ -115,7 +119,7 @@ impl MyGlobal {
         };
 
         self.config = Some(config);
-        self.base_mut().emit_signal("config_update".into(), &[]);
+        self.base_mut().emit_signal("config_updated".into(), &[]);
     }
 
     pub fn get_sub_window(&self) -> u8 {
@@ -133,10 +137,27 @@ impl MyGlobal {
 
     pub fn set_login(&mut self, user: UserConfig) {
         self.user_state = Some(user);
+        self.base_mut().emit_signal("login_updated".into(), &[]);
     }
 
     pub fn set_logout(&mut self) {
         self.user_state = None;
+    }
+
+    pub fn get_task(&self, ab: AB) -> Option<Task> {
+        match ab {
+            AB::Apanel => self.task_a.clone(),
+            AB::Bpanel => self.task_b.clone(),
+        }
+    }
+
+    pub fn set_task(&mut self, task: Task, ab: AB) {
+        match ab {
+            AB::Apanel => self.task_a = Some(task),
+            AB::Bpanel => self.task_b = Some(task),
+        }
+        self.base_mut()
+            .emit_signal("task_updated".into(), &[ab.to_variant()]);
     }
 }
 

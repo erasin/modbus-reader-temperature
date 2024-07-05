@@ -5,7 +5,7 @@ use godot::{
     obj::WithBaseField,
     prelude::*,
 };
-use mb::utils::{hms_from_duration_string, time_from_hms};
+use mb::utils::{hms_from_duration, hms_from_duration_string, time_from_hms};
 use strum::{AsRefStr, VariantArray};
 
 use mb_data::{
@@ -19,6 +19,8 @@ use crate::{
     scenes::my_global::get_global_config,
     utils::{string_cut, string_number_only},
 };
+
+use super::my_global::MyGlobal;
 
 #[derive(GodotClass)]
 #[class(init,base=PanelContainer)]
@@ -68,121 +70,107 @@ impl IPanelContainer for ProgramsView {
         self.task.task_loop = 1;
         self.task.power.voltage = 220;
 
-        let mut temp_node = self.get_temp_node();
-        temp_node.connect(
+        let mut task_title_node = self.get_task_name_node();
+        task_title_node.connect("text_changed".into(), self.base().callable("on_task_name"));
+        task_title_node.grab_focus();
+
+        self.get_temp_node().connect(
             "text_changed".into(),
             self.base().callable("on_temp_number"),
         );
 
-        let mut voltage_top_node = self.get_voltage_top_node();
-        voltage_top_node.connect(
+        self.get_voltage_top_node().connect(
             "text_changed".into(),
             self.base().callable("on_voltage_top_number"),
         );
 
-        let mut voltage_down_node = self.get_voltage_down_node();
-        voltage_down_node.connect(
+        self.get_voltage_down_node().connect(
             "text_changed".into(),
             self.base().callable("on_voltage_down_number"),
         );
 
-        let mut current_top_node = self.get_current_top_node();
-        current_top_node.connect(
+        self.get_current_top_node().connect(
             "text_changed".into(),
             self.base().callable("on_current_top_number"),
         );
 
-        let mut current_down_node = self.get_current_down_node();
-        current_down_node.connect(
+        self.get_current_down_node().connect(
             "text_changed".into(),
             self.base().callable("on_current_down_number"),
         );
 
-        let mut power_mode_node = self.get_power_type_node();
-        power_mode_node.connect(
+        self.get_power_type_node().connect(
             "item_selected".into(),
             self.base().callable("on_power_mode_selected"),
         );
 
-        let mut power_voltage_node = self.get_power_voltage_node();
-        power_voltage_node.connect(
+        self.get_power_voltage_node().connect(
             "text_changed".into(),
             self.base().callable("on_power_voltage_number"),
         );
 
-        let mut power_current_node = self.get_power_current_node();
-        power_current_node.connect(
+        self.get_power_current_node().connect(
             "text_changed".into(),
             self.base().callable("on_power_current_number"),
         );
 
-        let mut task_loop_node = self.get_task_loop_node();
-        task_loop_node.connect(
+        self.get_task_loop_node().connect(
             "text_changed".into(),
             self.base().callable("on_task_loop_number"),
         );
 
-        let mut task_items_node = self.get_task_list_node();
-        task_items_node.connect(
+        self.get_task_items_node().connect(
             "item_selected".into(),
             self.base().callable("on_task_item_selected"),
         );
 
         // ItemPowerVoltage
-        let mut item_power_voltage_node = self.get_item_power_voltage_node();
-        item_power_voltage_node.connect(
+        self.get_item_power_voltage_node().connect(
             "item_selected".into(),
             self.base().callable("on_item_power_voltage_selected"),
         );
         self.item_power_voltage_update();
 
-        let mut item_hours_node = self.get_item_hours_node();
-        item_hours_node.connect(
+        self.get_item_hours_node().connect(
             "text_changed".into(),
             self.base().callable("on_item_hours_number"),
         );
 
-        let mut item_minutes_node = self.get_item_minutes_node();
-        item_minutes_node.connect(
+        self.get_item_minutes_node().connect(
             "text_changed".into(),
             self.base().callable("on_item_minutes_number"),
         );
 
-        let mut item_seconds_node = self.get_item_seconds_node();
-        item_seconds_node.connect(
+        self.get_item_seconds_node().connect(
             "text_changed".into(),
             self.base().callable("on_item_seconds_number"),
         );
 
-        let mut item_save_node = self.get_item_save_node();
-        item_save_node.connect("pressed".into(), self.base().callable("on_item_save"));
+        self.get_item_save_node()
+            .connect("pressed".into(), self.base().callable("on_item_save"));
 
-        let mut item_edit_node = self.get_item_edit_node();
-        item_edit_node.connect("pressed".into(), self.base().callable("on_item_edit"));
+        self.get_item_edit_node()
+            .connect("pressed".into(), self.base().callable("on_item_edit"));
 
-        let mut item_delete_node = self.get_item_delete_node();
-        item_delete_node.connect("pressed".into(), self.base().callable("on_item_delete"));
+        self.get_item_delete_node()
+            .connect("pressed".into(), self.base().callable("on_item_delete"));
 
-        let mut item_clear_node = self.get_item_clear_node();
-        item_clear_node.connect("pressed".into(), self.base().callable("on_item_clear"));
+        self.get_item_clear_node()
+            .connect("pressed".into(), self.base().callable("on_item_clear"));
 
-        let mut task_list_node = self.get_task_list_node();
-        task_list_node.connect(
+        self.get_task_list_node().connect(
             "item_selected".into(),
             self.base().callable("on_task_list_selected"),
         );
 
-        let mut task_save_node = self.get_task_save_node();
-        task_save_node.connect("pressed".into(), self.base().callable("on_task_save"));
+        self.get_task_save_node()
+            .connect("pressed".into(), self.base().callable("on_task_save"));
 
-        let mut task_edit_node = self.get_task_edit_node();
-        task_edit_node.connect("pressed".into(), self.base().callable("on_task_edit"));
+        self.get_task_delete_node()
+            .connect("pressed".into(), self.base().callable("on_task_delete"));
 
-        let mut task_delete_node = self.get_task_delete_node();
-        task_delete_node.connect("pressed".into(), self.base().callable("on_task_delete"));
-
-        let mut task_load_node = self.get_task_load_node();
-        task_load_node.connect("pressed".into(), self.base().callable("on_task_load"));
+        self.get_task_load_node()
+            .connect("pressed".into(), self.base().callable("on_task_load"));
 
         self.task_items_update();
         self.task_list_update();
@@ -206,6 +194,8 @@ impl ProgramsView {
 
         let mut check_b_btn = self.get_check_b_node();
         check_b_btn.set_disabled(false);
+
+        self.task_list_update();
     }
 
     #[func]
@@ -217,6 +207,13 @@ impl ProgramsView {
 
         let mut check_b_btn = self.get_check_b_node();
         check_b_btn.set_disabled(true);
+
+        self.task_list_update();
+    }
+
+    #[func]
+    fn on_task_name(&mut self, text: String) {
+        self.task.title = text;
     }
 
     #[func]
@@ -227,7 +224,7 @@ impl ProgramsView {
         let dur = text
             .parse::<u16>()
             .unwrap_or_default()
-            .clamp(u16::MIN + 1, u16::MAX);
+            .clamp(u16::MIN, u16::MAX);
 
         self.task.temperature = dur;
 
@@ -244,7 +241,7 @@ impl ProgramsView {
         let dur = text
             .parse::<u32>()
             .unwrap_or_default()
-            .clamp(u32::MIN + 1, u32::MAX);
+            .clamp(u32::MIN, u32::MAX);
 
         self.task.voltage_verify.voltage_top = dur as f32;
 
@@ -261,7 +258,7 @@ impl ProgramsView {
         let dur = text
             .parse::<u32>()
             .unwrap_or_default()
-            .clamp(u32::MIN + 1, u32::MAX);
+            .clamp(u32::MIN, u32::MAX);
 
         self.task.voltage_verify.voltage_down = dur as f32;
 
@@ -278,7 +275,7 @@ impl ProgramsView {
         let dur = text
             .parse::<u32>()
             .unwrap_or_default()
-            .clamp(u32::MIN + 1, u32::MAX);
+            .clamp(u32::MIN, u32::MAX);
 
         self.task.voltage_verify.current_top = dur as f32;
 
@@ -295,7 +292,7 @@ impl ProgramsView {
         let dur = text
             .parse::<u32>()
             .unwrap_or_default()
-            .clamp(u32::MIN + 1, u32::MAX);
+            .clamp(u32::MIN, u32::MAX);
 
         self.task.voltage_verify.current_down = dur as f32;
 
@@ -307,7 +304,7 @@ impl ProgramsView {
     #[func]
     fn on_power_mode_selected(&mut self, index: u32) {
         match PowerMode::VARIANTS.get(index as usize) {
-            Some(mode) => self.task.power.mode = mode.clone(),
+            Some(&mode) => self.task.power.mode = mode,
             None => {}
         };
     }
@@ -320,7 +317,7 @@ impl ProgramsView {
         let dur = text
             .parse::<u32>()
             .unwrap_or_default()
-            .clamp(u32::MIN + 1, u32::MAX);
+            .clamp(u32::MIN, u32::MAX);
 
         self.task.power.voltage = dur;
 
@@ -338,7 +335,7 @@ impl ProgramsView {
         let dur = text
             .parse::<u32>()
             .unwrap_or_default()
-            .clamp(u32::MIN + 1, u32::MAX);
+            .clamp(u32::MIN, u32::MAX);
 
         self.task.power.current = dur;
 
@@ -355,7 +352,7 @@ impl ProgramsView {
         let dur = text
             .parse::<u32>()
             .unwrap_or_default()
-            .clamp(u32::MIN + 1, u32::MAX);
+            .clamp(u32::MIN, u32::MAX);
 
         self.task.task_loop = dur;
 
@@ -364,6 +361,38 @@ impl ProgramsView {
         number.set_caret_column(len as i32);
 
         self.task_total_time();
+    }
+
+    #[func]
+    fn on_task_item_selected(&mut self, index: u32) {
+        godot_print!("item {index}");
+        if index == 0 {
+            return;
+        }
+        // 去头
+        let index = (index - 1) as usize;
+        let item = match self.task.items.get(index) {
+            Some(&item) => item,
+            None => {
+                return;
+            }
+        };
+
+        let mut power_node = self.get_item_power_voltage_node();
+        let power_index = match item.power_on {
+            true => 1,
+            false => 0,
+        };
+        power_node.select(power_index);
+
+        let (hours, minutes, seconds) = hms_from_duration(item.dur);
+
+        self.get_item_hours_node()
+            .set_text(hours.to_string().into());
+        self.get_item_minutes_node()
+            .set_text(minutes.to_string().into());
+        self.get_item_seconds_node()
+            .set_text(seconds.to_string().into());
     }
 
     #[func]
@@ -420,40 +449,138 @@ impl ProgramsView {
 
     #[func]
     fn on_item_save(&mut self) {
-        self.task.items.push(self.item.clone());
+        self.task.items.push(self.item);
+        self.task_items_update();
+    }
+
+    #[func]
+    fn on_item_edit(&mut self) {
+        let mut item_node = self.get_task_items_node();
+        let index = match item_node.get_selected_items().get(0) {
+            Some(index) => index - 1, // 去头
+            None => {
+                return;
+            }
+        };
+
+        self.task.items[index as usize] = self.item;
+        self.task_items_update();
+    }
+
+    #[func]
+    fn on_item_delete(&mut self) {
+        let mut item_node = self.get_task_items_node();
+        let index = match item_node.get_selected_items().get(0) {
+            Some(index) => index - 1, // 去头
+            None => {
+                return;
+            }
+        };
+
+        self.task.items.remove(index as usize);
         self.task_items_update();
         self.task_total_time();
     }
 
     #[func]
-    fn on_item_edit(&mut self) {}
+    fn on_item_clear(&mut self) {
+        self.task.items = Vec::new();
+        self.task_items_update();
+    }
 
     #[func]
-    fn on_item_delete(&mut self) {}
+    fn on_task_save(&mut self) {
+        log::debug!("task save: {}", self.task.title);
+        // 保存
+        if self.task.title.is_empty() {
+            return;
+        }
+        log::debug!("task: {:?}", self.task);
+
+        {
+            let db = get_db().lock().unwrap();
+            match TableTask::set(&db, &self.task) {
+                Ok(list) => {}
+                Err(e) => {
+                    log::error!("task 保存失败：{e}");
+                }
+            };
+        }
+
+        self.task_list_update();
+    }
 
     #[func]
-    fn on_item_clear(&mut self) {}
+    fn on_task_delete(&mut self) {
+        let mut task_list_node = self.get_task_list_node();
+
+        let s = task_list_node.get_selected_items();
+        godot_print!("{:?}", s);
+
+        let index = match task_list_node.get_selected_items().get(0) {
+            Some(index) => index,
+            None => {
+                return;
+            }
+        };
+
+        if let Some(task) = self.list.get(index as usize) {
+            let db = get_db().lock().unwrap();
+            match TableTask::delete(&db, task.title.clone(), &task.ab) {
+                Ok(_) => {}
+                Err(e) => {
+                    log::error!("task 删除失败：{}", e.to_string());
+                }
+            };
+        };
+
+        self.task_list_update();
+    }
 
     #[func]
-    fn on_task_save(&mut self) {}
+    fn on_task_load(&mut self) {
+        let mut my_global = MyGlobal::singleton();
 
-    #[func]
-    fn on_task_edit(&mut self) {}
-
-    #[func]
-    fn on_task_delete(&mut self) {}
-
-    #[func]
-    fn on_task_load(&mut self) {}
-
-    #[func]
-    fn on_task_item_selected(&mut self, index: u32) {
-        godot_print!("item {index}")
+        my_global
+            .bind_mut()
+            .set_task(self.task.clone(), self.task.ab.into());
     }
 
     #[func]
     fn on_task_list_selected(&mut self, index: u32) {
-        godot_print!("list {index}")
+        godot_print!("list {index}");
+
+        self.task = match self.list.get(index as usize) {
+            Some(task) => task.clone(),
+            None => {
+                return;
+            }
+        };
+
+        self.get_task_name_node()
+            .set_text(self.task.title.clone().into());
+
+        self.get_voltage_top_node()
+            .set_text(self.task.voltage_verify.voltage_top.to_string().into());
+        self.get_voltage_down_node()
+            .set_text(self.task.voltage_verify.voltage_down.to_string().into());
+        self.get_current_top_node()
+            .set_text(self.task.voltage_verify.current_top.to_string().into());
+        self.get_current_down_node()
+            .set_text(self.task.voltage_verify.current_down.to_string().into());
+
+        self.get_power_type_node()
+            .select(self.task.power.mode as i32);
+
+        self.get_power_voltage_node()
+            .set_text(self.task.power.voltage.to_string().into());
+        self.get_power_current_node()
+            .set_text(self.task.power.current.to_string().into());
+
+        self.get_task_loop_node()
+            .set_text(self.task.task_loop.to_string().into());
+
+        self.task_items_update();
     }
 }
 
@@ -507,9 +634,9 @@ impl ProgramsView {
             .fold(Duration::from_secs(0), |sum, x| sum + x);
 
         let dur = dur * self.task.task_loop;
+        self.task.count_time = dur;
 
         let text = hms_from_duration_string(dur);
-
         let mut count_time_node = self.get_count_time_node();
         count_time_node.set_text(text.into());
     }
@@ -525,6 +652,7 @@ impl ProgramsView {
 
         self.task_list_str = Array::new();
         self.list.iter().for_each(|task| {
+            godot_print!("{}", task.title.clone());
             self.task_list_str.push(task.title.clone().into());
         });
 
@@ -580,11 +708,11 @@ impl ProgramsView {
             self.task_items_str.push(s.into());
         });
 
+        self.task_total_time();
+
         self.base_mut()
             .emit_signal("update_task_item_list".into(), &[]);
     }
-
-    fn task_load(&mut self) {}
 
     // get node
     define_get_nodes![
@@ -616,7 +744,6 @@ impl ProgramsView {
         (get_item_clear_node, UniqueName::ItemClear, Button),
         (get_task_list_node, UniqueName::TaskList, ItemList),
         (get_task_save_node, UniqueName::TaskSave, Button),
-        (get_task_edit_node, UniqueName::TaskEdit, Button),
         (get_task_delete_node, UniqueName::TaskDelete, Button),
         (get_task_load_node, UniqueName::TaskLoad, Button),
     ];
@@ -648,7 +775,6 @@ enum UniqueName {
     ItemHours,
     ItemMinutes,
     ItemSeconds,
-
     ItemSave,
     ItemEdit,
     ItemDelete,
@@ -656,7 +782,6 @@ enum UniqueName {
 
     TaskList,
     TaskSave,
-    TaskEdit,
     TaskDelete,
     TaskLoad,
 }
