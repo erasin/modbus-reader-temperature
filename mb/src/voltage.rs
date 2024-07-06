@@ -2,6 +2,8 @@
 //! RS485
 //! b 115200
 
+use std::time::Duration;
+
 use serde::{Deserialize, Serialize};
 
 use crate::error::Error;
@@ -31,13 +33,13 @@ impl Voltage {
 /// 电压数据集合
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct VoltageData {
-    pub time: u64,
+    pub time: Duration,
     pub slave: u8,
     pub data: Vec<VoltageChannel>,
 }
 
 impl VoltageData {
-    pub fn new(dur: u64, slave: u8, data: Vec<VoltageChannel>) -> Self {
+    pub fn new(dur: Duration, slave: u8, data: Vec<VoltageChannel>) -> Self {
         Self {
             time: dur,
             slave,
@@ -49,7 +51,7 @@ impl VoltageData {
         self.slave = slave;
     }
 
-    pub fn set_time(&mut self, dur: u64) {
+    pub fn set_time(&mut self, dur: Duration) {
         self.time = dur;
     }
 
@@ -57,6 +59,26 @@ impl VoltageData {
         self.data.iter_mut().for_each(|c| {
             c.state = get_mb_state(c, verify);
         });
+    }
+
+    pub fn voltage(&self) -> f32 {
+        let l = self.data.len();
+
+        self.data
+            .iter()
+            .map(|c| c.voltage)
+            .fold(0_f32, |s, a| s + a)
+            / l as f32
+    }
+
+    pub fn current(&self) -> f32 {
+        let l = self.data.len();
+
+        self.data
+            .iter()
+            .map(|c| c.current)
+            .fold(0_f32, |s, a| s + a)
+            / l as f32
     }
 }
 

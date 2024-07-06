@@ -1,4 +1,6 @@
 //! 继电器
+use std::time::Duration;
+
 /// 1 2 奇偶校验
 /// 3-5 波特率
 /// 6-10 地址位 10 -> 6 二进制
@@ -50,7 +52,7 @@ impl RelayMode {
 
 #[derive(Debug, Copy, Clone, PartialEq, PartialOrd)]
 pub struct RelayData {
-    pub time: u64,
+    pub time: Duration,
     pub value: u16,
 }
 
@@ -90,6 +92,6 @@ impl TryFrom<FunResponse> for RelayData {
 
 impl std::fmt::Display for RelayData {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "time:{}\nvalue: {:08b}", self.time, self.value)
+        write!(f, "time:{}\nvalue: {:08b}", self.time.as_secs(), self.value)
     }
 }

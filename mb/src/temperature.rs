@@ -12,6 +12,8 @@
 //! let res = vec![0x01, 0x06, 0x00, 0x3C, 0x02, 0x59, 0x88, 0x9C];
 //! ```
 
+use std::time::Duration;
+
 use crate::{
     error::Error,
     protocol::{FunRequest, FunResponse, Function, FunctionCode},
@@ -66,7 +68,7 @@ impl TemperatureMode {
 /// 温度
 #[derive(Debug, Copy, Clone, PartialEq, PartialOrd)]
 pub struct TemperatureData {
-    pub time: u64,
+    pub time: Duration,
     pub value: f32,
 }
 

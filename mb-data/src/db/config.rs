@@ -25,11 +25,8 @@ impl TableGlobal {
         let table = read_txn.open_table(TABLE)?;
 
         let query = table.get("config".to_string())?;
-        let data = match query {
-            Some(d) => {
-                let c: Config = serde_json::from_slice(d.value())?;
-                c
-            }
+        let data: Config = match query {
+            Some(d) => serde_json::from_slice(d.value())?,
             None => Config::default(),
         };
 

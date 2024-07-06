@@ -6,7 +6,7 @@ use crate::{
     task::{Task, AB},
 };
 
-pub const TABLE: TableDefinition<String, &[u8]> = TableDefinition::new("task_a");
+pub const TABLE_A: TableDefinition<String, &[u8]> = TableDefinition::new("task_a");
 
 pub const TABLE_B: TableDefinition<String, &[u8]> = TableDefinition::new("task_b");
 
@@ -15,7 +15,7 @@ pub struct TableTask;
 impl TableTask {
     pub fn set(db: &Database, data: &Task) -> Result<()> {
         let table_ab = match data.ab {
-            AB::A => TABLE,
+            AB::A => TABLE_A,
             AB::B => TABLE_B,
         };
 
@@ -32,7 +32,7 @@ impl TableTask {
 
     pub fn get<T: Into<String>>(db: &Database, key: T, ab: &AB) -> Result<Task> {
         let table_ab = match ab {
-            AB::A => TABLE,
+            AB::A => TABLE_A,
             AB::B => TABLE_B,
         };
 
@@ -53,7 +53,7 @@ impl TableTask {
 
     pub fn delete<T: Into<String>>(db: &Database, key: T, ab: &AB) -> Result<()> {
         let table_ab = match ab {
-            AB::A => TABLE,
+            AB::A => TABLE_A,
             AB::B => TABLE_B,
         };
 
@@ -69,7 +69,7 @@ impl TableTask {
 
     pub fn list(db: &Database, ab: &AB) -> Result<Vec<Task>> {
         let table_ab = match ab {
-            AB::A => TABLE,
+            AB::A => TABLE_A,
             AB::B => TABLE_B,
         };
 

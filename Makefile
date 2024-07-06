@@ -11,6 +11,9 @@ help:
 build: ## build
 	@cargo build
 
+clippy: ## clippy
+	@cargo clippy --all-targets --workspace
+
 release: ## release
 	@cargo build --release
 

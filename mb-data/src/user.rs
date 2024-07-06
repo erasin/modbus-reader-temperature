@@ -1,5 +1,7 @@
 //! 用户定义
 
+use std::time::Duration;
+
 use mb::utils::current_timestamp;
 use serde::{Deserialize, Serialize};
 use strum::VariantArray;
@@ -8,7 +10,7 @@ use strum::VariantArray;
 pub struct UserConfig {
     pub name: String,
     pub pwd: String,
-    pub created_at: u64,
+    pub created_at: Duration,
     pub purview: Vec<UserPurview>,
 }
 
@@ -35,7 +37,7 @@ impl Default for UserConfig {
         Self {
             name: "root".into(),
             pwd: "9600".into(),
-            created_at: 0,
+            created_at: Duration::from_secs(0),
             purview: UserPurview::VARIANTS.to_vec(),
         }
     }

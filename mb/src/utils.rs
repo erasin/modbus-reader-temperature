@@ -1,11 +1,8 @@
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 /// 获取当前时间戳（秒级）
-pub fn current_timestamp() -> u64 {
-    SystemTime::now()
-        .duration_since(UNIX_EPOCH)
-        .unwrap()
-        .as_secs()
+pub fn current_timestamp() -> Duration {
+    SystemTime::now().duration_since(UNIX_EPOCH).unwrap()
 }
 
 pub fn time_from_hms(hours: u64, minutes: u64, seconds: u64) -> Duration {

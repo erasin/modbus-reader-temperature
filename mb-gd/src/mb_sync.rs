@@ -1,3 +1,4 @@
+use mb::power::{Power, PowerData, PowerMode};
 use mb::protocol::Builder;
 use mb::relay::{Relay, RelayData, RelayMode};
 use mb::temperature::{Temperature, TemperatureData, TemperatureMode};
@@ -57,7 +58,6 @@ pub fn set_temperature(config: &TemperatureConfig, ab: AB, temp: u16) -> Result<
 }
 
 // 获取继电器开关
-
 pub fn get_relay(config: &RelayConfig, ab: AB) -> Result<RelayData> {
     let port_name = config.serial_port.port.clone();
     let baudrate = config.serial_port.baudrate.into();
@@ -77,6 +77,42 @@ pub fn set_relay(config: &RelayConfig, ab: AB, mode: &RelayMode) -> Result<Relay
 
     let builder = Builder::new(port_name, baudrate);
     let request = Relay::request(slave, mode);
+    let response = builder.call(&request)?;
+    response.try_into()
+}
+
+// 获取继电器开关
+pub fn get_power_on(config: &RelayConfig, ab: AB) -> Result<PowerData> {
+    let port_name = config.serial_port.port.clone();
+    let baudrate = config.serial_port.baudrate.into();
+    let slave = config.slave;
+
+    let builder = Builder::new(port_name, baudrate);
+    let request = Power::request(slave, &PowerMode::GetOnOff);
+    let response = builder.call(&request)?;
+    response.try_into()
+}
+
+// 获取继电器开关
+pub fn get_power_voltage(config: &RelayConfig, ab: AB) -> Result<PowerData> {
+    let port_name = config.serial_port.port.clone();
+    let baudrate = config.serial_port.baudrate.into();
+    let slave = config.slave;
+
+    let builder = Builder::new(port_name, baudrate);
+    let request = Power::request(slave, &PowerMode::GetVoltage);
+    let response = builder.call(&request)?;
+    response.try_into()
+}
+
+// 设定电源
+pub fn set_power(config: &RelayConfig, ab: AB, mode: &PowerMode) -> Result<PowerData> {
+    let port_name = config.serial_port.port.clone();
+    let baudrate = config.serial_port.baudrate.into();
+    let slave = config.slave;
+
+    let builder = Builder::new(port_name, baudrate);
+    let request = Power::request(slave, mode);
     let response = builder.call(&request)?;
     response.try_into()
 }

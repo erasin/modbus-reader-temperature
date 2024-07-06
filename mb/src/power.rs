@@ -1,5 +1,7 @@
 //!  电源
 
+use std::time::Duration;
+
 use crate::{
     error::Error,
     protocol::{FunRequest, FunResponse, Function, FunctionCode},
@@ -78,7 +80,7 @@ pub fn f32_u16(v: f32) -> [u16; 2] {
 /// 温度
 #[derive(Debug, Copy, Clone, PartialEq, PartialOrd)]
 pub struct PowerData {
-    pub time: u64,
+    pub time: Duration,
     pub value: f32,
 }
 

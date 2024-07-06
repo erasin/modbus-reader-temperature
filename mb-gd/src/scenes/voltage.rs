@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use channel::VoltageChannelView;
 use godot::{
     engine::{Button, Control, GridContainer, IPanelContainer, Label, PanelContainer, Timer},
@@ -5,15 +7,25 @@ use godot::{
     prelude::*,
 };
 use mb::{
-    utils::hms_from_duration_string,
+    utils::{current_timestamp, hms_from_duration_string},
     voltage::{VoltageData, VoltageState, VOLTAGE_CHANNEL},
 };
-use mb_data::task::Task;
+use mb_data::{
+    db::{
+        get_db,
+        voltage::{TableVoltage, VoltageDataGroup},
+    },
+    task::Task,
+};
 use state_tag::VoltageStateTagView;
 use strum::{AsRefStr, IntoEnumIterator};
 
 use crate::{
-    chart::ChartView, colors::IntoColor, data::AB, define_get_nodes, mb_sync::get_voltage_data,
+    chart::ChartView,
+    colors::IntoColor,
+    data::AB,
+    define_get_nodes,
+    mb_sync::{get_temperature, get_voltage_data},
     scenes::my_global::get_global_config,
 };
 
@@ -36,6 +48,11 @@ pub struct VoltageView {
     state_run: bool,
     state_age: bool,
     state_power: bool,
+
+    start_at: Duration,
+    end_at: Duration,
+
+    chart_data: Vec<Vector2>,
 
     // data: Option<VoltageData>,
     base: Base<PanelContainer>,
@@ -102,19 +119,9 @@ impl IPanelContainer for VoltageView {
         let mut chart = self.get_chart_node();
         {
             let mut chart = chart.bind_mut();
-
-            let points = [
-                Vector2::new(0., 10.),
-                Vector2::new(10., 110.),
-                Vector2::new(20., 110.),
-                Vector2::new(30., 110.),
-                Vector2::new(40., 10.),
-                Vector2::new(50., 10.),
-                Vector2::new(60., 10.),
-            ];
-
+            let points = [];
             let x_labels = [0., 10., 20., 30., 40., 50., 60.0];
-            let y_labels = [0., 55., 110., 220., 240.0];
+            let y_labels = [0., 20., 60., 80., 100., 110., 160., 240.0];
 
             chart.set_points(points.into());
             chart.set_x_coord(x_labels.into());
@@ -162,13 +169,6 @@ impl VoltageView {
 
         self.state_age = !self.state_age;
         self.btn_state_update();
-
-        let mut timer = self.get_req_timer_node();
-        if timer.is_stopped() {
-            timer.start();
-        } else {
-            timer.stop();
-        }
     }
 
     #[func]
@@ -221,6 +221,7 @@ impl VoltageView {
         let mut start_btn = self.get_start_toggle_node();
         let mut age_btn = self.get_ageing_toggle_node();
         let mut power_btn = self.get_power_toggle_node();
+        let mut timer = self.get_req_timer_node();
 
         if self.state_run {
             power_btn.set_disabled(false);
@@ -242,10 +243,13 @@ impl VoltageView {
         }
 
         if self.state_age {
+            timer.start();
+            self.start_at = current_timestamp();
             age_btn.set_text("停止老化".into());
             power_btn.set_disabled(true);
             start_btn.set_disabled(true);
         } else {
+            timer.stop();
             power_btn.set_disabled(false);
             age_btn.set_text("开始老化".into());
         }
@@ -254,6 +258,7 @@ impl VoltageView {
     /// 读取老化数据
     fn task_run(&mut self) {
         let config = get_global_config();
+        let task = self.task.clone().unwrap();
 
         //根据 AB 区 获取参数
         let voltage = match self.ab {
@@ -268,28 +273,49 @@ impl VoltageView {
 
         // godot_print!("voltage init -- {:?}", voltage);
 
+        let temperature = match get_temperature(&config.temperature, self.ab) {
+            Ok(t) => t.value,
+            Err(e) => {
+                self.on_ageing_toggle();
+                log::error!("温度获取失败: {}", e.to_string());
+                0.
+            }
+        };
+
         let data: Vec<VoltageData> = (voltage.slave_start..=voltage.slave_end)
-            .map(|slave| {
-                let data = match get_voltage_data(&voltage, slave) {
-                    Ok(d) => {
-                        let mut data = d;
-                        data.update_channel_state(&voltage.verify);
-                        data
-                    }
-                    Err(e) => {
-                        timer.stop();
-
-                        let mut start_btn = self.get_start_toggle_node();
-                        start_btn.set_text("开始".into());
-
-                        godot_print!(" Write failed {:?}: {:?}", voltage, e);
-                        VoltageData::new(0, 0, Vec::new())
-                    }
-                };
-
-                data.clone()
+            .map(|slave| match get_voltage_data(&voltage, slave) {
+                Ok(d) => {
+                    let mut data = d;
+                    data.update_channel_state(&voltage.verify);
+                    data
+                }
+                Err(e) => {
+                    self.on_ageing_toggle();
+                    log::error!("电压电流获取失败: {}", e.to_string());
+                    VoltageData::new(Duration::from_secs(0), 0, Vec::new())
+                }
             })
             .collect();
+
+        if !data.is_empty() {
+            let data_group = VoltageDataGroup {
+                time: current_timestamp(),
+                ab: self.ab.into(),
+                // TODO 产品名称
+                good_name: "".to_string(),
+                task_name: task.title.clone(),
+                start_at: self.start_at,
+                task_age_time: task.count_time,
+                temperature,
+                data: data.clone(),
+            };
+            {
+                let db = get_db().lock().unwrap();
+                if let Err(e) = TableVoltage::set(&db, &data_group) {
+                    log::error!("老化数据存储错误: {}", e.to_string());
+                };
+            }
+        }
 
         // self.data = Some(data.clone());
         // godot_print!(" Write failed {:?}", data);
@@ -328,6 +354,36 @@ impl VoltageView {
         }
 
         self.base_mut().emit_signal("mb_read_over".into(), &[]);
+
+        self.chart_update()
+    }
+
+    fn chart_update(&mut self) {
+        let list = {
+            let db = get_db().lock().unwrap();
+            match TableVoltage::range_last(&db, self.ab.into(), 100) {
+                Ok(data) => data,
+                Err(e) => {
+                    log::error!("老化数据读取失败: {}", e.to_string());
+                    return;
+                }
+            }
+        };
+
+        let points = list
+            .iter()
+            .rev()
+            .take(60)
+            .enumerate()
+            .map(|(index, data)| {
+                println!("{index} => {}", data.voltage());
+                Vector2::new(index as f32, data.voltage())
+            })
+            .collect();
+
+        let mut chart = self.get_chart_node();
+        chart.bind_mut().set_points(points);
+        chart.queue_redraw();
     }
 
     define_get_nodes![
