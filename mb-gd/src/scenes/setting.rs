@@ -54,8 +54,7 @@ impl SettingView {
     fn on_pro_name(&mut self, text: String) {
         let mut pro_name = self.get_pro_name_node();
         let text = text.trim();
-
-        self.config.pro_name = text.to_owned();
+        text.clone_into(&mut self.config.pro_name);
 
         let len = text.len();
         pro_name.set_text(text.into());
@@ -84,8 +83,6 @@ impl SettingView {
         };
 
         self.config.voltage_a.serial_port.port = sel;
-
-        return;
     }
 
     #[func]
@@ -96,8 +93,6 @@ impl SettingView {
         };
 
         self.config.voltage_a.serial_port.baudrate = sel;
-
-        return;
     }
 
     #[func]
@@ -110,8 +105,6 @@ impl SettingView {
         };
 
         self.config.voltage_b.serial_port.port = sel;
-
-        return;
     }
 
     #[func]
@@ -122,8 +115,6 @@ impl SettingView {
         };
 
         self.config.voltage_b.serial_port.baudrate = sel;
-
-        return;
     }
 
     #[func]
@@ -136,8 +127,6 @@ impl SettingView {
         };
 
         self.config.temperature.serial_port.port = sel;
-
-        return;
     }
 
     #[func]
@@ -148,8 +137,6 @@ impl SettingView {
         };
 
         self.config.temperature.serial_port.baudrate = sel;
-
-        return;
     }
 
     #[func]
@@ -162,8 +149,6 @@ impl SettingView {
         };
 
         self.config.relay.serial_port.port = sel;
-
-        return;
     }
 
     #[func]
@@ -174,8 +159,6 @@ impl SettingView {
         };
 
         self.config.relay.serial_port.baudrate = sel;
-
-        return;
     }
 
     #[func]
@@ -188,8 +171,6 @@ impl SettingView {
         };
 
         self.config.power_a.serial_port.port = sel;
-
-        return;
     }
 
     #[func]
@@ -200,8 +181,6 @@ impl SettingView {
         };
 
         self.config.power_a.serial_port.baudrate = sel;
-
-        return;
     }
 
     #[func]
@@ -214,8 +193,6 @@ impl SettingView {
         };
 
         self.config.power_b.serial_port.port = sel;
-
-        return;
     }
 
     #[func]
@@ -226,8 +203,6 @@ impl SettingView {
         };
 
         self.config.power_b.serial_port.baudrate = sel;
-
-        return;
     }
 
     #[func]
@@ -364,8 +339,6 @@ impl SettingView {
             .get_node_as::<LineEdit>(UniqueName::DefectiveDur.as_ref());
 
         dur_input.set_editable(self.config.defective.rule == DefectiveRule::InTime);
-
-        return;
     }
 
     #[func]

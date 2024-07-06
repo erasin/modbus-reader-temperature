@@ -110,9 +110,9 @@ impl Baudrate {
     ];
 }
 
-impl Into<u32> for Baudrate {
-    fn into(self) -> u32 {
-        match self {
+impl From<Baudrate> for u32 {
+    fn from(val: Baudrate) -> Self {
+        match val {
             Baudrate::R1200 => 1200,
             Baudrate::R2400 => 2400,
             Baudrate::R4800 => 4800,

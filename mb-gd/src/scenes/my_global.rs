@@ -164,8 +164,7 @@ impl MyGlobal {
 pub fn get_global_config() -> Config {
     let mut my_global = MyGlobal::singleton();
     let mut my_global = my_global.bind_mut();
-    let config = my_global.get_config();
-    config
+    my_global.get_config()
 }
 
 pub fn set_global_config(config: Config) {

@@ -31,8 +31,6 @@ impl Mock for PowerMock {
         let mode = self.mode.params();
 
         let data = f32_u16(60.);
-        let response = Function::new(self.slave, mode.0, data.to_vec());
-
-        response
+        Function::new(self.slave, mode.0, data.to_vec())
     }
 }

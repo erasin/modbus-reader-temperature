@@ -48,7 +48,7 @@ impl VoltageChannelView {
 
 impl VoltageChannelView {
     pub fn set_data(&mut self, data: &VoltageChannel) {
-        self.data = data.clone();
+        self.data = *data;
     }
 
     pub fn set_index(&mut self, index: usize) {
@@ -70,8 +70,8 @@ impl VoltageChannelView {
             .get_node_as::<Control>(UniqueName::State.to_string());
 
         index_label.set_text(format!("{:2}", self.index + 1).into());
-        voltage_label.set_text(format!("{:.2}V", self.data.voltage).into());
-        current_label.set_text(format!("{:2} mA", self.data.current).into());
+        voltage_label.set_text(format!("{:2}V", self.data.voltage).into());
+        current_label.set_text(format!("{:2}A", self.data.current).into());
 
         state.set_modulate(self.color);
     }

@@ -33,7 +33,7 @@ impl IPanelContainer for UserManagerView {
         // 添加权限list and connect
         let mut purview_node = self.get_purview_node();
 
-        UserPurview::iter().into_iter().for_each(|up| {
+        UserPurview::iter().for_each(|up| {
             let mut cb = CheckBox::new_alloc();
             cb.set_text(up.to_string().into());
             purview_node.add_child(cb.upcast());
@@ -190,7 +190,7 @@ impl UserManagerView {
                 cb.set_pressed(false);
 
                 if let Some(p) = UserPurview::VARIANTS.get(index) {
-                    if user.purview.contains(&p) {
+                    if user.purview.contains(p) {
                         cb.set_pressed(true);
                     }
                 };

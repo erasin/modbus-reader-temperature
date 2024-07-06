@@ -13,8 +13,8 @@ pub enum Error {
     DataNull,
 }
 
-impl<T> Into<crate::Result<T>> for Error {
-    fn into(self) -> crate::Result<T> {
-        Err(Box::new(self))
+impl<T> From<Error> for crate::Result<T> {
+    fn from(val: Error) -> Self {
+        Err(Box::new(val))
     }
 }

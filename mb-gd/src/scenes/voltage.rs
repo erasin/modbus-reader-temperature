@@ -33,6 +33,10 @@ pub struct VoltageView {
 
     task: Option<Task>,
 
+    state_run: bool,
+    state_age: bool,
+    state_power: bool,
+
     // data: Option<VoltageData>,
     base: Base<PanelContainer>,
 }
@@ -81,14 +85,17 @@ impl IPanelContainer for VoltageView {
         }
 
         // 开启
-        self.get_start_toggle_node()
-            .connect("pressed".into(), self.base().callable("on_start_toggle"));
+        let mut start_btn = self.get_start_toggle_node();
+        start_btn.connect("pressed".into(), self.base().callable("on_start_toggle"));
+        start_btn.set_disabled(true);
 
-        self.get_ageing_toggle_node()
-            .connect("pressed".into(), self.base().callable("on_ageing_toggle"));
+        let mut age_btn = self.get_ageing_toggle_node();
+        age_btn.connect("pressed".into(), self.base().callable("on_ageing_toggle"));
+        age_btn.set_disabled(true);
 
-        self.get_power_toggle_node()
-            .connect("pressed".into(), self.base().callable("on_power_toggle"));
+        let mut power_btn = self.get_power_toggle_node();
+        power_btn.connect("pressed".into(), self.base().callable("on_power_toggle"));
+        power_btn.set_disabled(true);
 
         self.task_update();
 
@@ -142,51 +149,66 @@ impl VoltageView {
     #[func]
     fn on_start_toggle(&mut self) {
         godot_print!("--- start pull");
-        let mut start_btn = self.get_start_toggle_node();
-        let mut timer = self.get_req_timer_node();
-        if timer.is_stopped() {
-            timer.start();
-            start_btn.set_text("停止".into());
-        } else {
-            timer.stop();
-            start_btn.set_text("开始".into());
-        }
+        self.state_run = !self.state_run;
+        self.btn_state_update();
     }
 
     /// 老化
     #[func]
-    fn on_ageing_toggle(&mut self) {}
+    fn on_ageing_toggle(&mut self) {
+        if !self.state_power {
+            return;
+        }
+
+        self.state_age = !self.state_age;
+        self.btn_state_update();
+
+        let mut timer = self.get_req_timer_node();
+        if timer.is_stopped() {
+            timer.start();
+        } else {
+            timer.stop();
+        }
+    }
 
     #[func]
-    fn on_power_toggle(&mut self) {}
+    fn on_power_toggle(&mut self) {
+        if !self.state_run {
+            return;
+        }
+
+        self.state_power = !self.state_power;
+        self.btn_state_update();
+    }
 }
 
 impl VoltageView {
     fn task_update(&mut self) {
         // 渲染 解锁按钮
-        // let mut start_btn = self.get_start_toggle_node();
-        let mut ageing_btn = self.get_ageing_toggle_node();
+        let mut start_btn = self.get_start_toggle_node();
+        let mut age_btn = self.get_ageing_toggle_node();
+        let mut power_btn = self.get_power_toggle_node();
         let mut pro_name_node = self.get_pro_name_node();
         let mut ageing_time_node = self.get_ageing_time_node();
         let mut power_state_node = self.get_power_state_node();
 
-        match &self.task {
-            Some(task) => {
-                // start_btn.set_disabled(false);
-                ageing_btn.set_disabled(false);
-                pro_name_node.set_text(task.title.clone().into());
-                ageing_time_node.set_text(hms_from_duration_string(task.count_time).into());
-                power_state_node.set_text(
-                    format!("{} {}V", task.power.mode.as_ref(), task.power.voltage).into(),
-                );
-            }
+        let task = match &self.task {
+            Some(task) => task,
             None => {
-                // start_btn.set_disabled(true);
-                ageing_btn.set_disabled(true);
+                start_btn.set_disabled(true);
+                age_btn.set_disabled(true);
+                power_btn.set_disabled(true);
                 pro_name_node.set_text("".into());
                 ageing_time_node.set_text("".into());
+                return;
             }
-        }
+        };
+
+        start_btn.set_disabled(false);
+        pro_name_node.set_text(task.title.clone().into());
+        ageing_time_node.set_text(hms_from_duration_string(task.count_time).into());
+        power_state_node
+            .set_text(format!("{} {}V", task.power.mode.as_ref(), task.power.voltage).into());
     }
 
     /// 老化中的状态监控
@@ -194,6 +216,40 @@ impl VoltageView {
 
     /// 电源开启后监控
     fn power_state_update(&mut self) {}
+
+    fn btn_state_update(&mut self) {
+        let mut start_btn = self.get_start_toggle_node();
+        let mut age_btn = self.get_ageing_toggle_node();
+        let mut power_btn = self.get_power_toggle_node();
+
+        if self.state_run {
+            power_btn.set_disabled(false);
+            start_btn.set_text("停止".into());
+        } else {
+            age_btn.set_disabled(true);
+            power_btn.set_disabled(true);
+            start_btn.set_text("开始".into());
+        }
+
+        if self.state_power {
+            age_btn.set_disabled(false);
+            start_btn.set_disabled(true);
+            power_btn.set_text("关闭电源".into());
+        } else {
+            start_btn.set_disabled(false);
+            age_btn.set_disabled(true);
+            power_btn.set_text("启动电源".into());
+        }
+
+        if self.state_age {
+            age_btn.set_text("停止老化".into());
+            power_btn.set_disabled(true);
+            start_btn.set_disabled(true);
+        } else {
+            power_btn.set_disabled(false);
+            age_btn.set_text("开始老化".into());
+        }
+    }
 
     /// 读取老化数据
     fn task_run(&mut self) {
@@ -213,7 +269,6 @@ impl VoltageView {
         // godot_print!("voltage init -- {:?}", voltage);
 
         let data: Vec<VoltageData> = (voltage.slave_start..=voltage.slave_end)
-            .into_iter()
             .map(|slave| {
                 let data = match get_voltage_data(&voltage, slave) {
                     Ok(d) => {
@@ -254,8 +309,7 @@ impl VoltageView {
                     channel_scene.set_name(name);
                     channel_scene
                 } else {
-                    let channel_scene = content.get_node_as::<VoltageChannelView>(name);
-                    channel_scene
+                    content.get_node_as::<VoltageChannelView>(name)
                 };
 
                 {

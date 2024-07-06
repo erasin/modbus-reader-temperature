@@ -56,14 +56,13 @@ impl LoginView {
 
         let user = {
             let db = get_db().lock().unwrap();
-            let user = match TableUser::get(&db, user_name.clone()) {
+            match TableUser::get(&db, user_name.clone()) {
                 Ok(user) => user,
                 Err(e) => {
                     log::error!("用户 {user_name} 登录错误：{e}");
                     UserConfig::default()
                 }
-            };
-            user
+            }
         };
 
         if user_name != user.name || !user.check_pwd(user_pwd) {

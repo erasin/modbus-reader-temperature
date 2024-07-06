@@ -25,8 +25,7 @@ impl From<&[u8]> for VoltageMock {
 impl Mock for VoltageMock {
     fn request(&self) -> Function {
         // let request: [u8; 8] = [0x01, 0x04, 0x00, 0x00, 0x00, 0x1E, 0x70, 0x02];
-        let request = Voltage::request(self.slave);
-        request
+        Voltage::request(self.slave)
     }
 
     fn response(&self) -> Function {
@@ -34,8 +33,7 @@ impl Mock for VoltageMock {
         let data = generate_response_voltage();
         // let data = static_response();
 
-        let response = Function::new(self.slave, code, data);
-        response
+        Function::new(self.slave, code, data)
     }
 }
 
@@ -59,13 +57,10 @@ fn static_response() -> Vec<u16> {
         0, 0, // 15
     ];
 
-    let data = data
-        .iter()
+    data.iter()
         .enumerate()
-        .filter_map(|(i, &x)| if i % 2 == 0 { Some(x * 1000) } else { Some(x) })
-        .collect();
-
-    data
+        .map(|(i, &x)| if i % 2 == 0 { x * 1000 } else { x })
+        .collect()
 }
 
 #[allow(dead_code)]
@@ -76,7 +71,6 @@ fn generate_response_voltage() -> Vec<u16> {
     let mut data: Vec<u16> = Vec::with_capacity(30);
 
     (0..=14)
-        .into_iter()
         .map(|_| {
             let voltage = match rng.gen_range(0..3) {
                 0 => rng.gen_range(0..25),

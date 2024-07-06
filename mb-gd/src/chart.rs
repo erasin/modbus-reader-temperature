@@ -65,27 +65,24 @@ impl IControl for ChartView {
         let pos = self.base().get_global_position();
         // self.base().get_global_transform().origin;
 
-        match event.try_cast::<InputEventMouseMotion>() {
-            Ok(mouse_event) => {
-                let mouse_position = mouse_event.get_position();
-                self.hovered_point = None; // Reset hovered point
+        if let Ok(mouse_event) = event.try_cast::<InputEventMouseMotion>() {
+            let mouse_position = mouse_event.get_position();
+            self.hovered_point = None; // Reset hovered point
 
-                // Check if mouse is hovering over any point
-                for &point in &self.points {
-                    let point2 = self.convert_point(point);
-                    let screen_point = pos + point2;
-                    // godot_print!(
-                    //     "mg:{mouse_position:?}\np1:{point:?}\np2:{point2:?}\nsp:{screen_point:?}"
-                    // );
-                    if mouse_position.distance_to(screen_point) < 95.0 {
-                        // godot_print!("---dis---");
-                        let value = format!("({}, {})", point.x, point.y);
-                        self.hovered_point = Some((point, value));
-                        break;
-                    }
+            // Check if mouse is hovering over any point
+            for &point in &self.points {
+                let point2 = self.convert_point(point);
+                let screen_point = pos + point2;
+                // godot_print!(
+                //     "mg:{mouse_position:?}\np1:{point:?}\np2:{point2:?}\nsp:{screen_point:?}"
+                // );
+                if mouse_position.distance_to(screen_point) < 95.0 {
+                    // godot_print!("---dis---");
+                    let value = format!("({}, {})", point.x, point.y);
+                    self.hovered_point = Some((point, value));
+                    break;
                 }
             }
-            Err(_) => return,
         }
     }
 }
@@ -109,12 +106,12 @@ impl ChartView {
 
     pub fn set_x_coord(&mut self, coord: Vec<f32>) {
         self.x_coord = coord;
-        self.max_x = self.x_coord.iter().cloned().fold(0. / 0., f32::max);
+        self.max_x = self.x_coord.iter().cloned().fold(f32::NAN, f32::max);
     }
 
     pub fn set_y_coord(&mut self, coord: Vec<f32>) {
         self.y_coord = coord;
-        self.max_y = self.y_coord.iter().cloned().fold(0. / 0., f32::max);
+        self.max_y = self.y_coord.iter().cloned().fold(f32::NAN, f32::max);
     }
 
     pub fn set_x_label<T: Into<String>>(&mut self, label: T) {

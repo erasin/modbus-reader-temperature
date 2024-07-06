@@ -38,9 +38,9 @@ impl From<task::AB> for AB {
     }
 }
 
-impl Into<task::AB> for AB {
-    fn into(self) -> task::AB {
-        match self {
+impl From<AB> for task::AB {
+    fn from(val: AB) -> Self {
+        match val {
             AB::Apanel => task::AB::A,
             AB::Bpanel => task::AB::B,
         }

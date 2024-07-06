@@ -303,9 +303,8 @@ impl ProgramsView {
 
     #[func]
     fn on_power_mode_selected(&mut self, index: u32) {
-        match PowerMode::VARIANTS.get(index as usize) {
-            Some(&mode) => self.task.power.mode = mode,
-            None => {}
+        if let Some(&mode) = PowerMode::VARIANTS.get(index as usize) {
+            self.task.power.mode = mode
         };
     }
 

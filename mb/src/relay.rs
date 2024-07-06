@@ -78,7 +78,7 @@ impl TryFrom<FunResponse> for RelayData {
 
     fn try_from(value: FunResponse) -> std::result::Result<Self, Self::Error> {
         let data = value.data();
-        let data = data.get(0).ok_or(Box::new(Error::DataNull))?;
+        let data = data.first().ok_or(Box::new(Error::DataNull))?;
         let dur = current_timestamp();
         let temp = RelayData {
             time: dur,

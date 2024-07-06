@@ -21,9 +21,9 @@ pub enum ColorPlate {
     Teal,
 }
 
-impl Into<Color> for ColorPlate {
-    fn into(self) -> Color {
-        match self {
+impl From<ColorPlate> for Color {
+    fn from(val: ColorPlate) -> Self {
+        match val {
             ColorPlate::Bg => Color::from_rgba8(236, 239, 241, 255),
             ColorPlate::Black => Color::from_rgba8(33, 33, 33, 255),
             ColorPlate::White => Color::from_rgba8(250, 250, 250, 255),
@@ -51,21 +51,21 @@ pub trait IntoColor {
 
 impl IntoColor for VoltageState {
     fn color(&self) -> Color {
-        ColorPlate::from(self.clone()).into()
+        ColorPlate::from(*self).into()
     }
 }
 
 impl From<VoltageState> for ColorPlate {
     fn from(value: VoltageState) -> Self {
         match value {
-            VoltageState::NoConnected => ColorPlate::Grey.into(),
-            VoltageState::Vacancy => ColorPlate::White.into(),
-            VoltageState::Qualified => ColorPlate::Green.into(),
-            VoltageState::UnderVoltage => ColorPlate::Red.into(),
-            VoltageState::UnderCurrent => ColorPlate::Yellow.into(),
-            VoltageState::OverVoltage => ColorPlate::Blue.into(),
-            VoltageState::OverCurrent => ColorPlate::Puple.into(),
-            VoltageState::NoOutput => ColorPlate::Cyan.into(),
+            VoltageState::NoConnected => ColorPlate::Grey,
+            VoltageState::Vacancy => ColorPlate::White,
+            VoltageState::Qualified => ColorPlate::Green,
+            VoltageState::UnderVoltage => ColorPlate::Red,
+            VoltageState::UnderCurrent => ColorPlate::Yellow,
+            VoltageState::OverVoltage => ColorPlate::Blue,
+            VoltageState::OverCurrent => ColorPlate::Puple,
+            VoltageState::NoOutput => ColorPlate::Cyan,
         }
     }
 }

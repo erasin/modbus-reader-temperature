@@ -29,8 +29,6 @@ impl Mock for TempMock {
     fn response(&self) -> Function {
         let mode = self.mode.params();
 
-        let response = Function::new(self.slave, mode.0, vec![60 * 10]);
-
-        response
+        Function::new(self.slave, mode.0, vec![60 * 10])
     }
 }

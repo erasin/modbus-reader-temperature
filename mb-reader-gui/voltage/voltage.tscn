@@ -81,12 +81,12 @@ text = " 开启"
 [node name="AgeingToggle" type="Button" parent="HboxContainer/功能区/VBoxContainer/按钮/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "老化"
+text = "开始老化"
 
 [node name="PowerToggle" type="Button" parent="HboxContainer/功能区/VBoxContainer/按钮/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "电源开启"
+text = "启动电源"
 
 [node name="时间" type="PanelContainer" parent="HboxContainer/功能区/VBoxContainer"]
 layout_mode = 2

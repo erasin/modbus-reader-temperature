@@ -27,8 +27,8 @@ pub enum Error {
     Fail,
 }
 
-impl<T> Into<mb::Result<T>> for Error {
-    fn into(self) -> mb::Result<T> {
-        Err(Box::new(self))
+impl<T> From<Error> for mb::Result<T> {
+    fn from(val: Error) -> Self {
+        Err(Box::new(val))
     }
 }

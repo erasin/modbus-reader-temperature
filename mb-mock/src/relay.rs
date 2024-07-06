@@ -39,11 +39,10 @@ impl Mock for RelayMock {
 
     fn response(&self) -> FunResponse {
         let mode = self.mode.params();
-        let response = match self.mode {
+        match self.mode {
             RelayMode::Read => Function::new(self.slave, mode.0, generate_relay()),
             _ => Relay::request(self.slave, &self.mode),
-        };
-        response
+        }
     }
 }
 

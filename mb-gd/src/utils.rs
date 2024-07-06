@@ -34,19 +34,20 @@ pub fn init_logging(verbosity: u64) -> Result<()> {
 }
 
 pub fn string_number_only(text: String) -> String {
-    text.chars()
-        .filter_map(|c| if c.is_digit(10) { Some(c) } else { None })
-        .collect()
+    text.chars().filter(|c| c.is_ascii_digit()).collect()
 }
 
 pub fn string_cut(input: &str, length: usize) -> String {
     let mut result = input.to_string();
 
-    if result.len() < length {
-        result.push_str(&" ".repeat(length - result.len()));
-    } else if result.len() > length {
-        result.truncate(length - 3); // Leave space for "..."
-        result.push_str("...");
+    match result.len().cmp(&length) {
+        std::cmp::Ordering::Less | std::cmp::Ordering::Equal => {
+            result.push_str(&" ".repeat(length - result.len()));
+        }
+        std::cmp::Ordering::Greater => {
+            result.truncate(length - 3); // Leave space for "..."
+            result.push_str("...");
+        }
     }
 
     result

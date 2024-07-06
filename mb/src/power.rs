@@ -53,18 +53,12 @@ impl PowerMode {
             PowerMode::SetOnOff => (FunctionCode::WriteMultipleRegisters, [9, 0x0003].to_vec()),
             PowerMode::SetVoltage(n) => {
                 let f = f32_u16(*n);
-                let mut data = Vec::with_capacity(3);
-                data.push(0x000A);
-                data.push(f[0]);
-                data.push(f[1]);
+                let data = vec![0x000A, f[0], f[1]];
                 (FunctionCode::WriteMultipleRegisters, data)
             }
             PowerMode::SetCurrent(n) => {
                 let f = f32_u16(*n);
-                let mut data = Vec::with_capacity(3);
-                data.push(0x000C);
-                data.push(f[0]);
-                data.push(f[1]);
+                let data = vec![0x000C, f[0], f[1]];
                 (FunctionCode::WriteMultipleRegisters, data)
             }
         }
@@ -107,7 +101,7 @@ impl TryFrom<FunResponse> for PowerData {
             })
             .collect();
 
-        let data = data.get(0).ok_or(Box::new(Error::DataNull))?;
+        let data = data.first().ok_or(Box::new(Error::DataNull))?;
 
         let dur = current_timestamp();
         let temp = PowerData {

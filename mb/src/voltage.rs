@@ -67,7 +67,7 @@ impl TryFrom<FunResponse> for VoltageData {
         let slave = data.slave();
         let data = data.data();
 
-        if data.len() == 0 {
+        if data.is_empty() {
             return Err(Box::new(Error::DataNull));
         }
 
@@ -124,12 +124,12 @@ impl From<VoltageF32> for VoltageData {
     }
 }
 
-impl Into<VoltageF32> for VoltageData {
-    fn into(self) -> VoltageF32 {
+impl From<VoltageData> for VoltageF32 {
+    fn from(val: VoltageData) -> Self {
         let mut result = [0.0; 30];
 
-        for ch in self.data.iter() {
-            let idx = ch.index as usize;
+        for ch in val.data.iter() {
+            let idx = ch.index;
             if idx < 15 {
                 result[idx * 2] = ch.voltage * 1000.0;
                 result[idx * 2 + 1] = ch.current;

@@ -45,7 +45,7 @@ impl Builder {
 }
 
 // ch340 32位字节缓存读取
-fn read_full_response(port: &mut Box<dyn SerialPort>, buffer: &mut Vec<u8>) -> Result<usize> {
+fn read_full_response(port: &mut Box<dyn SerialPort>, buffer: &mut [u8]) -> Result<usize> {
     let mut total_read = 0;
     let mut read_buffer = [0u8; 32];
 
@@ -145,7 +145,7 @@ impl Function {
         }
 
         // 掐头去尾
-        let byte_count = request.len() - 4 as usize;
+        let byte_count = request.len() - 4_usize;
         if byte_count < 2 || byte_count % 2 != 0 {
             return Err(Box::new(Error::DataLenError)); // 数据长度不匹配
         }

@@ -79,7 +79,7 @@ impl TryFrom<FunResponse> for TemperatureData {
             .iter()
             .map(|&r| r as f32 * 0.1)
             .collect::<Vec<f32>>();
-        let value = data.get(0).ok_or(Box::new(Error::DataNull))?;
+        let value = data.first().ok_or(Box::new(Error::DataNull))?;
 
         let dur = current_timestamp();
         let temp = TemperatureData {
