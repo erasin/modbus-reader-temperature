@@ -1,6 +1,7 @@
 use godot::{
     engine::{
-        BoxContainer, Button, CheckBox, IPanelContainer, ItemList, Label, LineEdit, PanelContainer,
+        AcceptDialog, BoxContainer, Button, CheckBox, IPanelContainer, ItemList, Label, LineEdit,
+        PanelContainer,
     },
     prelude::*,
 };
@@ -125,6 +126,11 @@ impl UserManagerView {
             };
         }
 
+        self.alert(
+            "保存确认".to_owned(),
+            "确认".to_owned(),
+            format!("已保存用户{}", user.name),
+        );
         self.user_item_update();
     }
 
@@ -224,6 +230,15 @@ impl UserManagerView {
         self.base_mut().emit_signal("update_users".into(), &[]);
     }
 
+    fn alert(&mut self, title: String, btn: String, info: String) {
+        let mut alert = self.get_alert_node();
+        let mut alert_info = self.get_alert_info_node();
+        alert.set_title(title.into());
+        alert.set_ok_button_text(btn.into());
+        alert_info.set_text(info.into());
+        alert.set_visible(true);
+    }
+
     define_get_nodes![
         (get_name_node, UniqueName::Name, LineEdit),
         (get_pwd_node, UniqueName::Pwd, LineEdit),
@@ -232,6 +247,8 @@ impl UserManagerView {
         (get_delete_node, UniqueName::Delete, Button),
         (get_user_list_node, UniqueName::UserList, ItemList),
         (get_error_node, UniqueName::Error, Label),
+        (get_alert_node, UniqueName::Alert, AcceptDialog),
+        (get_alert_info_node, UniqueName::AlertInfo, Label),
     ];
 }
 
@@ -246,4 +263,7 @@ enum UniqueName {
 
     UserList,
     Error,
+
+    Alert,
+    AlertInfo,
 }

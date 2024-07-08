@@ -1,9 +1,10 @@
-[gd_scene load_steps=5 format=3 uid="uid://bbftwdp68kqte"]
+[gd_scene load_steps=6 format=3 uid="uid://bbftwdp68kqte"]
 
 [ext_resource type="StyleBox" uid="uid://bhtstjj7isp2b" path="res://assets/pane.tres" id="1_5ici8"]
 [ext_resource type="Script" path="res://sys/programs.gd" id="1_awss4"]
 [ext_resource type="StyleBox" uid="uid://cxwvlet43ndso" path="res://assets/title.tres" id="2_mau8k"]
 [ext_resource type="StyleBox" uid="uid://clw6m1nklh48q" path="res://assets/btn_focus.tres" id="3_ecubj"]
+[ext_resource type="Theme" uid="uid://bqplrcrrq65aj" path="res://assets/light.tres" id="5_s66ot"]
 
 [node name="Programs" type="ProgramsView"]
 script = ExtResource("1_awss4")
@@ -263,45 +264,51 @@ placeholder_text = "0"
 layout_mode = 2
 text = "A"
 
-[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/HBoxContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_right = 10
 
-[node name="编辑器" type="VBoxContainer" parent="MarginContainer/HBoxContainer/MarginContainer"]
+[node name="编辑器" type="VBoxContainer" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/MarginContainer"]
 layout_mode = 2
 
-[node name="PanelContainer" type="PanelContainer" parent="MarginContainer/HBoxContainer/MarginContainer/编辑器"]
+[node name="PanelContainer" type="PanelContainer" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/MarginContainer/编辑器"]
 layout_mode = 2
 theme_override_styles/panel = ExtResource("1_5ici8")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/HBoxContainer/MarginContainer/编辑器/PanelContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/MarginContainer/编辑器/PanelContainer"]
 layout_mode = 2
 
-[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/HBoxContainer/MarginContainer/编辑器/PanelContainer/VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/MarginContainer/编辑器/PanelContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="总时长" type="Label" parent="MarginContainer/HBoxContainer/MarginContainer/编辑器/PanelContainer/VBoxContainer/HBoxContainer"]
+[node name="总时长" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/MarginContainer/编辑器/PanelContainer/VBoxContainer/HBoxContainer"]
 custom_minimum_size = Vector2(80, 0)
 layout_mode = 2
 text = "老化总时长："
 horizontal_alignment = 2
 
-[node name="CountTime" type="Label" parent="MarginContainer/HBoxContainer/MarginContainer/编辑器/PanelContainer/VBoxContainer/HBoxContainer"]
+[node name="CountTime" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/MarginContainer/编辑器/PanelContainer/VBoxContainer/HBoxContainer"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(80, 0)
 layout_mode = 2
 
-[node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer/HBoxContainer/MarginContainer/编辑器/PanelContainer/VBoxContainer"]
+[node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/MarginContainer/编辑器/PanelContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="MarginContainer/HBoxContainer/MarginContainer/编辑器/PanelContainer/VBoxContainer/HBoxContainer2"]
+[node name="Label" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/MarginContainer/编辑器/PanelContainer/VBoxContainer/HBoxContainer2"]
 custom_minimum_size = Vector2(80, 0)
 layout_mode = 2
 text = "循环次数："
 horizontal_alignment = 2
 
-[node name="TaskLoop" type="LineEdit" parent="MarginContainer/HBoxContainer/MarginContainer/编辑器/PanelContainer/VBoxContainer/HBoxContainer2"]
+[node name="TaskLoop" type="LineEdit" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/MarginContainer/编辑器/PanelContainer/VBoxContainer/HBoxContainer2"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(100, 0)
 layout_mode = 2
@@ -309,54 +316,54 @@ placeholder_text = "1"
 alignment = 1
 select_all_on_focus = true
 
-[node name="PanelContainer2" type="PanelContainer" parent="MarginContainer/HBoxContainer/MarginContainer/编辑器"]
+[node name="PanelContainer2" type="PanelContainer" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/MarginContainer/编辑器"]
 layout_mode = 2
 theme_override_styles/panel = ExtResource("1_5ici8")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/HBoxContainer/MarginContainer/编辑器/PanelContainer2"]
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/MarginContainer/编辑器/PanelContainer2"]
 layout_mode = 2
 
-[node name="TaskItems" type="ItemList" parent="MarginContainer/HBoxContainer/MarginContainer/编辑器/PanelContainer2/VBoxContainer"]
+[node name="TaskItems" type="ItemList" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/MarginContainer/编辑器/PanelContainer2/VBoxContainer"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(400, 220)
 layout_mode = 2
 
-[node name="PanelContainer3" type="PanelContainer" parent="MarginContainer/HBoxContainer/MarginContainer/编辑器"]
+[node name="PanelContainer3" type="PanelContainer" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/MarginContainer/编辑器"]
 layout_mode = 2
 theme_override_styles/panel = ExtResource("1_5ici8")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/HBoxContainer/MarginContainer/编辑器/PanelContainer3"]
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/MarginContainer/编辑器/PanelContainer3"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="MarginContainer/HBoxContainer/MarginContainer/编辑器/PanelContainer3/VBoxContainer"]
+[node name="Label" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/MarginContainer/编辑器/PanelContainer3/VBoxContainer"]
 layout_mode = 2
 theme_override_styles/normal = ExtResource("2_mau8k")
 text = "时序参数："
 
-[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/HBoxContainer/MarginContainer/编辑器/PanelContainer3/VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/MarginContainer/编辑器/PanelContainer3/VBoxContainer"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="MarginContainer/HBoxContainer/MarginContainer/编辑器/PanelContainer3/VBoxContainer/HBoxContainer"]
+[node name="Label" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/MarginContainer/编辑器/PanelContainer3/VBoxContainer/HBoxContainer"]
 custom_minimum_size = Vector2(80, 0)
 layout_mode = 2
 text = "电压："
 horizontal_alignment = 2
 
-[node name="ItemPowerVoltage" type="OptionButton" parent="MarginContainer/HBoxContainer/MarginContainer/编辑器/PanelContainer3/VBoxContainer/HBoxContainer"]
+[node name="ItemPowerVoltage" type="OptionButton" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/MarginContainer/编辑器/PanelContainer3/VBoxContainer/HBoxContainer"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(100, 0)
 layout_mode = 2
 
-[node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer/HBoxContainer/MarginContainer/编辑器/PanelContainer3/VBoxContainer"]
+[node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/MarginContainer/编辑器/PanelContainer3/VBoxContainer"]
 layout_mode = 2
 
-[node name="时长" type="Label" parent="MarginContainer/HBoxContainer/MarginContainer/编辑器/PanelContainer3/VBoxContainer/HBoxContainer2"]
+[node name="时长" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/MarginContainer/编辑器/PanelContainer3/VBoxContainer/HBoxContainer2"]
 custom_minimum_size = Vector2(80, 0)
 layout_mode = 2
 text = "时长："
 horizontal_alignment = 2
 
-[node name="ItemHours" type="LineEdit" parent="MarginContainer/HBoxContainer/MarginContainer/编辑器/PanelContainer3/VBoxContainer/HBoxContainer2"]
+[node name="ItemHours" type="LineEdit" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/MarginContainer/编辑器/PanelContainer3/VBoxContainer/HBoxContainer2"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(50, 0)
 layout_mode = 2
@@ -364,11 +371,11 @@ placeholder_text = "0"
 alignment = 1
 select_all_on_focus = true
 
-[node name="Label2" type="Label" parent="MarginContainer/HBoxContainer/MarginContainer/编辑器/PanelContainer3/VBoxContainer/HBoxContainer2"]
+[node name="Label2" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/MarginContainer/编辑器/PanelContainer3/VBoxContainer/HBoxContainer2"]
 layout_mode = 2
 text = "时"
 
-[node name="ItemMinutes" type="LineEdit" parent="MarginContainer/HBoxContainer/MarginContainer/编辑器/PanelContainer3/VBoxContainer/HBoxContainer2"]
+[node name="ItemMinutes" type="LineEdit" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/MarginContainer/编辑器/PanelContainer3/VBoxContainer/HBoxContainer2"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(50, 0)
 layout_mode = 2
@@ -376,11 +383,11 @@ placeholder_text = "0"
 alignment = 1
 select_all_on_focus = true
 
-[node name="Label3" type="Label" parent="MarginContainer/HBoxContainer/MarginContainer/编辑器/PanelContainer3/VBoxContainer/HBoxContainer2"]
+[node name="Label3" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/MarginContainer/编辑器/PanelContainer3/VBoxContainer/HBoxContainer2"]
 layout_mode = 2
 text = "分"
 
-[node name="ItemSeconds" type="LineEdit" parent="MarginContainer/HBoxContainer/MarginContainer/编辑器/PanelContainer3/VBoxContainer/HBoxContainer2"]
+[node name="ItemSeconds" type="LineEdit" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/MarginContainer/编辑器/PanelContainer3/VBoxContainer/HBoxContainer2"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(50, 0)
 layout_mode = 2
@@ -388,83 +395,149 @@ placeholder_text = "0"
 alignment = 1
 select_all_on_focus = true
 
-[node name="Label4" type="Label" parent="MarginContainer/HBoxContainer/MarginContainer/编辑器/PanelContainer3/VBoxContainer/HBoxContainer2"]
+[node name="Label4" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/MarginContainer/编辑器/PanelContainer3/VBoxContainer/HBoxContainer2"]
 layout_mode = 2
 text = "秒"
 
-[node name="PanelContainer4" type="PanelContainer" parent="MarginContainer/HBoxContainer/MarginContainer/编辑器"]
+[node name="PanelContainer4" type="PanelContainer" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/MarginContainer/编辑器"]
 layout_mode = 2
 theme_override_styles/panel = ExtResource("1_5ici8")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/HBoxContainer/MarginContainer/编辑器/PanelContainer4"]
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/MarginContainer/编辑器/PanelContainer4"]
 layout_mode = 2
 
-[node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer/HBoxContainer/MarginContainer/编辑器/PanelContainer4/VBoxContainer"]
+[node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/MarginContainer/编辑器/PanelContainer4/VBoxContainer"]
 layout_mode = 2
 alignment = 1
 
-[node name="ItemSave" type="Button" parent="MarginContainer/HBoxContainer/MarginContainer/编辑器/PanelContainer4/VBoxContainer/HBoxContainer2"]
+[node name="ItemSave" type="Button" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/MarginContainer/编辑器/PanelContainer4/VBoxContainer/HBoxContainer2"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "添加时序项目"
 
-[node name="ItemEdit" type="Button" parent="MarginContainer/HBoxContainer/MarginContainer/编辑器/PanelContainer4/VBoxContainer/HBoxContainer2"]
+[node name="ItemEdit" type="Button" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/MarginContainer/编辑器/PanelContainer4/VBoxContainer/HBoxContainer2"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "修改选中时序"
 
-[node name="ItemDelete" type="Button" parent="MarginContainer/HBoxContainer/MarginContainer/编辑器/PanelContainer4/VBoxContainer/HBoxContainer2"]
+[node name="ItemDelete" type="Button" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/MarginContainer/编辑器/PanelContainer4/VBoxContainer/HBoxContainer2"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.788235, 0, 0, 1)
 text = "删除时序项目"
 
-[node name="ItemClear" type="Button" parent="MarginContainer/HBoxContainer/MarginContainer/编辑器/PanelContainer4/VBoxContainer/HBoxContainer2"]
+[node name="ItemClear" type="Button" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/MarginContainer/编辑器/PanelContainer4/VBoxContainer/HBoxContainer2"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.788235, 0, 0, 1)
 text = "清空时序"
 
-[node name="列表" type="VBoxContainer" parent="MarginContainer/HBoxContainer"]
+[node name="列表" type="VBoxContainer" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
 
-[node name="PanelContainer" type="PanelContainer" parent="MarginContainer/HBoxContainer/列表"]
+[node name="PanelContainer" type="PanelContainer" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/列表"]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_styles/panel = ExtResource("1_5ici8")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/HBoxContainer/列表/PanelContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/列表/PanelContainer"]
 layout_mode = 2
 
-[node name="TaskList" type="ItemList" parent="MarginContainer/HBoxContainer/列表/PanelContainer/VBoxContainer"]
+[node name="TaskList" type="ItemList" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/列表/PanelContainer/VBoxContainer"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(240, 500)
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/HBoxContainer/列表/PanelContainer/VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/列表/PanelContainer/VBoxContainer"]
 layout_mode = 2
 alignment = 1
 
-[node name="TaskSave" type="Button" parent="MarginContainer/HBoxContainer/列表/PanelContainer/VBoxContainer/HBoxContainer"]
+[node name="TaskSave" type="Button" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/列表/PanelContainer/VBoxContainer/HBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "保存程序"
 
-[node name="TaskDelete" type="Button" parent="MarginContainer/HBoxContainer/列表/PanelContainer/VBoxContainer/HBoxContainer"]
+[node name="TaskDelete" type="Button" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/列表/PanelContainer/VBoxContainer/HBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.788235, 0, 0, 1)
 text = "删除程序"
 
-[node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer/HBoxContainer/列表/PanelContainer/VBoxContainer"]
+[node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/列表/PanelContainer/VBoxContainer"]
 layout_mode = 2
 alignment = 1
 
-[node name="TaskLoad" type="Button" parent="MarginContainer/HBoxContainer/列表/PanelContainer/VBoxContainer/HBoxContainer2"]
+[node name="PanelContainer" type="PanelContainer" parent="MarginContainer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_styles/panel = ExtResource("1_5ici8")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/HBoxContainer/VBoxContainer/PanelContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer/PanelContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_styles/normal = ExtResource("2_mau8k")
+text = "加载程序"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/HBoxContainer/VBoxContainer/PanelContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/HBoxContainer/VBoxContainer/PanelContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer/PanelContainer/VBoxContainer/HBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
+text = "揣品名称："
+horizontal_alignment = 2
+
+[node name="ProductTitle" type="LineEdit" parent="MarginContainer/HBoxContainer/VBoxContainer/PanelContainer/VBoxContainer/HBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer/HBoxContainer/VBoxContainer/PanelContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer/PanelContainer/VBoxContainer/HBoxContainer/HBoxContainer2"]
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
+text = "产品序列："
+horizontal_alignment = 2
+
+[node name="ProductIndex" type="LineEdit" parent="MarginContainer/HBoxContainer/VBoxContainer/PanelContainer/VBoxContainer/HBoxContainer/HBoxContainer2"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+
+[node name="HBoxContainer3" type="HBoxContainer" parent="MarginContainer/HBoxContainer/VBoxContainer/PanelContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+alignment = 2
+
+[node name="Label" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer/PanelContainer/VBoxContainer/HBoxContainer/HBoxContainer3"]
+layout_mode = 2
+
+[node name="TaskLoad" type="Button" parent="MarginContainer/HBoxContainer/VBoxContainer/PanelContainer/VBoxContainer/HBoxContainer/HBoxContainer3"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "载入程序"
+
+[node name="Alert" type="AcceptDialog" parent="."]
+unique_name_in_owner = true
+initial_position = 1
+size = Vector2i(400, 200)
+theme = ExtResource("5_s66ot")
+theme_override_styles/panel = ExtResource("1_5ici8")
+
+[node name="CenterContainer" type="CenterContainer" parent="Alert"]
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="AlertInfo" type="Label" parent="Alert/CenterContainer"]
+unique_name_in_owner = true
+layout_mode = 2
 
 [connection signal="update_task_item_list" from="." to="." method="_on_update_task_item_list"]
 [connection signal="update_task_list" from="." to="." method="_on_update_task_list"]

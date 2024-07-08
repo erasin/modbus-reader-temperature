@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=3 uid="uid://ciewnonjuycx6"]
+[gd_scene load_steps=5 format=3 uid="uid://ciewnonjuycx6"]
 
 [ext_resource type="StyleBox" uid="uid://bhtstjj7isp2b" path="res://assets/pane.tres" id="1_vnvb2"]
 [ext_resource type="Texture2D" uid="uid://c4j0cr737oyw" path="res://assets/ball.png" id="2_gtrl5"]
 [ext_resource type="PackedScene" uid="uid://c28yq4x6cbvc7" path="res://voltage/chart.tscn" id="2_qnsh8"]
+[ext_resource type="Theme" uid="uid://bqplrcrrq65aj" path="res://assets/light.tres" id="4_exkob"]
 
 [node name="Voltage" type="VoltageView"]
 anchors_preset = 15
@@ -16,7 +17,6 @@ unique_name_in_owner = true
 
 [node name="AgeTimer" type="Timer" parent="."]
 unique_name_in_owner = true
-one_shot = true
 
 [node name="VoltageContainer" type="HBoxContainer" parent="."]
 unique_name_in_owner = true
@@ -107,7 +107,7 @@ layout_mode = 2
 layout_mode = 2
 text = "程序名称："
 
-[node name="ProName" type="Label" parent="VoltageContainer/功能区/VBoxContainer/时间/VBoxContainer/HBoxContainer"]
+[node name="TaskName" type="Label" parent="VoltageContainer/功能区/VBoxContainer/时间/VBoxContainer/HBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 
@@ -192,6 +192,28 @@ text = "不良品："
 horizontal_alignment = 2
 
 [node name="CountDefective" type="Label" parent="VoltageContainer/功能区/VBoxContainer/时间/VBoxContainer/HBoxContainer8"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="HBoxContainer9" type="HBoxContainer" parent="VoltageContainer/功能区/VBoxContainer/时间/VBoxContainer"]
+layout_mode = 2
+
+[node name="产品名称" type="Label" parent="VoltageContainer/功能区/VBoxContainer/时间/VBoxContainer/HBoxContainer9"]
+layout_mode = 2
+text = "产品名称："
+
+[node name="ProductTitle" type="Label" parent="VoltageContainer/功能区/VBoxContainer/时间/VBoxContainer/HBoxContainer9"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="HBoxContainer10" type="HBoxContainer" parent="VoltageContainer/功能区/VBoxContainer/时间/VBoxContainer"]
+layout_mode = 2
+
+[node name="产品序列" type="Label" parent="VoltageContainer/功能区/VBoxContainer/时间/VBoxContainer/HBoxContainer10"]
+layout_mode = 2
+text = "程序名称："
+
+[node name="ProductIndex" type="Label" parent="VoltageContainer/功能区/VBoxContainer/时间/VBoxContainer/HBoxContainer10"]
 unique_name_in_owner = true
 layout_mode = 2
 
@@ -280,3 +302,13 @@ unique_name_in_owner = true
 layout_mode = 2
 texture = ExtResource("2_gtrl5")
 expand_mode = 2
+
+[node name="Alert" type="AcceptDialog" parent="."]
+unique_name_in_owner = true
+initial_position = 1
+theme = ExtResource("4_exkob")
+
+[node name="AlertInfo" type="Label" parent="Alert"]
+unique_name_in_owner = true
+offset_right = 40.0
+offset_bottom = 19.0

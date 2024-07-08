@@ -1,0 +1,12 @@
+[gd_scene format=3 uid="uid://cl42k2sc3vrq0"]
+
+[node name="Alert" type="AcceptDialog"]
+visible = true
+
+[node name="AlertInfo" type="Label" parent="."]
+unique_name_in_owner = true
+offset_left = 8.0
+offset_top = 8.0
+offset_right = 92.0
+offset_bottom = 55.0
+text = "info!"

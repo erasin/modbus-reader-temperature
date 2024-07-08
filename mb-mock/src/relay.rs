@@ -7,9 +7,9 @@ use mb::{
 };
 use rand::Rng;
 
-fn mock_data() -> &'static Mutex<u16> {
+fn fake_data() -> &'static Mutex<u16> {
     static MOCK_DATA: OnceLock<Mutex<u16>> = OnceLock::new();
-    MOCK_DATA.get_or_init(|| Mutex::new(0x00000000))
+    MOCK_DATA.get_or_init(|| Mutex::new(0))
 }
 
 #[derive(Debug)]
@@ -42,10 +42,10 @@ impl From<&[u8]> for RelayMock {
             _ => {
                 // 解析请求
 
-                // TODO 处理数据
-                let mut data = mock_data().lock().unwrap();
-                let req_data = req.data()[0];
-                *data = req_data;
+                let mut data = fake_data().lock().unwrap();
+                let req_data = req.data();
+                // 因为为请求数据 0 为线圈， 1 为数据
+                *data = req_data[1];
                 let mut mock = RelayMock::new(value[0], RelayMode::ONOFF(0));
                 mock.set_req(req);
                 mock
@@ -56,7 +56,6 @@ impl From<&[u8]> for RelayMock {
 
 impl Mock for RelayMock {
     fn request(&self) -> FunRequest {
-        println!("req------>{:?}", self);
         match self.mode {
             RelayMode::Read => Relay::request(self.slave, &self.mode),
             _ => self
@@ -67,8 +66,7 @@ impl Mock for RelayMock {
     }
 
     fn response(&self) -> FunResponse {
-        println!("res------>{:?}", self);
-        let data = mock_data().lock().unwrap();
+        let data = fake_data().lock().unwrap();
         let mode = self.mode.params();
         match self.mode {
             RelayMode::Read => Function::new(self.slave, mode.0, vec![*data]),

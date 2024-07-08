@@ -1,7 +1,10 @@
 use std::time::Duration;
 
 use godot::{
-    engine::{Button, IPanelContainer, ItemList, Label, LineEdit, OptionButton, PanelContainer},
+    engine::{
+        AcceptDialog, Button, IPanelContainer, ItemList, Label, LineEdit, OptionButton,
+        PanelContainer,
+    },
     obj::WithBaseField,
     prelude::*,
 };
@@ -157,6 +160,16 @@ impl IPanelContainer for ProgramsView {
 
         self.get_item_clear_node()
             .connect("pressed".into(), self.base().callable("on_item_clear"));
+
+        self.get_product_title_node().connect(
+            "text_changed".into(),
+            self.base().callable("on_product_title_changed"),
+        );
+
+        self.get_product_index_node().connect(
+            "text_changed".into(),
+            self.base().callable("on_product_index_changed"),
+        );
 
         self.get_task_list_node().connect(
             "item_selected".into(),
@@ -488,6 +501,16 @@ impl ProgramsView {
     }
 
     #[func]
+    fn on_product_title_changed(&mut self, text: String) {
+        self.task.product.title = text.to_string();
+    }
+
+    #[func]
+    fn on_product_index_changed(&mut self, text: String) {
+        self.task.product.index = text.to_string();
+    }
+
+    #[func]
     fn on_task_save(&mut self) {
         log::debug!("task save: {}", self.task.title);
         // 保存
@@ -505,6 +528,12 @@ impl ProgramsView {
                 }
             };
         }
+
+        self.alert(
+            "保存确认".to_owned(),
+            "确认".to_owned(),
+            format!("已保存为{}", self.task.title),
+        );
 
         self.task_list_update();
     }
@@ -539,6 +568,17 @@ impl ProgramsView {
     #[func]
     fn on_task_load(&mut self) {
         let mut my_global = MyGlobal::singleton();
+
+        // TODO: 检查产品，检查时长
+
+        let product_title = self.get_product_title_node();
+        let product_index = self.get_product_index_node();
+
+        self.alert(
+            format!("加载程序{}", self.task.title),
+            "确认".to_owned(),
+            format!("已保存为{}", self.task.title),
+        );
 
         my_global
             .bind_mut()
@@ -645,13 +685,16 @@ impl ProgramsView {
             let db = get_db().lock().unwrap();
             self.list = match TableTask::list(&db, &self.task.ab) {
                 Ok(list) => list,
-                Err(_) => Vec::new(),
+                Err(e) => {
+                    log::error!("{}", e.to_string());
+                    Vec::new()
+                }
             };
         }
 
+        godot_print!("{:?}, {:?}", self.task.ab, self.list.len());
         self.task_list_str = Array::new();
         self.list.iter().for_each(|task| {
-            godot_print!("{}", task.title.clone());
             self.task_list_str.push(task.title.clone().into());
         });
 
@@ -713,6 +756,15 @@ impl ProgramsView {
             .emit_signal("update_task_item_list".into(), &[]);
     }
 
+    fn alert(&mut self, title: String, btn: String, info: String) {
+        let mut alert = self.get_alert_node();
+        let mut alert_info = self.get_alert_info_node();
+        alert.set_title(title.into());
+        alert.set_ok_button_text(btn.into());
+        alert_info.set_text(info.into());
+        alert.set_visible(true);
+    }
+
     // get node
     define_get_nodes![
         (get_check_a_node, UniqueName::CheckA, Button),
@@ -741,10 +793,14 @@ impl ProgramsView {
         (get_item_edit_node, UniqueName::ItemEdit, Button),
         (get_item_delete_node, UniqueName::ItemDelete, Button),
         (get_item_clear_node, UniqueName::ItemClear, Button),
+        (get_product_title_node, UniqueName::ProductTitle, LineEdit),
+        (get_product_index_node, UniqueName::ProductIndex, LineEdit),
         (get_task_list_node, UniqueName::TaskList, ItemList),
         (get_task_save_node, UniqueName::TaskSave, Button),
         (get_task_delete_node, UniqueName::TaskDelete, Button),
         (get_task_load_node, UniqueName::TaskLoad, Button),
+        (get_alert_node, UniqueName::Alert, AcceptDialog),
+        (get_alert_info_node, UniqueName::AlertInfo, Label),
     ];
 }
 
@@ -779,8 +835,14 @@ enum UniqueName {
     ItemDelete,
     ItemClear,
 
+    ProductTitle,
+    ProductIndex,
+
     TaskList,
     TaskSave,
     TaskDelete,
     TaskLoad,
+
+    Alert,
+    AlertInfo,
 }

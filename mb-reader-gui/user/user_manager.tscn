@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=3 uid="uid://bpiln1r7t4yhu"]
+[gd_scene load_steps=5 format=3 uid="uid://bpiln1r7t4yhu"]
 
 [ext_resource type="StyleBox" uid="uid://bhtstjj7isp2b" path="res://assets/pane.tres" id="1_d0v70"]
 [ext_resource type="Script" path="res://user/user_manager.gd" id="1_imvy4"]
 [ext_resource type="StyleBox" uid="uid://cxwvlet43ndso" path="res://assets/title.tres" id="2_r5ip8"]
+[ext_resource type="Theme" uid="uid://bqplrcrrq65aj" path="res://assets/light.tres" id="4_j4icg"]
 
 [node name="UserManager" type="UserManagerView"]
 anchors_preset = 15
@@ -107,6 +108,21 @@ theme_override_styles/panel = ExtResource("1_d0v70")
 [node name="UserList" type="ItemList" parent="MarginContainer/HBoxContainer/PanelContainer2"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 400)
+layout_mode = 2
+
+[node name="Alert" type="AcceptDialog" parent="."]
+unique_name_in_owner = true
+initial_position = 1
+size = Vector2i(400, 200)
+theme = ExtResource("4_j4icg")
+theme_override_styles/panel = ExtResource("1_d0v70")
+
+[node name="CenterContainer" type="CenterContainer" parent="Alert"]
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="AlertInfo" type="Label" parent="Alert/CenterContainer"]
+unique_name_in_owner = true
 layout_mode = 2
 
 [connection signal="update_users" from="." to="." method="_on_update_users"]

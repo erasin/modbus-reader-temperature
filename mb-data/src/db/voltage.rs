@@ -249,6 +249,7 @@ mod test {
     fn test_list() {
         let db = get_db().lock().unwrap();
         // assert_eq!((), TableVoltage::clean(&db, AB::A).unwrap());
+        // return;
 
         let dur = current_timestamp();
 
@@ -307,4 +308,60 @@ mod test {
             }
         };
     }
+}
+
+use std::collections::HashMap;
+
+// TODO 计算平均值
+pub fn average_voltage_data_per_minute(
+    groups: Vec<VoltageDataGroup>,
+    pre_min: u64,
+) -> Vec<VoltageDataGroup> {
+    // 获取起始时间 结束结束时间
+
+    // 计算平均时间
+
+    let mut grouped_data: HashMap<u64, Vec<VoltageDataGroup>> = HashMap::new();
+
+    let pre_sec = 60 * pre_min;
+
+    // 分组数据
+    for group in groups {
+        let minute = group.time.as_secs() / pre_sec;
+        grouped_data.entry(minute).or_insert(Vec::new()).push(group);
+    }
+
+    let mut averaged_groups: Vec<VoltageDataGroup> = Vec::new();
+
+    // 计算每分钟的平均值
+    for (_, groups) in grouped_data {
+        let mut total_channels: HashMap<usize, (f32, f32, usize)> = HashMap::new();
+        let mut first_group = groups[0].clone();
+
+        for group in groups {
+            for data in &group.data {
+                for channel in &data.data {
+                    let entry = total_channels.entry(channel.index).or_insert((0.0, 0.0, 0));
+                    entry.0 += channel.voltage;
+                    entry.1 += channel.current;
+                    entry.2 += 1;
+                }
+            }
+        }
+
+        for data in &mut first_group.data {
+            for channel in &mut data.data {
+                if let Some((total_voltage, total_current, count)) =
+                    total_channels.get(&channel.index)
+                {
+                    channel.voltage = total_voltage / *count as f32;
+                    channel.current = total_current / *count as f32;
+                }
+            }
+        }
+
+        averaged_groups.push(first_group);
+    }
+
+    averaged_groups
 }

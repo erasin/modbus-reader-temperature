@@ -23,8 +23,22 @@ pub struct Task {
 
     /// 时序表
     pub count_time: Duration,
+    /// 时序循环次数
     pub task_loop: u32,
+    /// 时序内容
     pub items: Vec<TaskItem>,
+
+    #[serde(skip_deserializing)]
+    pub product: Product,
+}
+
+/// 产品
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct Product {
+    /// 产品名称
+    pub title: String,
+    /// 产品序列
+    pub index: String,
 }
 
 #[derive(Debug, Clone, Copy, Default, Serialize, Deserialize)]

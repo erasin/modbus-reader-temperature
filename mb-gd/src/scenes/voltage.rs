@@ -1,17 +1,16 @@
 use std::{
-    ops::{MulAssign, Sub},
+    ops::{Sub, SubAssign},
+    path::PathBuf,
     time::Duration,
 };
 
 use channel::VoltageChannelView;
 use godot::{
-    engine::{
-        Button, ColorPicker, Control, GridContainer, IPanelContainer, Label, Os, PanelContainer,
-        Timer,
-    },
+    engine::{Button, Control, GridContainer, IPanelContainer, Label, PanelContainer, Timer},
     obj::WithBaseField,
     prelude::*,
 };
+use mb::Result;
 use mb::{
     utils::{current_timestamp, hms_from_duration_string},
     voltage::{VoltageData, VoltageState, VOLTAGE_CHANNEL},
@@ -19,11 +18,13 @@ use mb::{
 use mb_data::{
     db::{
         get_db,
-        voltage::{TableVoltage, VoltageDataGroup},
+        voltage::{average_voltage_data_per_minute, TableVoltage, VoltageDataGroup},
     },
+    dirs::doc_dir,
     task::Task,
-    utils::{time_dur_odt, time_format_human, time_human},
+    utils::{time_dur_odt, time_human, time_human_filename, time_now},
 };
+use rust_xlsxwriter::Workbook;
 use state_tag::VoltageStateTagView;
 use strum::{AsRefStr, IntoEnumIterator};
 
@@ -178,17 +179,35 @@ impl VoltageView {
         self.task_update();
     }
 
+    /// 请求处理
     #[func]
     fn on_req_timer_timeout(&mut self) {
         self.task_run();
         self.chart_update();
         self.state_update();
+        self.count_good();
+    }
+
+    /// 老化结束处理
+    #[func]
+    fn on_age_timer_timeout(&mut self) {
+        self.state_age = false;
+        self.btn_state_update();
+        self.count_good();
+        if let Err(e) = self.save_history() {
+            log::error!("{}", e.to_string());
+        };
     }
 
     #[func]
     fn on_start_toggle(&mut self) {
         self.state_run = !self.state_run;
         self.btn_state_update();
+
+        // TODO remove
+        if let Err(e) = self.save_history() {
+            log::error!("{}", e.to_string());
+        };
     }
 
     /// 老化
@@ -220,10 +239,12 @@ impl VoltageView {
         let mut start_btn = self.get_start_toggle_node();
         let mut age_btn = self.get_ageing_toggle_node();
         let mut power_btn = self.get_power_toggle_node();
-        let mut pro_name_node = self.get_pro_name_node();
+        let mut pro_name_node = self.get_task_name_node();
         let mut ageing_time_node = self.get_ageing_time_node();
         let mut power_state_node = self.get_power_state_node();
         let mut age_timer = self.get_age_timer_node();
+        let mut product_title_node = self.get_product_title_node();
+        let mut product_index_node = self.get_product_index_node();
 
         let task = match &self.task {
             Some(task) => task,
@@ -244,6 +265,9 @@ impl VoltageView {
         self.count_down = task.count_time;
         power_state_node
             .set_text(format!("{} {}V", task.power.mode.as_ref(), task.power.voltage).into());
+
+        product_title_node.set_text(task.product.title.clone().into());
+        product_index_node.set_text(task.product.index.clone().into());
 
         age_timer.set_one_shot(true);
         age_timer.set_wait_time(task.count_time.as_secs_f64());
@@ -291,6 +315,7 @@ impl VoltageView {
             start_btn.set_disabled(true);
         } else {
             req_timer.stop();
+            age_timer.stop();
             power_btn.set_disabled(false);
             age_btn.set_text("开始老化".into());
         }
@@ -356,6 +381,9 @@ impl VoltageView {
     fn task_run(&mut self) {
         let config = get_global_config();
         let task = self.task.clone().unwrap();
+        if !self.state_run || !self.state_age || !self.state_power {
+            return;
+        }
 
         //根据 AB 区 获取参数
         let voltage = match self.ab {
@@ -468,7 +496,13 @@ impl VoltageView {
         }
 
         if self.state_age {
-            self.count_down = self.end_at - current_timestamp();
+            let current_time = current_timestamp();
+            self.count_down = match self.end_at.cmp(&current_time) {
+                std::cmp::Ordering::Less | std::cmp::Ordering::Equal => Duration::from_secs(0),
+                std::cmp::Ordering::Greater => self.end_at.sub(current_time),
+            }
+
+            // (current_time);
         }
 
         let mut start_time = self.get_start_time_node();
@@ -525,8 +559,67 @@ impl VoltageView {
         state_error_node.set_modulate(state_error.into());
     }
 
+    /// 计算良品率
+    fn count_good(&mut self) {
+        // 计算良品
+    }
+
     /// 保存文件
-    fn save_history(&mut self) {}
+    fn save_history(&mut self) -> Result<()> {
+        let config = get_global_config();
+        // 保存
+
+        // 文件路径
+        let mut doc_path = if config.history.export_dir.is_empty() {
+            doc_dir()
+        } else {
+            PathBuf::from(config.history.export_dir)
+        };
+
+        let time_name = time_human_filename(time_now());
+        //产品名称
+        let task = self.task.clone().unwrap();
+        let pro_name = task.product.title;
+        let pro_id = task.product.index;
+        let file_name = format!("{pro_name}_{pro_id}_{time_name}.xlsx");
+        doc_path.push(file_name);
+
+        // 数据
+        // 计算每分钟的品均值
+        // 保存为
+        let list = {
+            let db = get_db().lock().unwrap();
+            TableVoltage::range_last(&db, self.ab.into(), 100)?
+        };
+
+        let list = average_voltage_data_per_minute(list, config.history.log_dur as u64);
+
+        let mut workbook = Workbook::new();
+        let worksheet = workbook.add_worksheet();
+
+        worksheet.write(0, 0, "Channel")?;
+        worksheet.write(0, 1, "电压")?;
+        worksheet.write(0, 2, "电流")?;
+        worksheet.write(0, 3, "时间")?;
+
+        for (index, item) in list.iter().enumerate() {
+            for (index_slave, slave) in item.data.iter().enumerate() {
+                for (index_channel, channel) in slave.data.iter().enumerate() {
+                    let channel_index = index_slave + index_channel + 1;
+                    let row = (index + channel_index) as u32;
+
+                    worksheet.write(row, 1, channel.voltage)?;
+                    worksheet.write(row, 1, channel.voltage)?;
+                    worksheet.write(row, 1, channel.current)?;
+                    worksheet.write(row, 3, time_human(time_dur_odt(item.time)))?;
+                }
+            }
+        }
+
+        workbook.save(doc_path)?;
+
+        Ok(())
+    }
 
     define_get_nodes![
         (get_voltage_container, UniqueName::VoltageContainer, Control),
@@ -537,7 +630,7 @@ impl VoltageView {
         (get_start_toggle_node, UniqueName::StartToggle, Button),
         (get_ageing_toggle_node, UniqueName::AgeingToggle, Button),
         (get_power_toggle_node, UniqueName::PowerToggle, Button),
-        (get_pro_name_node, UniqueName::ProName, Label),
+        (get_task_name_node, UniqueName::TaskName, Label),
         (get_start_time_node, UniqueName::StartTime, Label),
         (get_count_down_time_node, UniqueName::CountDownTime, Label),
         (get_ageing_time_node, UniqueName::AgeingTime, Label),
@@ -545,6 +638,8 @@ impl VoltageView {
         (get_count_num_node, UniqueName::CountNum, Label),
         (get_count_good_node, UniqueName::CountGood, Label),
         (get_count_defective_node, UniqueName::CountDefective, Label),
+        (get_product_title_node, UniqueName::ProductTitle, Label),
+        (get_product_index_node, UniqueName::ProductIndex, Label),
         (get_ab_name_node, UniqueName::AbName, Label),
         (get_state_run_node, UniqueName::StateRun, Control),
         (get_state_error_node, UniqueName::StateError, Control),
@@ -568,7 +663,7 @@ enum UniqueName {
     AgeingToggle,
     PowerToggle,
 
-    ProName,
+    TaskName,
     StartTime,
     CountDownTime,
     AgeingTime,
@@ -576,6 +671,8 @@ enum UniqueName {
     CountNum,
     CountGood,
     CountDefective,
+    ProductTitle,
+    ProductIndex,
 
     AbName,
     StateRun,

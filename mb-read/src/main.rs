@@ -18,11 +18,12 @@ fn main() -> Result<()> {
 
     // req.run_temp(TempMock::new(0x01, TemperatureMode::Temp1))?;
 
-    req.run_relay(RelayMock::new(0x02, RelayMode::Read))?;
-    req.run_relay(RelayMock::new(0x02, RelayMode::ON(0, 1)))?;
-    req.run_relay(RelayMock::new(0x02, RelayMode::Read))?;
+    // req.run_relay(RelayMock::new(0x02, RelayMode::Read))?;
+    // req.run_relay(RelayMock::new(0x02, RelayMode::ON(0, 1)))?;
+    // req.run_relay(RelayMock::new(0x02, RelayMode::Read))?;
 
-    // req.run_power(PowerMock::new(0x03, mb::power::PowerMode::GetVoltage))?;
+    req.run_power(PowerMock::new(0x03, mb::power::PowerMode::SetOnOff))?;
+    req.run_power(PowerMock::new(0x03, mb::power::PowerMode::GetVoltage))?;
 
     // req.run_voltage(VoltageMock::new(0x05))?;
 
@@ -58,10 +59,10 @@ macro_rules! define_run_mock{
                 println!("\n----\nstart $fn_name: \n",);
 
                 let request = mock.request();
-                print_hex("request", &request.origin());
+                print_hex("request", &request.request_data());
 
                 let response = self.builder.call(&request)?;
-                print_hex("response", &response.origin());
+                print_hex("response", &response.response_data());
 
                 if response == request {
                     println!("命令执行\n");

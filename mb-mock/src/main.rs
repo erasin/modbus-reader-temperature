@@ -46,7 +46,7 @@ fn main() -> std::io::Result<()> {
 
                 if buffer == mock.request().request_data().as_slice() {
                     print_hex("request", &buffer.to_vec());
-                    let response = mock.response().origin();
+                    let response = mock.response().response_data();
                     port.write_all(response.as_slice())?;
                     print_hex("response", &response);
 

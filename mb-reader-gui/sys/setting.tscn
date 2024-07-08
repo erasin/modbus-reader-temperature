@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3 uid="uid://cg63tx3u2mhnh"]
+[gd_scene load_steps=4 format=3 uid="uid://cg63tx3u2mhnh"]
 
 [ext_resource type="StyleBox" uid="uid://bhtstjj7isp2b" path="res://assets/pane.tres" id="1_6fv7b"]
 [ext_resource type="StyleBox" uid="uid://cxwvlet43ndso" path="res://assets/title.tres" id="1_u6mbo"]
+[ext_resource type="Theme" uid="uid://bqplrcrrq65aj" path="res://assets/light.tres" id="3_yui6a"]
 
 [node name="Setting" type="SettingView"]
 anchors_preset = 15
@@ -566,7 +567,7 @@ alignment = 1
 
 [node name="Label2" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer3/VBoxContainer3/历史数据/VBoxContainer/HBoxContainer"]
 layout_mode = 2
-text = "秒"
+text = "分钟"
 
 [node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer3/VBoxContainer3/历史数据/VBoxContainer"]
 layout_mode = 2
@@ -626,3 +627,18 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
 text = "确认"
+
+[node name="Alert" type="AcceptDialog" parent="."]
+unique_name_in_owner = true
+initial_position = 1
+size = Vector2i(400, 200)
+theme = ExtResource("3_yui6a")
+theme_override_styles/panel = ExtResource("1_6fv7b")
+
+[node name="CenterContainer" type="CenterContainer" parent="Alert"]
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="AlertInfo" type="Label" parent="Alert/CenterContainer"]
+unique_name_in_owner = true
+layout_mode = 2

@@ -2,7 +2,7 @@ use godot::{
     engine::{
         file_dialog::{Access, FileMode},
         window::WindowInitialPosition,
-        Button, CheckBox, FileDialog, IPanelContainer, Label, LineEdit, OptionButton,
+        AcceptDialog, Button, CheckBox, FileDialog, IPanelContainer, Label, LineEdit, OptionButton,
         PanelContainer,
     },
     prelude::*,
@@ -416,6 +416,11 @@ impl SettingView {
 
     #[func]
     fn on_submit(&mut self) {
+        self.alert(
+            "保存确认".to_owned(),
+            "确认".to_owned(),
+            "已保存配置".to_owned(),
+        );
         set_global_config(self.config.clone());
     }
 }
@@ -720,6 +725,15 @@ impl SettingView {
         panel_b.set_visible(self.config.enable_b_panel);
     }
 
+    fn alert(&mut self, title: String, btn: String, info: String) {
+        let mut alert = self.get_alert_node();
+        let mut alert_info = self.get_alert_info_node();
+        alert.set_title(title.into());
+        alert.set_ok_button_text(btn.into());
+        alert_info.set_text(info.into());
+        alert.set_visible(true);
+    }
+
     define_get_nodes![
         (get_pro_name_node, UniqueName::ProName, LineEdit),
         (get_enable_apanel_node, UniqueName::EnableApanel, CheckBox),
@@ -821,6 +835,8 @@ impl SettingView {
             Label
         ),
         (get_submit_node, UniqueName::Submit, Button),
+        (get_alert_node, UniqueName::Alert, AcceptDialog),
+        (get_alert_info_node, UniqueName::AlertInfo, Label),
     ];
 }
 
@@ -869,6 +885,9 @@ enum UniqueName {
     HistoryExportDir,
 
     Submit,
+
+    Alert,
+    AlertInfo,
 }
 
 impl std::fmt::Display for UniqueName {

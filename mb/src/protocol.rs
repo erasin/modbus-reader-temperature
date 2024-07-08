@@ -187,22 +187,6 @@ impl Function {
         Ok(fp)
     }
 
-    pub fn origin(&self) -> Vec<u8> {
-        match self.code {
-            FunctionCode::ReadCoils
-            | FunctionCode::ReadDiscreteInputs
-            | FunctionCode::ReadHoldingRegisters
-            | FunctionCode::ReadInputRegisters => self.response_data(),
-            FunctionCode::WriteSingleCoil
-            | FunctionCode::ReadWriteMultipleRegisters
-            | FunctionCode::WriteSingleRegister
-            | FunctionCode::WriteMultipleCoils
-            | FunctionCode::WriteMultipleRegisters
-            | FunctionCode::MaskWriteRegister
-            | FunctionCode::Custom(_) => self.request_data(),
-        }
-    }
-
     /// 生成请求数据
     pub fn request_data(&self) -> Vec<u8> {
         let len = self.data_u16.len() * 2;
@@ -226,8 +210,24 @@ impl Function {
         response
     }
 
-    /// 生成返回数据
     pub fn response_data(&self) -> Vec<u8> {
+        match self.code {
+            FunctionCode::ReadCoils
+            | FunctionCode::ReadDiscreteInputs
+            | FunctionCode::ReadHoldingRegisters
+            | FunctionCode::ReadInputRegisters => self._response_data(),
+            FunctionCode::WriteSingleCoil
+            | FunctionCode::ReadWriteMultipleRegisters
+            | FunctionCode::WriteSingleRegister
+            | FunctionCode::WriteMultipleCoils
+            | FunctionCode::WriteMultipleRegisters
+            | FunctionCode::MaskWriteRegister
+            | FunctionCode::Custom(_) => self.request_data(),
+        }
+    }
+
+    /// 生成返回数据
+    fn _response_data(&self) -> Vec<u8> {
         let len = self.data_u16.len() * 2;
         let mut data: Vec<u8> = Vec::with_capacity(len);
 

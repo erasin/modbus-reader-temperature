@@ -37,3 +37,10 @@ pub fn time_human(dur: OffsetDateTime) -> String {
 
     dur.to_offset(*get_time_offset()).format(&format).unwrap()
 }
+
+pub fn time_human_filename(dur: OffsetDateTime) -> String {
+    let format = "[year][month][day][hour][minute][second]";
+    let format = format_description::parse(format).unwrap();
+
+    dur.to_offset(*get_time_offset()).format(&format).unwrap()
+}
