@@ -29,7 +29,7 @@ impl Builder {
         let _i = port.write(&request.request_data())?;
 
         port.flush().unwrap();
-        thread::sleep(Duration::from_millis(100));
+        // thread::sleep(Duration::from_millis(100));
 
         let mut response = vec![0u8; 1024];
         let n = read_full_response(&mut port, &mut response)?;

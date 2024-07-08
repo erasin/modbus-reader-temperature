@@ -6,7 +6,7 @@ use godot::{
 use mb::voltage::VoltageChannel;
 use strum::AsRefStr;
 
-use crate::colors::ColorPlate;
+use crate::{colors::ColorPlate, define_get_nodes};
 
 #[derive(GodotClass)]
 #[class(base=PanelContainer)]
@@ -22,7 +22,6 @@ pub struct VoltageChannelView {
 #[godot_api]
 impl IPanelContainer for VoltageChannelView {
     fn init(base: Base<PanelContainer>) -> Self {
-        // godot_print!("item init");
         Self {
             index: 0,
             data: VoltageChannel::default(),
@@ -31,9 +30,10 @@ impl IPanelContainer for VoltageChannelView {
         }
     }
     fn ready(&mut self) {
-        // let on_update_data = self.base().callable("on_update_data");
-        // self.base_mut()
-        //     .connect("update_data".into(), on_update_data);
+        let mut voltage_label = self.get_voltage_node();
+        let mut current_label = self.get_current_node();
+        voltage_label.set_visible(false);
+        current_label.set_visible(false);
     }
 }
 
@@ -56,18 +56,10 @@ impl VoltageChannelView {
     }
 
     pub fn update_ui(&mut self) {
-        let mut index_label = self
-            .base()
-            .get_node_as::<Label>(UniqueName::Index.to_string());
-        let mut voltage_label = self
-            .base()
-            .get_node_as::<Label>(UniqueName::Voltage.to_string());
-        let mut current_label = self
-            .base()
-            .get_node_as::<Label>(UniqueName::Current.to_string());
-        let mut state = self
-            .base()
-            .get_node_as::<Control>(UniqueName::State.to_string());
+        let mut index_label = self.get_index_node();
+        let mut voltage_label = self.get_voltage_node();
+        let mut current_label = self.get_current_node();
+        let mut state = self.get_state_node();
 
         index_label.set_text(format!("{:2}", self.index + 1).into());
         voltage_label.set_text(format!("{:2.2}V", self.data.voltage).into());
@@ -75,6 +67,13 @@ impl VoltageChannelView {
 
         state.set_modulate(self.color);
     }
+
+    define_get_nodes![
+        (get_index_node, UniqueName::Index, Label),
+        (get_voltage_node, UniqueName::Voltage, Label),
+        (get_current_node, UniqueName::Current, Label),
+        (get_state_node, UniqueName::State, Control),
+    ];
 }
 
 #[derive(AsRefStr, Debug)]

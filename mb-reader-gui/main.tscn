@@ -12,103 +12,108 @@ grow_horizontal = 2
 grow_vertical = 2
 theme = ExtResource("1_ml6vt")
 
-[node name="PanelContainer" type="MarginContainer" parent="."]
+[node name="ScrollContainer" type="ScrollContainer" parent="."]
 layout_mode = 2
 
-[node name="VSplitContainer" type="VBoxContainer" parent="PanelContainer"]
+[node name="PanelContainer" type="MarginContainer" parent="ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="VSplitContainer" type="VBoxContainer" parent="ScrollContainer/PanelContainer"]
 layout_mode = 2
 
-[node name="Panel1" type="PanelContainer" parent="PanelContainer/VSplitContainer"]
+[node name="Panel1" type="PanelContainer" parent="ScrollContainer/PanelContainer/VSplitContainer"]
 layout_mode = 2
 
-[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/VSplitContainer/Panel1"]
+[node name="HBoxContainer" type="HBoxContainer" parent="ScrollContainer/PanelContainer/VSplitContainer/Panel1"]
 layout_mode = 2
 
-[node name="HBoxContainer2" type="HBoxContainer" parent="PanelContainer/VSplitContainer/Panel1/HBoxContainer"]
+[node name="HBoxContainer2" type="HBoxContainer" parent="ScrollContainer/PanelContainer/VSplitContainer/Panel1/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 alignment = 1
 
-[node name="Save" type="Button" parent="PanelContainer/VSplitContainer/Panel1/HBoxContainer/HBoxContainer2"]
+[node name="Save" type="Button" parent="ScrollContainer/PanelContainer/VSplitContainer/Panel1/HBoxContainer/HBoxContainer2"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "保存"
 
-[node name="Open" type="Button" parent="PanelContainer/VSplitContainer/Panel1/HBoxContainer/HBoxContainer2"]
+[node name="Open" type="Button" parent="ScrollContainer/PanelContainer/VSplitContainer/Panel1/HBoxContainer/HBoxContainer2"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "打开
 "
 
-[node name="HBoxContainer3" type="HBoxContainer" parent="PanelContainer/VSplitContainer/Panel1/HBoxContainer"]
+[node name="HBoxContainer3" type="HBoxContainer" parent="ScrollContainer/PanelContainer/VSplitContainer/Panel1/HBoxContainer"]
 layout_mode = 2
 
-[node name="LoginUserName" type="Label" parent="PanelContainer/VSplitContainer/Panel1/HBoxContainer/HBoxContainer3"]
+[node name="LoginUserName" type="Label" parent="ScrollContainer/PanelContainer/VSplitContainer/Panel1/HBoxContainer/HBoxContainer3"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "未登录"
 
-[node name="LoginBtn" type="Button" parent="PanelContainer/VSplitContainer/Panel1/HBoxContainer/HBoxContainer3"]
+[node name="LoginBtn" type="Button" parent="ScrollContainer/PanelContainer/VSplitContainer/Panel1/HBoxContainer/HBoxContainer3"]
 unique_name_in_owner = true
 layout_mode = 2
 text = " 登录 "
 
-[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/VSplitContainer/Panel1/HBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="ScrollContainer/PanelContainer/VSplitContainer/Panel1/HBoxContainer"]
 layout_mode = 2
 
-[node name="SystemSetBtn" type="Button" parent="PanelContainer/VSplitContainer/Panel1/HBoxContainer/HBoxContainer"]
+[node name="SystemSetBtn" type="Button" parent="ScrollContainer/PanelContainer/VSplitContainer/Panel1/HBoxContainer/HBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "系统设置"
 
-[node name="ProgramsBtn" type="Button" parent="PanelContainer/VSplitContainer/Panel1/HBoxContainer/HBoxContainer"]
+[node name="ProgramsBtn" type="Button" parent="ScrollContainer/PanelContainer/VSplitContainer/Panel1/HBoxContainer/HBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "程序编辑"
 
-[node name="UserManagerBtn" type="Button" parent="PanelContainer/VSplitContainer/Panel1/HBoxContainer/HBoxContainer"]
+[node name="UserManagerBtn" type="Button" parent="ScrollContainer/PanelContainer/VSplitContainer/Panel1/HBoxContainer/HBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "用户管理"
 
-[node name="Panel3" type="PanelContainer" parent="PanelContainer/VSplitContainer"]
+[node name="Panel3" type="PanelContainer" parent="ScrollContainer/PanelContainer/VSplitContainer"]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_styles/panel = ExtResource("2_qfy1n")
 
-[node name="HSplitContainer" type="HSplitContainer" parent="PanelContainer/VSplitContainer/Panel3"]
+[node name="HSplitContainer" type="HSplitContainer" parent="ScrollContainer/PanelContainer/VSplitContainer/Panel3"]
 layout_mode = 2
 
-[node name="Apanel" type="PanelContainer" parent="PanelContainer/VSplitContainer/Panel3/HSplitContainer"]
+[node name="Apanel" type="PanelContainer" parent="ScrollContainer/PanelContainer/VSplitContainer/Panel3/HSplitContainer"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(500, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="MarginContainer" type="MarginContainer" parent="PanelContainer/VSplitContainer/Panel3/HSplitContainer/Apanel"]
+[node name="MarginContainer" type="MarginContainer" parent="ScrollContainer/PanelContainer/VSplitContainer/Panel3/HSplitContainer/Apanel"]
 layout_mode = 2
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 10
 
-[node name="VoltageA" parent="PanelContainer/VSplitContainer/Panel3/HSplitContainer/Apanel/MarginContainer" instance=ExtResource("1_6pq7q")]
+[node name="VoltageA" parent="ScrollContainer/PanelContainer/VSplitContainer/Panel3/HSplitContainer/Apanel/MarginContainer" instance=ExtResource("1_6pq7q")]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="Bpanel" type="PanelContainer" parent="PanelContainer/VSplitContainer/Panel3/HSplitContainer"]
+[node name="Bpanel" type="PanelContainer" parent="ScrollContainer/PanelContainer/VSplitContainer/Panel3/HSplitContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="MarginContainer" type="MarginContainer" parent="PanelContainer/VSplitContainer/Panel3/HSplitContainer/Bpanel"]
+[node name="MarginContainer" type="MarginContainer" parent="ScrollContainer/PanelContainer/VSplitContainer/Panel3/HSplitContainer/Bpanel"]
 layout_mode = 2
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 10
 
-[node name="VoltageB" parent="PanelContainer/VSplitContainer/Panel3/HSplitContainer/Bpanel/MarginContainer" instance=ExtResource("1_6pq7q")]
+[node name="VoltageB" parent="ScrollContainer/PanelContainer/VSplitContainer/Panel3/HSplitContainer/Bpanel/MarginContainer" instance=ExtResource("1_6pq7q")]
 ab = "Bpanel"
 unique_name_in_owner = true
 layout_mode = 2

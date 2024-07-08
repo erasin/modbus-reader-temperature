@@ -53,6 +53,7 @@ impl IControl for ChartView {
         }
     }
 
+    // 更新绘制
     fn draw(&mut self) {
         self.draw_grid_lines();
         self.draw_labels();
@@ -60,7 +61,7 @@ impl IControl for ChartView {
         self.draw_hover();
     }
 
-    fn input(&mut self, event: Gd<InputEvent>) {
+    fn gui_input(&mut self, event: Gd<InputEvent>) {
         let size = self.base().get_size();
         let pos = self.base().get_global_position();
         // self.base().get_global_transform().origin;
@@ -126,6 +127,7 @@ impl ChartView {
         self.label_color = color;
     }
 
+    /// 绘制背景线
     fn draw_grid_lines(&mut self) {
         let size = self.base().get_size();
         let step_x = size.x / 10.0;
@@ -157,6 +159,7 @@ impl ChartView {
         }
     }
 
+    /// 绘制 label
     fn draw_labels(&mut self) {
         let font = self
             .base()
@@ -206,6 +209,7 @@ impl ChartView {
             .draw_string(font.clone(), point, label.into());
     }
 
+    /// 绘制 points
     fn draw_points(&mut self) {
         if self.points.len() < 2 {
             return;
@@ -218,7 +222,7 @@ impl ChartView {
             let p2 = self.convert_point(self.points[i + 1]);
             self.base_mut()
                 .draw_line_ex(p1, p2, color)
-                .width(4.0)
+                .width(2.0)
                 .done();
         }
 
@@ -227,15 +231,15 @@ impl ChartView {
         // 数据原点
         for i in 0..self.points.len() {
             let p1 = self.convert_point(self.points[i]);
-            self.base_mut().draw_circle(p1, 5., color);
+            self.base_mut().draw_circle(p1, 3., color);
         }
     }
+
+    /// 绘制
     fn draw_hover(&mut self) {
         if self.hovered_point.is_none() {
             return;
         }
-        godot_print!("---- hover---");
-
         let p = self.hovered_point.clone().unwrap();
 
         let font = self
@@ -248,7 +252,7 @@ impl ChartView {
         self.base_mut().draw_string(font.clone(), point, p.1.into());
     }
 
-    // 转化为 rect 的坐标
+    /// 转化为 rect 的坐标
     fn convert_point(&self, point: Vector2) -> Vector2 {
         let size = self.base().get_size();
 
