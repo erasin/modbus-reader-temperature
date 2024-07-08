@@ -21,7 +21,7 @@ pub fn get_voltage_data(config: &VoltageConfig, slave: u8) -> Result<VoltageData
     response.try_into()
 }
 
-// 获取温度
+/// 获取温度
 pub fn get_temperature(config: &TemperatureConfig, ab: AB) -> Result<TemperatureData> {
     let port_name = config.serial_port.port.clone();
     let baudrate = config.serial_port.baudrate.into();
@@ -39,7 +39,7 @@ pub fn get_temperature(config: &TemperatureConfig, ab: AB) -> Result<Temperature
     response.try_into()
 }
 
-// 设置取温度
+/// 设置取温度
 pub fn set_temperature(config: &TemperatureConfig, ab: AB, temp: u16) -> Result<TemperatureData> {
     let port_name = config.serial_port.port.clone();
     let baudrate = config.serial_port.baudrate.into();
@@ -57,7 +57,7 @@ pub fn set_temperature(config: &TemperatureConfig, ab: AB, temp: u16) -> Result<
     response.try_into()
 }
 
-// 获取继电器开关
+/// 获取继电器开关
 pub fn get_relay(config: &RelayConfig, ab: AB) -> Result<RelayData> {
     let port_name = config.serial_port.port.clone();
     let baudrate = config.serial_port.baudrate.into();
@@ -69,7 +69,7 @@ pub fn get_relay(config: &RelayConfig, ab: AB) -> Result<RelayData> {
     response.try_into()
 }
 
-// 设定继电器
+/// 设定继电器
 pub fn set_relay(config: &RelayConfig, ab: AB, mode: &RelayMode) -> Result<RelayData> {
     let port_name = config.serial_port.port.clone();
     let baudrate = config.serial_port.baudrate.into();
@@ -81,7 +81,7 @@ pub fn set_relay(config: &RelayConfig, ab: AB, mode: &RelayMode) -> Result<Relay
     response.try_into()
 }
 
-// 获取继电器开关
+/// 获取电源开关状态
 pub fn get_power_on(config: &RelayConfig, ab: AB) -> Result<PowerData> {
     let port_name = config.serial_port.port.clone();
     let baudrate = config.serial_port.baudrate.into();
@@ -93,7 +93,7 @@ pub fn get_power_on(config: &RelayConfig, ab: AB) -> Result<PowerData> {
     response.try_into()
 }
 
-// 获取继电器开关
+/// 获取电源电压
 pub fn get_power_voltage(config: &RelayConfig, ab: AB) -> Result<PowerData> {
     let port_name = config.serial_port.port.clone();
     let baudrate = config.serial_port.baudrate.into();
@@ -105,7 +105,7 @@ pub fn get_power_voltage(config: &RelayConfig, ab: AB) -> Result<PowerData> {
     response.try_into()
 }
 
-// 设定电源
+/// 设定电源
 pub fn set_power(config: &RelayConfig, ab: AB, mode: &PowerMode) -> Result<PowerData> {
     let port_name = config.serial_port.port.clone();
     let baudrate = config.serial_port.baudrate.into();

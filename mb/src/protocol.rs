@@ -5,6 +5,7 @@ use serialport::{SerialPort, SerialPortType};
 use std::{thread, time::Duration};
 
 use crate::error::Error;
+use crate::utils::print_hex;
 use crate::Result;
 
 #[derive(Debug, Clone)]
@@ -21,6 +22,7 @@ impl Builder {
         }
     }
 
+    /// 发送请求，读取数据后，将数据转化
     pub fn call(&self, request: &FunRequest) -> Result<FunResponse> {
         let mut port = serialport::new(self.port_name.clone(), self.baudrate)
             .timeout(Duration::from_millis(300))
@@ -38,7 +40,23 @@ impl Builder {
         // 只保留实际读取到的字节
         response.truncate(n);
 
-        let response = Function::parse_response(&response)?;
+        // 如果是命令则？
+        // print_hex("re res:", &response.to_vec());
+        let response = match request.code {
+            FunctionCode::ReadCoils
+            | FunctionCode::ReadDiscreteInputs
+            | FunctionCode::ReadHoldingRegisters
+            | FunctionCode::ReadInputRegisters => Function::parse_response(&response)?,
+            FunctionCode::WriteSingleCoil
+            | FunctionCode::ReadWriteMultipleRegisters
+            | FunctionCode::WriteSingleRegister
+            | FunctionCode::WriteMultipleCoils
+            | FunctionCode::WriteMultipleRegisters
+            | FunctionCode::MaskWriteRegister
+            | FunctionCode::Custom(_) => request.clone(),
+        };
+
+        // let response = Function::parse_response(&response)?;
 
         Ok(response)
     }
@@ -112,12 +130,13 @@ impl Function {
 
     // 解析Modbus响应数据，将其转换为 Function
     pub fn parse_response(response: &[u8]) -> Result<Self> {
-        if response.len() < 5 {
-            return Err(Box::new(Error::DataShort)); // 响应数据太短
+        let len = response.len();
+        if len < 5 {
+            return Err(Box::new(Error::DataShort(len))); // 响应数据太短
         }
 
         let byte_count = response[2] as usize;
-        if response.len() < 3 + byte_count || byte_count % 2 != 0 {
+        if len < 3 + byte_count || byte_count % 2 != 0 {
             return Err(Box::new(Error::DataLenError)); // 数据长度不匹配
         }
 
@@ -140,8 +159,9 @@ impl Function {
 
     /// 将数据解析为请求 Function
     pub fn parse_request(request: &[u8]) -> Result<Self> {
-        if request.len() < 4 {
-            return Err(Box::new(Error::DataShort)); // 响应数据太短
+        let len = request.len();
+        if len < 4 {
+            return Err(Box::new(Error::DataShort(len))); // 响应数据太短
         }
 
         // 掐头去尾
@@ -165,6 +185,22 @@ impl Function {
         };
 
         Ok(fp)
+    }
+
+    pub fn origin(&self) -> Vec<u8> {
+        match self.code {
+            FunctionCode::ReadCoils
+            | FunctionCode::ReadDiscreteInputs
+            | FunctionCode::ReadHoldingRegisters
+            | FunctionCode::ReadInputRegisters => self.response_data(),
+            FunctionCode::WriteSingleCoil
+            | FunctionCode::ReadWriteMultipleRegisters
+            | FunctionCode::WriteSingleRegister
+            | FunctionCode::WriteMultipleCoils
+            | FunctionCode::WriteMultipleRegisters
+            | FunctionCode::MaskWriteRegister
+            | FunctionCode::Custom(_) => self.request_data(),
+        }
     }
 
     /// 生成请求数据

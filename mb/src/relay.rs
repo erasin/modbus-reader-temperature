@@ -11,6 +11,8 @@ use crate::{
     utils::current_timestamp,
 };
 
+/// 继电器
+#[derive(Debug)]
 pub struct Relay;
 
 impl Relay {
@@ -22,6 +24,7 @@ impl Relay {
     }
 }
 
+#[derive(Debug)]
 pub enum RelayMode {
     /// 0b0000_0000 二进制八位占位符表示灯开关
     ONOFF(u16),
@@ -36,8 +39,8 @@ pub enum RelayMode {
 impl RelayMode {
     pub fn params(&self) -> (FunctionCode, [u16; 2]) {
         match self {
-            RelayMode::ONOFF(n) => (FunctionCode::WriteSingleRegister, [0, *n]),
             RelayMode::Read => (FunctionCode::ReadHoldingRegisters, [0, 1]),
+            RelayMode::ONOFF(n) => (FunctionCode::WriteSingleRegister, [0, *n]),
             RelayMode::ON(value, position) => {
                 let bit = RelayData::set_bit(*value, *position, true);
                 (FunctionCode::WriteSingleRegister, [0, bit])

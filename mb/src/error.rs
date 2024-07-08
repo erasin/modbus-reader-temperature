@@ -3,8 +3,8 @@ pub enum Error {
     #[error("格式解析失败")]
     MbParseFail,
 
-    #[error("响应数据太短")]
-    DataShort,
+    #[error("响应数据太短:len is {0}")]
+    DataShort(usize),
 
     #[error("响应数据长度不匹配")]
     DataLenError,

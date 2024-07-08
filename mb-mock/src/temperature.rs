@@ -7,11 +7,20 @@ use mb::{
 pub struct TempMock {
     slave: u8,
     mode: TemperatureMode,
+    req: Option<Function>,
 }
 
 impl TempMock {
     pub fn new(slave: u8, mode: TemperatureMode) -> Self {
-        TempMock { slave, mode }
+        TempMock {
+            slave,
+            mode,
+            req: None,
+        }
+    }
+
+    pub fn set_fc(&mut self, req: Function) {
+        self.req = Some(req);
     }
 }
 
@@ -27,16 +36,12 @@ impl From<&[u8]> for TempMock {
                     TempMock::new(req.slave(), TemperatureMode::Temp2)
                 }
             }
-            FunctionCode::ReadCoils => todo!(),
-            FunctionCode::ReadDiscreteInputs => todo!(),
-            FunctionCode::ReadInputRegisters => todo!(),
-            FunctionCode::WriteSingleCoil => todo!(),
-            FunctionCode::WriteSingleRegister => todo!(),
-            FunctionCode::WriteMultipleCoils => todo!(),
-            FunctionCode::WriteMultipleRegisters => todo!(),
-            FunctionCode::MaskWriteRegister => todo!(),
-            FunctionCode::ReadWriteMultipleRegisters => todo!(),
-            FunctionCode::Custom(_) => todo!(),
+            FunctionCode::WriteSingleRegister => {
+                let mut mock = TempMock::new(req.slave(), TemperatureMode::Run(0));
+                mock.set_fc(req);
+                mock
+            }
+            _ => todo!(),
         }
     }
 }
@@ -47,8 +52,11 @@ impl Mock for TempMock {
     }
 
     fn response(&self) -> Function {
-        let mode = self.mode.params();
-
-        Function::new(self.slave, mode.0, vec![60 * 10])
+        let (mode, _data) = self.mode.params();
+        if mode == FunctionCode::ReadHoldingRegisters {
+            Function::new(self.slave, mode, vec![60 * 10])
+        } else {
+            self.req.clone().unwrap()
+        }
     }
 }

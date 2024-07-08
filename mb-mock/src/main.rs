@@ -5,6 +5,15 @@ use mb_mock::{
     power::PowerMock, relay::RelayMock, temperature::TempMock, voltage::VoltageMock, Mock,
 };
 
+pub enum Slave {
+    None,
+    Temp,
+    Relay,
+    PowerA,
+    PowerB,
+    Voltage,
+}
+
 fn main() -> std::io::Result<()> {
     let port_name = "/dev/ttyUSB1";
     let baudrate = 9600;
@@ -37,7 +46,7 @@ fn main() -> std::io::Result<()> {
 
                 if buffer == mock.request().request_data().as_slice() {
                     print_hex("request", &buffer.to_vec());
-                    let response = mock.response().response_data();
+                    let response = mock.response().origin();
                     port.write_all(response.as_slice())?;
                     print_hex("response", &response);
 

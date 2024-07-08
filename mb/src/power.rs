@@ -67,6 +67,7 @@ impl PowerMode {
     }
 }
 
+// 32 转 16
 pub fn f32_u16(v: f32) -> [u16; 2] {
     let b = v.to_bits();
     let bytes = b.to_be_bytes();
@@ -77,7 +78,7 @@ pub fn f32_u16(v: f32) -> [u16; 2] {
     u16_array
 }
 
-/// 温度
+/// 电源
 #[derive(Debug, Copy, Clone, PartialEq, PartialOrd)]
 pub struct PowerData {
     pub time: Duration,
