@@ -75,6 +75,7 @@ impl Mock for RelayMock {
     }
 }
 
+#[allow(dead_code)]
 fn generate_relay() -> Vec<u16> {
     let mut rng = rand::thread_rng();
     let i = rng.gen_range(0..2);

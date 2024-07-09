@@ -61,7 +61,13 @@ impl VoltageChannelView {
         let mut current_label = self.get_current_node();
         let mut state = self.get_state_node();
 
-        index_label.set_text(format!("{:2}", self.index + 1).into());
+        let index = if self.data.index == 0 {
+            self.index
+        } else {
+            self.data.index
+        } + 1;
+
+        index_label.set_text(format!("{:2}", index).into());
         voltage_label.set_text(format!("{:2.2}V", self.data.voltage).into());
         current_label.set_text(format!("{:2.2}A", self.data.current).into());
 

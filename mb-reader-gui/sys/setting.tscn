@@ -615,6 +615,39 @@ unique_name_in_owner = true
 layout_mode = 2
 text = "路径"
 
+[node name="TestPort" type="PanelContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer3/VBoxContainer3"]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(260, 0)
+layout_mode = 2
+theme_override_styles/panel = ExtResource("1_6fv7b")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer3/VBoxContainer3/TestPort"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer3/VBoxContainer3/TestPort/VBoxContainer"]
+layout_mode = 2
+theme_override_styles/normal = ExtResource("1_u6mbo")
+text = " 测试端口"
+
+[node name="电源" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer3/VBoxContainer3/TestPort/VBoxContainer"]
+layout_mode = 2
+
+[node name="PowerOn" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer3/VBoxContainer3/TestPort/VBoxContainer/电源"]
+layout_mode = 2
+text = "电源开"
+
+[node name="PowerOff" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer3/VBoxContainer3/TestPort/VBoxContainer/电源"]
+layout_mode = 2
+text = "电源关"
+
+[node name="PowerVoltageGet" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer3/VBoxContainer3/TestPort/VBoxContainer/电源"]
+layout_mode = 2
+text = "电源电压"
+
+[node name="PowerInfo" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer3/VBoxContainer3/TestPort/VBoxContainer"]
+layout_mode = 2
+
 [node name="PanelContainer" type="PanelContainer" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
 

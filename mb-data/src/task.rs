@@ -41,7 +41,7 @@ pub struct Product {
     pub index: String,
 }
 
-#[derive(Debug, Clone, Copy, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Default, Serialize, Deserialize, strum::AsRefStr)]
 pub enum AB {
     #[default]
     A,

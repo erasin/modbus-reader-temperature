@@ -55,6 +55,12 @@ impl VoltageData {
         self.time = dur;
     }
 
+    pub fn update_channel_index(&mut self, index: usize) {
+        self.data.iter_mut().for_each(|c| {
+            c.index = c.index + index * VOLTAGE_CHANNEL;
+        });
+    }
+
     pub fn update_channel_state(&mut self, verify: &Verify) {
         self.data.iter_mut().for_each(|c| {
             c.state = get_mb_state(c, verify);

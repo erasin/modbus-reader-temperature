@@ -2,10 +2,9 @@
 
 use core::fmt;
 use serialport::{SerialPort, SerialPortType};
-use std::{thread, time::Duration};
+use std::time::Duration;
 
 use crate::error::Error;
-use crate::utils::print_hex;
 use crate::Result;
 
 #[derive(Debug, Clone)]

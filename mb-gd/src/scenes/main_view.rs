@@ -7,7 +7,7 @@ use godot::{
     obj::WithBaseField,
     prelude::*,
 };
-use mb_data::dirs;
+use mb_data::{dirs, user::UserPurview};
 use strum::AsRefStr;
 
 use crate::{define_get_nodes, scenes::my_global::get_global_config};
@@ -235,15 +235,32 @@ impl MainView {
         let mut login_btn = self.get_login_btn_node();
         let mut label = self.get_login_user_name_node();
 
+        let mut user_manager_btn = self.get_user_manager_btn_node();
+        let mut setting_btn = self.get_system_set_btn_node();
+        let mut programs_btn = self.get_programs_btn_node();
+
         let g = MyGlobal::singleton();
         match g.bind().get_login() {
             Some(user) => {
                 label.set_text(user.name.into());
                 login_btn.set_text("退出".into());
+
+                user.purview.iter().for_each(|p| match p {
+                    UserPurview::UserManager => user_manager_btn.set_visible(true),
+                    UserPurview::SysSetting => setting_btn.set_visible(true),
+                    UserPurview::Programs => programs_btn.set_visible(true),
+                    UserPurview::Run => {}
+                });
+                programs_btn.grab_focus();
             }
             None => {
+                login_btn.grab_focus();
                 label.set_text("".into());
                 login_btn.set_text("登录".into());
+
+                user_manager_btn.set_visible(false);
+                setting_btn.set_visible(false);
+                programs_btn.set_visible(false);
             }
         };
     }

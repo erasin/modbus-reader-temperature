@@ -71,27 +71,28 @@ layout_mode = 2
 [node name="VBoxContainer" type="VBoxContainer" parent="VoltageContainer/功能区"]
 layout_mode = 2
 
-[node name="按钮" type="PanelContainer" parent="VoltageContainer/功能区/VBoxContainer"]
+[node name="PurviewRun" type="PanelContainer" parent="VoltageContainer/功能区/VBoxContainer"]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_styles/panel = ExtResource("1_vnvb2")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="VoltageContainer/功能区/VBoxContainer/按钮"]
+[node name="VBoxContainer" type="VBoxContainer" parent="VoltageContainer/功能区/VBoxContainer/PurviewRun"]
 layout_mode = 2
 
-[node name="StartToggle" type="Button" parent="VoltageContainer/功能区/VBoxContainer/按钮/VBoxContainer"]
+[node name="StartToggle" type="Button" parent="VoltageContainer/功能区/VBoxContainer/PurviewRun/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 text = " 开启"
 
-[node name="AgeingToggle" type="Button" parent="VoltageContainer/功能区/VBoxContainer/按钮/VBoxContainer"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "开始老化"
-
-[node name="PowerToggle" type="Button" parent="VoltageContainer/功能区/VBoxContainer/按钮/VBoxContainer"]
+[node name="PowerToggle" type="Button" parent="VoltageContainer/功能区/VBoxContainer/PurviewRun/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "启动电源"
+
+[node name="AgeingToggle" type="Button" parent="VoltageContainer/功能区/VBoxContainer/PurviewRun/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "开始老化"
 
 [node name="时间" type="PanelContainer" parent="VoltageContainer/功能区/VBoxContainer"]
 layout_mode = 2
@@ -211,7 +212,7 @@ layout_mode = 2
 
 [node name="产品序列" type="Label" parent="VoltageContainer/功能区/VBoxContainer/时间/VBoxContainer/HBoxContainer10"]
 layout_mode = 2
-text = "程序名称："
+text = "产品序列："
 
 [node name="ProductIndex" type="Label" parent="VoltageContainer/功能区/VBoxContainer/时间/VBoxContainer/HBoxContainer10"]
 unique_name_in_owner = true

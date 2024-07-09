@@ -557,7 +557,7 @@ impl ProgramsView {
             match TableTask::delete(&db, task.title.clone(), &task.ab) {
                 Ok(_) => {}
                 Err(e) => {
-                    log::error!("task 删除失败：{}", e.to_string());
+                    log::error!("task 删除失败：{}", e);
                 }
             };
         };
@@ -571,13 +571,43 @@ impl ProgramsView {
 
         // TODO: 检查产品，检查时长
 
-        let product_title = self.get_product_title_node();
-        let product_index = self.get_product_index_node();
+        let mut product_title = self.get_product_title_node();
+        let mut product_index = self.get_product_index_node();
+
+        let p_title = product_title.get_text();
+
+        if p_title.is_empty() {
+            self.alert(
+                "产品名称不可为空！".to_owned(),
+                "确认".to_owned(),
+                "产品名称不可为空！".to_owned(),
+            );
+            product_title.grab_focus();
+            return;
+        }
+
+        let p_index = product_index.get_text();
+        if p_index.is_empty() {
+            self.alert(
+                "产品序列不可为空！".to_owned(),
+                "确认".to_owned(),
+                "产品序列不可为空！".to_owned(),
+            );
+            product_index.grab_focus();
+            return;
+        }
+
+        self.task.product.title = p_title.to_string();
+        self.task.product.index = p_index.to_string();
 
         self.alert(
             format!("加载程序{}", self.task.title),
             "确认".to_owned(),
-            format!("已保存为{}", self.task.title),
+            format!(
+                "已加载程序{}到{}面板",
+                self.task.title,
+                self.task.ab.as_ref()
+            ),
         );
 
         my_global
@@ -680,13 +710,14 @@ impl ProgramsView {
         count_time_node.set_text(text.into());
     }
 
+    /// 程序列表更新
     fn task_list_update(&mut self) {
         {
             let db = get_db().lock().unwrap();
             self.list = match TableTask::list(&db, &self.task.ab) {
                 Ok(list) => list,
                 Err(e) => {
-                    log::error!("{}", e.to_string());
+                    log::error!("{}", e);
                     Vec::new()
                 }
             };

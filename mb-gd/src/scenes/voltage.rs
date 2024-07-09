@@ -1,8 +1,4 @@
-use std::{
-    ops::{Sub, SubAssign},
-    path::PathBuf,
-    time::Duration,
-};
+use std::{ops::Sub, path::PathBuf, time::Duration};
 
 use channel::VoltageChannelView;
 use godot::{
@@ -18,10 +14,13 @@ use mb::{
 use mb_data::{
     db::{
         get_db,
-        voltage::{average_voltage_data_per_minute, TableVoltage, VoltageDataGroup},
+        voltage::{
+            voltage_average_every_n_minutes, TableVoltage, VoltageChannelItem, VoltageDataGroup,
+        },
     },
     dirs::doc_dir,
     task::Task,
+    user::UserPurview,
     utils::{time_dur_odt, time_human, time_human_filename, time_now},
 };
 use rust_xlsxwriter::Workbook;
@@ -53,9 +52,7 @@ pub struct VoltageView {
 
     task: Option<Task>,
 
-    state_run: bool,
-    state_age: bool,
-    state_power: bool,
+    state: State,
 
     // TODO 合并到 state_age enum
     age_error: bool,
@@ -73,6 +70,22 @@ pub struct VoltageView {
 
     // data: Option<VoltageData>,
     base: Base<PanelContainer>,
+}
+
+/// 状态
+#[derive(Debug, Default, PartialEq)]
+enum State {
+    /// 默认不可用
+    #[default]
+    Disable,
+    /// 默认待机
+    Wait,
+    /// 运行
+    Run,
+    /// 电源开启
+    Power,
+    /// 老化
+    Ageing,
 }
 
 const CHANNEL_COL: i32 = 12;
@@ -157,9 +170,8 @@ impl IPanelContainer for VoltageView {
     fn process(&mut self, delta: f64) {
         self.content_size_update();
         self.state_update();
-        // if self.state_power {
-        //     self.power_state_update();
-        // }
+        self.btn_state_update();
+        self.user_purview_update();
     }
 }
 
@@ -184,51 +196,81 @@ impl VoltageView {
     fn on_req_timer_timeout(&mut self) {
         self.task_run();
         self.chart_update();
-        self.state_update();
         self.count_good();
     }
 
     /// 老化结束处理
     #[func]
     fn on_age_timer_timeout(&mut self) {
-        self.state_age = false;
-        self.btn_state_update();
+        {
+            self.state = State::Power;
+        }
+
         self.count_good();
         if let Err(e) = self.save_history() {
-            log::error!("{}", e.to_string());
+            log::error!("{}", e);
         };
     }
 
     #[func]
     fn on_start_toggle(&mut self) {
-        self.state_run = !self.state_run;
+        self.state = match self.state {
+            State::Wait => State::Run,
+            State::Run => State::Wait,
+            _ => {
+                return;
+            }
+        };
+
         self.btn_state_update();
 
         // TODO remove
         if let Err(e) = self.save_history() {
-            log::error!("{}", e.to_string());
+            log::error!("{}", e);
         };
+    }
+
+    #[func]
+    fn on_power_toggle(&mut self) {
+        self.state = match self.state {
+            State::Run => State::Power,
+            State::Power => State::Run,
+            _ => {
+                return;
+            }
+        };
+
+        self.btn_state_update();
     }
 
     /// 老化
     #[func]
     fn on_ageing_toggle(&mut self) {
-        if !self.state_power {
-            return;
-        }
+        self.state = match self.state {
+            State::Power => State::Ageing,
+            State::Ageing => State::Power,
+            _ => {
+                return;
+            }
+        };
 
-        self.state_age = !self.state_age;
         self.btn_state_update();
-    }
 
-    #[func]
-    fn on_power_toggle(&mut self) {
-        if !self.state_run {
-            return;
+        let mut req_timer = self.get_req_timer_node();
+        let mut age_timer = self.get_age_timer_node();
+        match self.state {
+            State::Ageing => {
+                age_timer.set_wait_time(self.count_time.as_secs_f64());
+                req_timer.start();
+                age_timer.start();
+                self.start_at = current_timestamp();
+                self.end_at = self.start_at + self.count_time;
+            }
+            _ => {
+                req_timer.stop();
+                age_timer.stop();
+            }
         }
-
-        self.state_power = !self.state_power;
-        self.btn_state_update();
     }
 }
 
@@ -245,6 +287,7 @@ impl VoltageView {
         let mut age_timer = self.get_age_timer_node();
         let mut product_title_node = self.get_product_title_node();
         let mut product_index_node = self.get_product_index_node();
+        let mut count_num_node = self.get_count_num_node();
 
         let task = match &self.task {
             Some(task) => task,
@@ -268,9 +311,12 @@ impl VoltageView {
 
         product_title_node.set_text(task.product.title.clone().into());
         product_index_node.set_text(task.product.index.clone().into());
+        count_num_node.set_text(self.count_num.to_string().into());
 
         age_timer.set_one_shot(true);
         age_timer.set_wait_time(task.count_time.as_secs_f64());
+
+        self.state = State::Wait;
     }
 
     /// 老化中的状态监控
@@ -283,41 +329,46 @@ impl VoltageView {
         let mut start_btn = self.get_start_toggle_node();
         let mut age_btn = self.get_ageing_toggle_node();
         let mut power_btn = self.get_power_toggle_node();
-        let mut req_timer = self.get_req_timer_node();
-        let mut age_timer = self.get_age_timer_node();
 
-        if self.state_run {
-            power_btn.set_disabled(false);
-            start_btn.set_text("停止".into());
-        } else {
-            age_btn.set_disabled(true);
-            power_btn.set_disabled(true);
-            start_btn.set_text("开始".into());
-        }
+        match self.state {
+            State::Disable => {
+                start_btn.set_disabled(true);
+                age_btn.set_disabled(true);
+                power_btn.set_disabled(true);
+            }
+            State::Wait => {
+                start_btn.set_disabled(false);
+                age_btn.set_disabled(true);
+                power_btn.set_disabled(true);
 
-        if self.state_power {
-            age_btn.set_disabled(false);
-            start_btn.set_disabled(true);
-            power_btn.set_text("关闭电源".into());
-        } else {
-            start_btn.set_disabled(false);
-            age_btn.set_disabled(true);
-            power_btn.set_text("启动电源".into());
-        }
+                start_btn.set_text("开始".into());
+                power_btn.set_text("启动电源".into());
+                age_btn.set_text("开始老化".into());
+            }
+            State::Run => {
+                start_btn.set_disabled(false);
+                power_btn.set_disabled(false);
+                age_btn.set_disabled(true);
 
-        if self.state_age {
-            req_timer.start();
-            age_timer.start();
-            self.start_at = current_timestamp();
-            self.end_at = self.start_at + self.count_time;
-            age_btn.set_text("停止老化".into());
-            power_btn.set_disabled(true);
-            start_btn.set_disabled(true);
-        } else {
-            req_timer.stop();
-            age_timer.stop();
-            power_btn.set_disabled(false);
-            age_btn.set_text("开始老化".into());
+                start_btn.set_text("停止".into());
+                power_btn.set_text("启动电源".into());
+                age_btn.set_text("开始老化".into());
+            }
+            State::Power => {
+                start_btn.set_disabled(true);
+                power_btn.set_disabled(false);
+                age_btn.set_disabled(false);
+
+                power_btn.set_text("关闭电源".into());
+                age_btn.set_text("开始老化".into());
+            }
+            State::Ageing => {
+                age_btn.set_disabled(false);
+                power_btn.set_disabled(true);
+                start_btn.set_disabled(true);
+
+                age_btn.set_text("停止老化".into());
+            }
         }
     }
 
@@ -350,6 +401,7 @@ impl VoltageView {
         self.content_size_update()
     }
 
+    /// 按照窗口大小变动 channel 列
     fn content_size_update(&mut self) {
         let config = get_global_config();
         let win_size = self.base().get_window().unwrap().get_size();
@@ -379,11 +431,13 @@ impl VoltageView {
 
     /// 读取老化数据
     fn task_run(&mut self) {
-        let config = get_global_config();
-        let task = self.task.clone().unwrap();
-        if !self.state_run || !self.state_age || !self.state_power {
+        if self.state != State::Ageing {
+            self.get_req_timer_node().stop();
             return;
         }
+
+        let config = get_global_config();
+        let task = self.task.clone().unwrap();
 
         //根据 AB 区 获取参数
         let voltage = match self.ab {
@@ -398,21 +452,23 @@ impl VoltageView {
             Ok(t) => t.value,
             Err(e) => {
                 self.on_ageing_toggle();
-                log::error!("温度获取失败: {}", e.to_string());
+                log::error!("温度获取失败: {}", e);
                 0.
             }
         };
 
         let data: Vec<VoltageData> = (voltage.slave_start..=voltage.slave_end)
-            .map(|slave| match get_voltage_data(&voltage, slave) {
+            .enumerate()
+            .map(|(index, slave)| match get_voltage_data(&voltage, slave) {
                 Ok(d) => {
                     let mut data = d;
                     data.update_channel_state(&voltage.verify);
+                    data.update_channel_index(index);
                     data
                 }
                 Err(e) => {
                     self.on_ageing_toggle();
-                    log::error!("电压电流获取失败: {}", e.to_string());
+                    log::error!("电压电流获取失败: {}", e);
                     VoltageData::new(Duration::from_secs(0), 0, Vec::new())
                 }
             })
@@ -422,8 +478,7 @@ impl VoltageView {
             let data_group = VoltageDataGroup {
                 time: current_timestamp(),
                 ab: self.ab.into(),
-                // TODO 产品名称
-                good_name: "".to_string(),
+                good_name: format!("{}_{}", task.product.title, task.product.index),
                 task_name: task.title.clone(),
                 start_at: self.start_at,
                 task_age_time: task.count_time,
@@ -433,7 +488,7 @@ impl VoltageView {
             {
                 let db = get_db().lock().unwrap();
                 if let Err(e) = TableVoltage::set(&db, &data_group) {
-                    log::error!("老化数据存储错误: {}", e.to_string());
+                    log::error!("老化数据存储错误: {}", e);
                 };
             }
         }
@@ -470,7 +525,7 @@ impl VoltageView {
             match TableVoltage::range_last(&db, self.ab.into(), 100) {
                 Ok(data) => data,
                 Err(e) => {
-                    log::error!("老化数据读取失败: {}", e.to_string());
+                    log::error!("老化数据读取失败: {}", e);
                     return;
                 }
             }
@@ -495,14 +550,13 @@ impl VoltageView {
             return;
         }
 
-        if self.state_age {
+        // 更新运行时间
+        if self.state == State::Ageing {
             let current_time = current_timestamp();
             self.count_down = match self.end_at.cmp(&current_time) {
                 std::cmp::Ordering::Less | std::cmp::Ordering::Equal => Duration::from_secs(0),
                 std::cmp::Ordering::Greater => self.end_at.sub(current_time),
             }
-
-            // (current_time);
         }
 
         let mut start_time = self.get_start_time_node();
@@ -513,7 +567,7 @@ impl VoltageView {
         start_time.set_text(time_human(time_dur_odt(self.start_at)).into());
         count_down_time.set_text(hms_from_duration_string(self.count_down).into());
 
-        count_good.set_text(time_human(time_dur_odt(self.end_at)).into());
+        count_good.set_text(self.count_good.to_string().into());
         count_defective.set_text(self.count_defective.to_string().into());
 
         let mut state_run_node = self.get_state_run_node();
@@ -521,34 +575,42 @@ impl VoltageView {
         let mut state_ageing_node = self.get_state_ageing_node();
         let mut state_power_node = self.get_state_power_node();
 
-        let state_run = if self.state_run {
-            ColorPlate::Green
-        } else {
-            ColorPlate::Grey
-        };
-        state_run_node.set_modulate(state_run.into());
-
-        let state_age = if self.state_age {
-            if self.age_error {
-                ColorPlate::Red
-            } else {
-                ColorPlate::Green
+        match self.state {
+            State::Disable | State::Wait => {
+                state_run_node.set_modulate(ColorPlate::Grey.into());
+                state_power_node.set_modulate(ColorPlate::Grey.into());
+                state_ageing_node.set_modulate(ColorPlate::Grey.into());
             }
-        } else {
-            ColorPlate::Grey
-        };
-        state_ageing_node.set_modulate(state_age.into());
-
-        let state_power = if self.state_power {
-            if self.power_error {
-                ColorPlate::Red
-            } else {
-                ColorPlate::Green
+            State::Run => {
+                state_run_node.set_modulate(ColorPlate::Green.into());
+                state_power_node.set_modulate(ColorPlate::Grey.into());
+                state_ageing_node.set_modulate(ColorPlate::Grey.into());
             }
-        } else {
-            ColorPlate::Grey
-        };
-        state_power_node.set_modulate(state_power.into());
+            State::Power => {
+                state_run_node.set_modulate(ColorPlate::Green.into());
+
+                let power_color = if self.power_error {
+                    ColorPlate::Red
+                } else {
+                    ColorPlate::Green
+                };
+
+                state_power_node.set_modulate(power_color.into());
+
+                state_ageing_node.set_modulate(ColorPlate::Grey.into());
+            }
+            State::Ageing => {
+                state_run_node.set_modulate(ColorPlate::Green.into());
+                state_power_node.set_modulate(ColorPlate::Green.into());
+
+                let age_color = if self.age_error {
+                    ColorPlate::Red
+                } else {
+                    ColorPlate::Green
+                };
+                state_ageing_node.set_modulate(age_color.into());
+            }
+        }
 
         let state_error = if self.age_error || self.power_error {
             ColorPlate::Red
@@ -562,6 +624,10 @@ impl VoltageView {
     /// 计算良品率
     fn count_good(&mut self) {
         // 计算良品
+        self.count_good = self.count_num - self.count_defective;
+
+        // TODO 读取延时处理
+        {}
     }
 
     /// 保存文件
@@ -589,10 +655,11 @@ impl VoltageView {
         // 保存为
         let list = {
             let db = get_db().lock().unwrap();
-            TableVoltage::range_last(&db, self.ab.into(), 100)?
+            TableVoltage::list(&db, self.ab.into())?
         };
+        log::debug!("list - {:?} ", list.len());
 
-        let list = average_voltage_data_per_minute(list, config.history.log_dur as u64);
+        let list = voltage_average_every_n_minutes(list, config.history.log_dur as u64);
 
         let mut workbook = Workbook::new();
         let worksheet = workbook.add_worksheet();
@@ -602,23 +669,36 @@ impl VoltageView {
         worksheet.write(0, 2, "电流")?;
         worksheet.write(0, 3, "时间")?;
 
-        for (index, item) in list.iter().enumerate() {
-            for (index_slave, slave) in item.data.iter().enumerate() {
-                for (index_channel, channel) in slave.data.iter().enumerate() {
-                    let channel_index = index_slave + index_channel + 1;
-                    let row = (index + channel_index) as u32;
-
-                    worksheet.write(row, 1, channel.voltage)?;
-                    worksheet.write(row, 1, channel.voltage)?;
-                    worksheet.write(row, 1, channel.current)?;
-                    worksheet.write(row, 3, time_human(time_dur_odt(item.time)))?;
-                }
-            }
+        for item in list.iter() {
+            let channel = item.ch;
+            let row = item.index as u32 + 1;
+            worksheet.write(row, 0, channel.index as u64)?;
+            worksheet.write(row, 1, channel.voltage)?;
+            worksheet.write(row, 2, channel.current)?;
+            worksheet.write(row, 3, time_human(time_dur_odt(item.time)))?;
         }
 
         workbook.save(doc_path)?;
 
         Ok(())
+    }
+
+    // 权限
+    fn user_purview_update(&mut self) {
+        let mut purview_run = self.get_purview_run_node();
+        let g = MyGlobal::singleton();
+        match g.bind().get_login() {
+            Some(user) => {
+                user.purview.iter().for_each(|p| {
+                    if let UserPurview::Run = p {
+                        purview_run.set_visible(true)
+                    }
+                });
+            }
+            None => {
+                purview_run.set_visible(false);
+            }
+        };
     }
 
     define_get_nodes![
@@ -627,6 +707,7 @@ impl VoltageView {
         (get_age_timer_node, UniqueName::AgeTimer, Timer),
         (get_tags_node, UniqueName::Tags, Control),
         (get_container_node, UniqueName::Container, GridContainer),
+        (get_purview_run_node, UniqueName::PurviewRun, PanelContainer),
         (get_start_toggle_node, UniqueName::StartToggle, Button),
         (get_ageing_toggle_node, UniqueName::AgeingToggle, Button),
         (get_power_toggle_node, UniqueName::PowerToggle, Button),
@@ -659,6 +740,7 @@ enum UniqueName {
 
     Tags,
     Container,
+    PurviewRun,
     StartToggle,
     AgeingToggle,
     PowerToggle,
