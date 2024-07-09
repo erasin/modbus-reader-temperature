@@ -15,7 +15,12 @@ use crate::{
     scenes::my_global::{get_global_config, set_global_config},
     utils::string_number_only,
 };
-use mb_data::config::{Baudrate, Config, DefectiveRule};
+use mb_data::{
+    config::{Baudrate, Config, DefectiveRule},
+    dirs::{data_dir, log_file},
+};
+
+use super::my_global::MyGlobal;
 
 #[derive(GodotClass)]
 #[class(init,base=PanelContainer)]
@@ -42,6 +47,7 @@ impl IPanelContainer for SettingView {
         self.defective_init();
         self.history_init();
         self.ab_init();
+        self.debug();
     }
 }
 
@@ -734,6 +740,22 @@ impl SettingView {
         alert.set_visible(true);
     }
 
+    /// 测试工具
+    fn debug(&mut self) {
+        let g = MyGlobal::singleton();
+        if let Some(user) = g.bind().get_login() {
+            if !user.name.eq("root") {
+                return;
+            }
+            self.get_debug_panel_node().set_visible(true);
+
+            self.get_path_data_node()
+                .set_text(data_dir().to_string_lossy().to_string().into());
+            self.get_path_log_node()
+                .set_text(log_file().to_string_lossy().to_string().into());
+        };
+    }
+
     define_get_nodes![
         (get_pro_name_node, UniqueName::ProName, LineEdit),
         (get_enable_apanel_node, UniqueName::EnableApanel, CheckBox),
@@ -837,6 +859,9 @@ impl SettingView {
         (get_submit_node, UniqueName::Submit, Button),
         (get_alert_node, UniqueName::Alert, AcceptDialog),
         (get_alert_info_node, UniqueName::AlertInfo, Label),
+        (get_debug_panel_node, UniqueName::DebugPanel, PanelContainer),
+        (get_path_data_node, UniqueName::PathData, Label),
+        (get_path_log_node, UniqueName::PathLog, Label),
     ];
 }
 
@@ -888,6 +913,10 @@ enum UniqueName {
 
     Alert,
     AlertInfo,
+
+    DebugPanel,
+    PathData,
+    PathLog,
 }
 
 impl std::fmt::Display for UniqueName {
