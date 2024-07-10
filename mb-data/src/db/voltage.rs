@@ -1,11 +1,14 @@
+use std::collections::HashMap;
+use std::ops::Sub;
 use std::time::Duration;
 
-use mb::voltage::{VoltageChannel, VoltageState};
+use mb::voltage::{Verify, VoltageChannel, VoltageState};
 use mb::Result;
 use mb::{utils::current_timestamp, voltage::VoltageData};
 use redb::{Database, ReadableTable, ReadableTableMetadata, TableDefinition};
 use serde::{Deserialize, Serialize};
 
+use crate::utils::time_dur_odt;
 use crate::{error::Error, task::AB};
 
 const TABLE_A: TableDefinition<u64, &[u8]> = TableDefinition::new("voltage_a");
@@ -189,6 +192,7 @@ impl TableVoltage {
 
         let read_txn = db.begin_read()?;
         let table = read_txn.open_table(table)?;
+        // log::debug!("start: {} --> end: {}", start, now);
 
         let mut users = Vec::new();
         for entry in table.range(start..now)? {
@@ -243,16 +247,105 @@ pub struct VoltageChannelItem {
     pub ch: VoltageChannel,
 }
 
+/// 获取 n 秒内的良品率
+pub fn check_defective_in_secs(
+    groups: Vec<VoltageDataGroup>,
+    secs: u64,
+    verify: &Verify,
+) -> Vec<VoltageChannel> {
+    let after = current_timestamp().as_secs() - secs;
+    //存储渠道长度
+    let mut channel_len: usize = 0;
+    // 转化列表
+    let list = groups
+        .iter()
+        .enumerate()
+        .flat_map(|(index_group, group)| {
+            let group_len = group.data.len();
+            group
+                .data
+                .iter()
+                .flat_map(|slave| {
+                    let ch_len = slave.data.len() * group_len;
+                    channel_len = channel_len.max(ch_len);
+                    slave
+                        .data
+                        .iter()
+                        .map(|c| VoltageChannelItem {
+                            index: index_group * ch_len + c.index,
+                            time: group.time,
+                            ch: *c,
+                        })
+                        .collect::<Vec<VoltageChannelItem>>()
+                })
+                .collect::<Vec<VoltageChannelItem>>()
+        })
+        .collect::<Vec<VoltageChannelItem>>();
+
+    // 按照渠道分组
+    let channels = (0..channel_len)
+        .map(|index| {
+            let chs = list
+                .iter()
+                // 获取同渠道，时间为 n 秒内的 数据
+                .filter(|&item| item.ch.index == index && item.time.as_secs() >= after)
+                .cloned()
+                .collect::<Vec<VoltageChannelItem>>();
+            if chs.len() as u64 >= secs {
+                chs
+            } else {
+                Vec::new()
+            }
+        })
+        .collect::<Vec<Vec<VoltageChannelItem>>>();
+
+    // 合并数据
+    channels
+        .iter()
+        .map(|chs| {
+            let l = chs.len();
+
+            let mut item = chs.iter().fold(
+                VoltageChannelItem {
+                    index: 0,
+                    time: Duration::from_secs(0),
+                    ch: VoltageChannel {
+                        index: 0,
+                        voltage: 0.,
+                        current: 0.,
+                        state: Default::default(),
+                    },
+                },
+                |mut a, b| {
+                    a.index = b.index;
+                    a.ch.index = b.ch.index;
+                    a.ch.voltage += b.ch.voltage;
+                    a.ch.current += b.ch.current;
+                    a
+                },
+            );
+            item.ch.voltage /= l as f32;
+            item.ch.current /= l as f32;
+            item.ch.set_state(verify);
+
+            item
+        })
+        .map(|item| item.ch)
+        .filter(|ch| ch.state != VoltageState::Qualified)
+        .collect::<Vec<VoltageChannel>>()
+}
+
+/// 获取每 n 分钟的平均数据
 pub fn voltage_average_every_n_minutes(
-    data_groups: Vec<VoltageDataGroup>,
-    minute: u64,
+    groups: Vec<VoltageDataGroup>,
+    minutes: u64,
 ) -> Vec<VoltageChannelItem> {
     // let mut current_interval_start = 0;
 
     //存储渠道长度
     let mut channel_len: usize = 0;
 
-    let list: Vec<VoltageChannelItem> = data_groups
+    let list: Vec<VoltageChannelItem> = groups
         .iter()
         .enumerate()
         .flat_map(|(index_group, group)| {
@@ -288,18 +381,79 @@ pub fn voltage_average_every_n_minutes(
         .collect::<Vec<Vec<VoltageChannelItem>>>();
 
     // 直接返回
-    if minute == 0 {
-        let list = channels.iter().cloned().flatten().collect();
+    if minutes == 0 {
+        let list = channels.iter().flatten().cloned().collect();
         return list;
     }
 
-    // 按照每n 分钟数据
-    let sec = minute * 60;
+    // 存储分钟节点
+    let list = channels
+        .iter()
+        .flat_map(|chs| {
+            //  每个频道的数据组
+            let mut min_list: HashMap<u64, Vec<VoltageChannelItem>> = HashMap::new();
+            // 这里使用 keys 主要是因为 hashmap 无序
+            let mut keys: Vec<u64> = Vec::new();
 
-    // let list = channels.iter().flat_map(|chs|{
-    //     chs.iter().map(|item| {}).collect
-    // }).rfold(init, |a, b|{
-    // }).collect();
+            chs.iter()
+                .map(|item| {
+                    let item_minute = time_dur_odt(item.time).replace_second(0).unwrap();
+                    let key = item_minute.unix_timestamp() as u64;
+
+                    // 分钟内
+                    let key_start = item_minute
+                        .sub(time::Duration::minutes(minutes as i64))
+                        .unix_timestamp() as u64;
+                    // 查询最近的 key
+
+                    let key = if keys.is_empty() {
+                        keys.push(key);
+                        key
+                    } else if let Some(k) = keys.iter().find(|&key| *key > key_start) {
+                        *k
+                    } else {
+                        keys.push(key);
+                        key
+                    };
+                    (key, item)
+                })
+                .for_each(|(key, &item)| {
+                    min_list.entry(key).or_default().push(item);
+                });
+
+            // 合并
+            keys.iter()
+                .map(|&key| {
+                    let item = min_list.get(&key).unwrap();
+                    let l = item.len();
+
+                    let mut item = item.iter().fold(
+                        VoltageChannelItem {
+                            index: 0,
+                            time: Duration::from_secs(key),
+                            ch: VoltageChannel {
+                                index: 0,
+                                voltage: 0.,
+                                current: 0.,
+                                state: Default::default(),
+                            },
+                        },
+                        |mut a, b| {
+                            a.index = b.index;
+                            a.ch.index = b.ch.index;
+                            a.ch.voltage += b.ch.voltage;
+                            a.ch.current += b.ch.current;
+                            a
+                        },
+                    );
+                    item.ch.voltage /= l as f32;
+                    item.ch.current /= l as f32;
+
+                    item
+                })
+                .collect::<Vec<VoltageChannelItem>>()
+        })
+        .collect::<Vec<VoltageChannelItem>>();
 
     // 为 excel 重新排序
     let mut list = list;
@@ -307,21 +461,7 @@ pub fn voltage_average_every_n_minutes(
         .enumerate()
         .for_each(|(index, item)| item.index = index);
 
-    return list;
-
-    // for group in data_groups.iter() {
-    //     for data in &group.data {
-    //         let timestamp = data.time.as_secs();
-    //         let interval_start = (timestamp / (n * 60)) * (n * 60);
-
-    //         if interval_start != current_interval_start {
-    //         }
-
-    // }
-
-    // // 处理最后一个时间段
-    // if count.iter().any(|&c| c > 0) {
-    // }
+    list
 }
 
 #[cfg(test)]

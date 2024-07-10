@@ -605,15 +605,12 @@ text = "选择路径"
 [node name="HBoxContainer4" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer3/VBoxContainer3/历史数据/VBoxContainer"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer3/VBoxContainer3/历史数据/VBoxContainer/HBoxContainer4"]
-custom_minimum_size = Vector2(80, 0)
-layout_mode = 2
-horizontal_alignment = 2
-
-[node name="HistoryExportDir" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer3/VBoxContainer3/历史数据/VBoxContainer/HBoxContainer4"]
+[node name="HistoryExportDir" type="RichTextLabel" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer3/VBoxContainer3/历史数据/VBoxContainer/HBoxContainer4"]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 50)
 layout_mode = 2
-text = "路径"
+size_flags_horizontal = 3
+text = "路径fsdfas d f a s d fasd f a sdfasdfasdfa\\nsdfasdfasdfasdfsadfsdfasdf"
 
 [node name="DebugPanel" type="PanelContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer3/VBoxContainer3"]
 unique_name_in_owner = true
@@ -630,18 +627,29 @@ layout_mode = 2
 theme_override_styles/normal = ExtResource("1_u6mbo")
 text = "数据路径"
 
-[node name="PathData" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer3/VBoxContainer3/DebugPanel/VBoxContainer"]
-unique_name_in_owner = true
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer3/VBoxContainer3/DebugPanel/VBoxContainer"]
 layout_mode = 2
 
-[node name="Label3" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer3/VBoxContainer3/DebugPanel/VBoxContainer"]
+[node name="PathLog" type="RichTextLabel" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer3/VBoxContainer3/DebugPanel/VBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 50)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="s" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer3/VBoxContainer3/DebugPanel/VBoxContainer"]
 layout_mode = 2
 theme_override_styles/normal = ExtResource("1_u6mbo")
 text = "日志路径"
 
-[node name="PathLog" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer3/VBoxContainer3/DebugPanel/VBoxContainer"]
-unique_name_in_owner = true
+[node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer3/VBoxContainer3/DebugPanel/VBoxContainer"]
 layout_mode = 2
+
+[node name="PathData" type="RichTextLabel" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer3/VBoxContainer3/DebugPanel/VBoxContainer/HBoxContainer2"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 50)
+layout_mode = 2
+size_flags_horizontal = 3
 
 [node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/MarginContainer3/VBoxContainer3/DebugPanel/VBoxContainer"]
 layout_mode = 2

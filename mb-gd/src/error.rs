@@ -20,6 +20,9 @@ pub enum Error {
     #[error("设备: {device} 链接丢失")]
     ConnectLost { device: String },
 
+    #[error("设备: 命令发送失败")]
+    PortFail,
+
     #[error("{msg}")]
     Msg { msg: String },
 

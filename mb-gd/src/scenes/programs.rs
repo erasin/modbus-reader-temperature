@@ -47,7 +47,7 @@ pub struct ProgramsView {
 #[godot_api]
 impl IPanelContainer for ProgramsView {
     fn ready(&mut self) {
-        godot_print!("programs ready");
+        // godot_print!("programs ready");
         self.config = get_global_config();
 
         let mut check_a_btn = self.get_check_a_node();
@@ -364,7 +364,7 @@ impl ProgramsView {
         let dur = text
             .parse::<u32>()
             .unwrap_or_default()
-            .clamp(u32::MIN, u32::MAX);
+            .clamp(u32::MIN + 1, u32::MAX);
 
         self.task.task_loop = dur;
 
@@ -377,7 +377,7 @@ impl ProgramsView {
 
     #[func]
     fn on_task_item_selected(&mut self, index: u32) {
-        godot_print!("item {index}");
+        // godot_print!("item {index}");
         if index == 0 {
             return;
         }
@@ -409,7 +409,7 @@ impl ProgramsView {
 
     #[func]
     fn on_item_power_voltage_selected(&mut self, index: u32) {
-        godot_print!("power {index}");
+        // godot_print!("power {index}");
 
         if index == 0 {
             self.item.power_on = false;
@@ -543,7 +543,7 @@ impl ProgramsView {
         let mut task_list_node = self.get_task_list_node();
 
         let s = task_list_node.get_selected_items();
-        godot_print!("{:?}", s);
+        // godot_print!("{:?}", s);
 
         let index = match task_list_node.get_selected_items().get(0) {
             Some(index) => index,
@@ -617,7 +617,7 @@ impl ProgramsView {
 
     #[func]
     fn on_task_list_selected(&mut self, index: u32) {
-        godot_print!("list {index}");
+        // godot_print!("list {index}");
 
         self.task = match self.list.get(index as usize) {
             Some(task) => task.clone(),
@@ -723,7 +723,7 @@ impl ProgramsView {
             };
         }
 
-        godot_print!("{:?}, {:?}", self.task.ab, self.list.len());
+        // godot_print!("{:?}, {:?}", self.task.ab, self.list.len());
         self.task_list_str = Array::new();
         self.list.iter().for_each(|task| {
             self.task_list_str.push(task.title.clone().into());

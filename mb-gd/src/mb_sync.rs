@@ -8,6 +8,7 @@ use mb::Result;
 use mb_data::config::{RelayConfig, TemperatureConfig, VoltageConfig};
 
 use crate::data::AB;
+use crate::error::Error;
 
 /// 获取电压电流
 pub fn get_voltage_data(config: &VoltageConfig, slave: u8) -> Result<VoltageData> {
@@ -70,7 +71,7 @@ pub fn get_relay(config: &RelayConfig, ab: AB) -> Result<RelayData> {
 }
 
 /// 设定继电器
-pub fn set_relay(config: &RelayConfig, ab: AB, mode: &RelayMode) -> Result<RelayData> {
+pub fn set_relay(config: &RelayConfig, ab: AB, mode: &RelayMode) -> Result<()> {
     let port_name = config.serial_port.port.clone();
     let baudrate = config.serial_port.baudrate.into();
     let slave = config.slave;
@@ -78,7 +79,12 @@ pub fn set_relay(config: &RelayConfig, ab: AB, mode: &RelayMode) -> Result<Relay
     let builder = Builder::new(port_name, baudrate);
     let request = Relay::request(slave, mode);
     let response = builder.call(&request)?;
-    response.try_into()
+
+    if request == response {
+        return Ok(());
+    }
+
+    Error::PortFail.into()
 }
 
 /// 获取电源开关状态

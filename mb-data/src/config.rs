@@ -164,7 +164,7 @@ impl std::fmt::Display for Baudrate {
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct DefectiveConfig {
     pub rule: DefectiveRule,
-    pub dur: u32,
+    pub dur: u64,
 }
 
 #[derive(Debug, PartialEq, PartialOrd, Default, Copy, Clone, Serialize, Deserialize)]

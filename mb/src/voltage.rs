@@ -63,7 +63,7 @@ impl VoltageData {
 
     pub fn update_channel_state(&mut self, verify: &Verify) {
         self.data.iter_mut().for_each(|c| {
-            c.state = get_mb_state(c, verify);
+            c.set_state(verify);
         });
     }
 
@@ -124,6 +124,47 @@ pub struct VoltageChannel {
     pub voltage: f32,
     pub current: f32,
     pub state: VoltageState,
+}
+
+impl VoltageChannel {
+    // 设定状态
+    pub fn set_state(&mut self, verify: &Verify) {
+        self.state = self.get_state(verify);
+    }
+
+    /// 获取电压状态
+    pub fn get_voltage_state(&self, verify: &Verify) -> VoltageState {
+        match self.voltage {
+            i if i >= verify.voltage_down && i <= verify.voltage_top => VoltageState::Qualified,
+            i if i < verify.voltage_down && i > 0. => VoltageState::UnderVoltage,
+            i if i > verify.voltage_top => VoltageState::OverVoltage,
+
+            _ => VoltageState::NoOutput,
+        }
+    }
+
+    /// 获取电流状态
+    pub fn get_current_state(&self, verify: &Verify) -> VoltageState {
+        match self.current {
+            i if i >= verify.current_down && i <= verify.current_top => VoltageState::Qualified,
+            i if i < verify.current_down && i > 0. => VoltageState::UnderCurrent,
+            i if i > verify.current_top => VoltageState::OverCurrent,
+
+            _ => VoltageState::NoOutput,
+        }
+    }
+
+    // 获取电压电流的总状态 电压优先
+    pub fn get_state(&self, verify: &Verify) -> VoltageState {
+        let state_voltage = self.get_voltage_state(verify);
+        let state_current = self.get_current_state(verify);
+
+        if state_voltage != VoltageState::Qualified {
+            state_voltage
+        } else {
+            state_current
+        }
+    }
 }
 
 /// 15对 电压&电流 值
@@ -199,40 +240,6 @@ pub enum VoltageState {
     OverCurrent,
     #[strum(to_string = "无输出")]
     NoOutput,
-}
-
-/// 获取电压状态
-pub fn get_voltage_state(data: &VoltageChannel, verify: &Verify) -> VoltageState {
-    match data.voltage {
-        i if i >= verify.voltage_down && i <= verify.voltage_top => VoltageState::Qualified,
-        i if i < verify.voltage_down && i > 0. => VoltageState::UnderVoltage,
-        i if i > verify.voltage_top => VoltageState::OverVoltage,
-
-        _ => VoltageState::NoOutput,
-    }
-}
-
-/// 获取电流状态
-pub fn get_current_state(data: &VoltageChannel, verify: &Verify) -> VoltageState {
-    match data.current {
-        i if i >= verify.current_down && i <= verify.current_top => VoltageState::Qualified,
-        i if i < verify.current_down && i > 0. => VoltageState::UnderCurrent,
-        i if i > verify.current_top => VoltageState::OverCurrent,
-
-        _ => VoltageState::NoOutput,
-    }
-}
-
-// 获取电压电流的总状态 电压优先
-pub fn get_mb_state(data: &VoltageChannel, verify: &Verify) -> VoltageState {
-    let state_voltage = get_voltage_state(data, verify);
-    let state_current = get_current_state(data, verify);
-
-    if state_voltage != VoltageState::Qualified {
-        state_voltage
-    } else {
-        state_current
-    }
 }
 
 /// 合格校验

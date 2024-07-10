@@ -29,7 +29,7 @@ pub struct UserManagerView {
 #[godot_api]
 impl IPanelContainer for UserManagerView {
     fn ready(&mut self) {
-        godot_print!("user manager ready");
+        // godot_print!("user manager ready");
 
         // 添加权限list and connect
         let mut purview_node = self.get_purview_node();

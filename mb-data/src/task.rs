@@ -68,11 +68,21 @@ pub enum PowerMode {
     Dc,
 }
 
-// 人物内容
+// 任务内容
 #[derive(Debug, Clone, Copy, Default, Serialize, Deserialize)]
 pub struct TaskItem {
     pub index: usize,
     pub power_on: bool,
     pub voltage: u32,
     pub dur: Duration,
+}
+
+impl Task {
+    ///  获取一次 items 的总时间
+    pub fn get_items_time(&self) -> Duration {
+        self.items
+            .iter()
+            .map(|item| item.dur)
+            .fold(Duration::from_secs(0), |sum, x| sum + x)
+    }
 }

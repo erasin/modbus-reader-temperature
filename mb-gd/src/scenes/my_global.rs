@@ -35,7 +35,7 @@ pub struct MyGlobal {
 #[godot_api]
 impl IObject for MyGlobal {
     fn init(base: Base<Object>) -> Self {
-        godot_print!("my singleton init");
+        // godot_print!("my singleton init");
 
         let _ = get_time_offset();
         let _ = init_logging(3);

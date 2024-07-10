@@ -25,7 +25,7 @@ pub struct LoginView {
 #[godot_api]
 impl IPanelContainer for LoginView {
     fn ready(&mut self) {
-        godot_print!("user ready");
+        // godot_print!("user ready");
         self.get_name_node().grab_focus();
 
         self.get_pwd_node()

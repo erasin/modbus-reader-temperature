@@ -3,7 +3,7 @@ use godot::{
         file_dialog::{Access, FileMode},
         window::WindowInitialPosition,
         AcceptDialog, Button, CheckBox, FileDialog, IPanelContainer, Label, LineEdit, OptionButton,
-        PanelContainer,
+        PanelContainer, RichTextLabel,
     },
     prelude::*,
 };
@@ -352,7 +352,7 @@ impl SettingView {
         let mut number = self.get_defective_dur_node();
 
         let text = string_number_only(text);
-        let dur = text.parse::<u32>().unwrap_or_default();
+        let dur = text.parse::<u64>().unwrap_or_default();
         self.config.defective.dur = dur;
         let len = text.len();
         number.set_text(text.into());
@@ -410,11 +410,9 @@ impl SettingView {
 
     #[func]
     fn on_open_history_export_dir_selected(&mut self, file_name: GString) {
-        godot_print!("--dir: {}", file_name);
+        // godot_print!("--dir: {}", file_name);
         // label
-        let mut label = self
-            .base()
-            .get_node_as::<Label>(UniqueName::HistoryExportDir.as_ref());
+        let mut label = self.get_history_export_dir_node();
         label.set_text(file_name.clone());
 
         self.config.history.export_dir = file_name.into();
@@ -676,9 +674,7 @@ impl SettingView {
             self.base().callable("on_defective_rule_item_selected"),
         );
 
-        let mut dur_input = self
-            .base()
-            .get_node_as::<LineEdit>(UniqueName::DefectiveDur.as_ref());
+        let mut dur_input = self.get_defective_dur_node();
 
         dur_input.connect(
             "text_changed".into(),
@@ -690,9 +686,7 @@ impl SettingView {
     }
 
     fn history_init(&mut self) {
-        let mut history_log_dur = self
-            .base()
-            .get_node_as::<LineEdit>(UniqueName::HistoryLogDur.to_string());
+        let mut history_log_dur = self.get_history_log_dur_node();
         history_log_dur.set_text(self.config.history.log_dur.to_string().into());
 
         history_log_dur.connect(
@@ -700,9 +694,7 @@ impl SettingView {
             self.base().callable("on_history_log_dur"),
         );
 
-        let mut history_lazy_dur = self
-            .base()
-            .get_node_as::<LineEdit>(UniqueName::HistoryLazyDur.to_string());
+        let mut history_lazy_dur = self.get_history_lazy_dur_node();
         history_lazy_dur.set_text(self.config.history.defective_lazy_dur.to_string().into());
 
         history_lazy_dur.connect(
@@ -710,17 +702,13 @@ impl SettingView {
             self.base().callable("on_history_lazy_dur"),
         );
 
-        let mut export_btn = self
-            .base()
-            .get_node_as::<Button>(UniqueName::HistoryExportDirBtn.as_ref());
+        let mut export_btn = self.get_history_export_dir_btn_node();
         export_btn.connect(
             "pressed".into(),
             self.base().callable("on_open_history_export_dir"),
         );
 
-        let mut history_export_dir = self
-            .base()
-            .get_node_as::<Label>(UniqueName::HistoryExportDir.to_string());
+        let mut history_export_dir = self.get_history_export_dir_node();
         history_export_dir.set_text(self.config.history.export_dir.clone().into());
     }
 
@@ -854,14 +842,14 @@ impl SettingView {
         (
             get_history_export_dir_node,
             UniqueName::HistoryExportDir,
-            Label
+            RichTextLabel
         ),
         (get_submit_node, UniqueName::Submit, Button),
         (get_alert_node, UniqueName::Alert, AcceptDialog),
         (get_alert_info_node, UniqueName::AlertInfo, Label),
         (get_debug_panel_node, UniqueName::DebugPanel, PanelContainer),
-        (get_path_data_node, UniqueName::PathData, Label),
-        (get_path_log_node, UniqueName::PathLog, Label),
+        (get_path_data_node, UniqueName::PathData, RichTextLabel),
+        (get_path_log_node, UniqueName::PathLog, RichTextLabel),
     ];
 }
 

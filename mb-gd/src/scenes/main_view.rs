@@ -28,7 +28,7 @@ pub struct MainView {
 #[godot_api]
 impl IPanelContainer for MainView {
     fn ready(&mut self) {
-        godot_print!("main view");
+        // godot_print!("main view");
         self.sub_window = load("res://sub_window.tscn");
         self.file_dialog = load("res://sys/file_dialog.tscn");
 

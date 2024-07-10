@@ -1,4 +1,4 @@
-use std::{ops::Sub, path::PathBuf, time::Duration};
+use std::{ops::Add, path::PathBuf, time::Duration};
 
 use channel::VoltageChannelView;
 use godot::{
@@ -6,16 +6,18 @@ use godot::{
     obj::WithBaseField,
     prelude::*,
 };
-use mb::Result;
 use mb::{
+    relay::RelayMode,
     utils::{current_timestamp, hms_from_duration_string},
     voltage::{VoltageData, VoltageState, VOLTAGE_CHANNEL},
 };
+use mb::{voltage::VoltageChannel, Result};
 use mb_data::{
     db::{
         get_db,
         voltage::{
-            voltage_average_every_n_minutes, TableVoltage, VoltageChannelItem, VoltageDataGroup,
+            check_defective_in_secs, voltage_average_every_n_minutes, TableVoltage,
+            VoltageDataGroup,
         },
     },
     dirs::doc_dir,
@@ -32,7 +34,7 @@ use crate::{
     colors::{ColorPlate, IntoColor},
     data::AB,
     define_get_nodes,
-    mb_sync::{get_temperature, get_voltage_data},
+    mb_sync::{get_relay, get_temperature, get_voltage_data, set_relay},
     scenes::my_global::get_global_config,
 };
 
@@ -51,7 +53,9 @@ pub struct VoltageView {
     tag_scene: Gd<PackedScene>,
 
     task: Option<Task>,
+    task_state: TaskState,
 
+    // 状态
     state: State,
 
     // TODO 合并到 state_age enum
@@ -68,8 +72,25 @@ pub struct VoltageView {
 
     chart_data: Vec<Vector2>,
 
+    /// 故障产品
+    defective_data: Vec<VoltageChannel>,
+
     // data: Option<VoltageData>,
     base: Base<PanelContainer>,
+}
+
+#[derive(Debug, Default, Clone, Copy)]
+struct TaskState {
+    /// 运行到第几次循环
+    loop_index: u32,
+    /// 执行总时间
+    count_time: Duration,
+    /// 执行的 item 索引
+    item_index: usize,
+    /// 本次执行时间
+    item_time: Duration,
+    /// 电源状态
+    power_on: bool,
 }
 
 /// 状态
@@ -111,6 +132,10 @@ impl IPanelContainer for VoltageView {
             "task_updated".into(),
             self.base().callable("on_global_task_updated"),
         );
+
+        let on_task_item_start = self.base().callable("on_task_item_start");
+        self.base_mut()
+            .connect("task_item_start".into(), on_task_item_start);
 
         self.get_ab_name_node().set_text(self.ab.title().into());
 
@@ -163,13 +188,14 @@ impl IPanelContainer for VoltageView {
             chart.set_y_label("V");
         }
 
-        self.task_update();
+        self.task_load();
         self.channel_init();
     }
 
     fn process(&mut self, delta: f64) {
+        self.task_state_update();
         self.content_size_update();
-        self.state_update();
+        self.ui_state_update();
         self.btn_state_update();
         self.user_purview_update();
     }
@@ -180,6 +206,10 @@ impl VoltageView {
     #[signal]
     fn mb_read_over();
 
+    /// 变动 item
+    #[signal]
+    fn task_item_start(index: u32);
+
     #[func]
     fn on_global_task_updated(&mut self, ab: crate::data::AB) {
         if self.ab != ab {
@@ -188,7 +218,7 @@ impl VoltageView {
 
         let my_global = MyGlobal::singleton();
         self.task = my_global.bind().get_task(ab);
-        self.task_update();
+        self.task_load();
     }
 
     /// 请求处理
@@ -196,7 +226,8 @@ impl VoltageView {
     fn on_req_timer_timeout(&mut self) {
         self.task_run();
         self.chart_update();
-        self.count_good();
+        self.check_defective();
+        self.power_state_update();
     }
 
     /// 老化结束处理
@@ -206,7 +237,7 @@ impl VoltageView {
             self.state = State::Power;
         }
 
-        self.count_good();
+        self.check_defective();
         if let Err(e) = self.save_history() {
             log::error!("{}", e);
         };
@@ -223,11 +254,6 @@ impl VoltageView {
         };
 
         self.btn_state_update();
-
-        // TODO remove
-        if let Err(e) = self.save_history() {
-            log::error!("{}", e);
-        };
     }
 
     #[func]
@@ -239,6 +265,8 @@ impl VoltageView {
                 return;
             }
         };
+
+        // TODO 冲击电源kk开关
 
         self.btn_state_update();
     }
@@ -265,6 +293,10 @@ impl VoltageView {
                 age_timer.start();
                 self.start_at = current_timestamp();
                 self.end_at = self.start_at + self.count_time;
+
+                let item_index = self.task_state.item_index as u32;
+                self.base_mut()
+                    .emit_signal("task_item_start".into(), &[item_index.to_variant()]);
             }
             _ => {
                 req_timer.stop();
@@ -272,11 +304,56 @@ impl VoltageView {
             }
         }
     }
+
+    #[func]
+    fn on_task_item_start(&mut self, index: u32) {
+        if self.task.is_none() {
+            return;
+        }
+        let config = get_global_config();
+        let config = config.relay;
+
+        log::debug!("继电器冲击：{index}");
+
+        let task = self.task.clone().unwrap();
+        if let Some(item) = task.items.get(index as usize) {
+            let pos: u8 = match self.ab {
+                AB::Apanel => 0,
+                AB::Bpanel => 1,
+            };
+
+            self.task_state.power_on = item.power_on;
+
+            // 获取继电器
+            let relay = match get_relay(&config, self.ab) {
+                Ok(data) => data,
+                Err(e) => {
+                    log::error!("继电器冲击失败： {e}");
+                    return;
+                }
+            };
+
+            let mode = if item.power_on {
+                // 冲击开关
+                RelayMode::ON(relay.value, pos)
+            } else {
+                RelayMode::OFF(relay.value, pos)
+            };
+
+            match set_relay(&config, self.ab, &mode) {
+                Ok(data) => data,
+                Err(e) => {
+                    log::error!("继电器冲击失败： {e}");
+                    return;
+                }
+            };
+        }
+    }
 }
 
 impl VoltageView {
     /// 检查程序加载
-    fn task_update(&mut self) {
+    fn task_load(&mut self) {
         // 渲染 解锁按钮
         let mut start_btn = self.get_start_toggle_node();
         let mut age_btn = self.get_ageing_toggle_node();
@@ -316,14 +393,102 @@ impl VoltageView {
         age_timer.set_one_shot(true);
         age_timer.set_wait_time(task.count_time.as_secs_f64());
 
+        self.count_good = 0;
+        self.count_defective = 0;
+
         self.state = State::Wait;
+
+        self.task_state = TaskState {
+            loop_index: 0,
+            count_time: Duration::from_secs(0),
+            item_index: 0,
+            item_time: Duration::from_secs(0),
+            power_on: false,
+        }
     }
 
     /// 老化中的状态监控
-    fn task_state_update(&mut self) {}
+    fn task_state_update(&mut self) {
+        if self.task.is_none() {
+            return;
+        }
+
+        let age_timer = self.get_age_timer_node();
+        let age_time_left = Duration::from_secs_f64(age_timer.get_time_left());
+        let age_time = Duration::from_secs_f64(age_timer.get_wait_time()) - age_time_left;
+        // 更新运行时间
+        if self.state == State::Ageing {
+            self.count_down = age_time_left;
+            // self.count_down = match self.end_at.cmp(&current_time) {
+            //     std::cmp::Ordering::Less | std::cmp::Ordering::Equal => Duration::from_secs(0),
+            //     std::cmp::Ordering::Greater => self.end_at.sub(current_time),
+            // }
+        } else {
+            return;
+        }
+
+        let mut task_state = self.task_state;
+        let start_at = self.start_at;
+
+        let task = self.task.clone().unwrap();
+
+        // 记录运行状态
+        // 执行 Item
+        let items_dur = task
+            .items
+            .iter()
+            .enumerate()
+            .filter(|(index, _)| index.le(&task_state.item_index))
+            .fold(Duration::default(), |mut a, b| {
+                a = a.add(b.1.dur);
+                a
+            });
+
+        let one_loop_dur = task.get_items_time();
+
+        let mut shot_task_item = false;
+
+        // log::debug!(
+        //     "TaskState：{:?}, {}, {}, {}",
+        //     task_state,
+        //     age_time.as_secs(),
+        //     items_dur.as_secs(),
+        //     one_loop_dur.as_secs(),
+        // );
+
+        // 如果 item 执行的时限超出一次循环
+        // 获取已运行的计算的部分
+        let dur = items_dur + task_state.loop_index * one_loop_dur;
+
+        // 进入下一个循环
+        if age_time.ge(&dur) {
+            if task_state.item_index.lt(&(task.items.len() - 1)) {
+                task_state.item_index += 1;
+            } else {
+                task_state.loop_index += 1;
+                task_state.item_index = 0;
+            }
+            shot_task_item = true;
+        }
+
+        self.task_state = task_state;
+
+        // 冲击电源
+        if shot_task_item {
+            let item_index = self.task_state.item_index as u32;
+            self.base_mut()
+                .emit_signal("task_item_start".into(), &[item_index.to_variant()]);
+        }
+    }
 
     /// 电源开启后监控
-    fn power_state_update(&mut self) {}
+    fn power_state_update(&mut self) {
+        if self.task.is_none() {
+            return;
+        }
+
+        // TODO 检查电源
+    }
 
     fn btn_state_update(&mut self) {
         let mut start_btn = self.get_start_toggle_node();
@@ -436,6 +601,12 @@ impl VoltageView {
             return;
         }
 
+        // 电源关闭情况下不予检查
+        if !self.task_state.power_on {
+            // TODO 是否重置 channel
+            return;
+        }
+
         let config = get_global_config();
         let task = self.task.clone().unwrap();
 
@@ -520,6 +691,7 @@ impl VoltageView {
 
     /// 图表数据更新
     fn chart_update(&mut self) {
+        // TODO  数据取材？
         let list = {
             let db = get_db().lock().unwrap();
             match TableVoltage::range_last(&db, self.ab.into(), 100) {
@@ -545,28 +717,19 @@ impl VoltageView {
     }
 
     /// 状态更新
-    fn state_update(&mut self) {
+    fn ui_state_update(&mut self) {
         if self.task.is_none() {
             return;
         }
 
-        // 更新运行时间
-        if self.state == State::Ageing {
-            let current_time = current_timestamp();
-            self.count_down = match self.end_at.cmp(&current_time) {
-                std::cmp::Ordering::Less | std::cmp::Ordering::Equal => Duration::from_secs(0),
-                std::cmp::Ordering::Greater => self.end_at.sub(current_time),
-            }
-        }
-
         let mut start_time = self.get_start_time_node();
         let mut count_down_time = self.get_count_down_time_node();
-        let mut count_good = self.get_count_good_node();
-        let mut count_defective = self.get_count_defective_node();
 
         start_time.set_text(time_human(time_dur_odt(self.start_at)).into());
         count_down_time.set_text(hms_from_duration_string(self.count_down).into());
 
+        let mut count_good = self.get_count_good_node();
+        let mut count_defective = self.get_count_defective_node();
         count_good.set_text(self.count_good.to_string().into());
         count_defective.set_text(self.count_defective.to_string().into());
 
@@ -622,12 +785,71 @@ impl VoltageView {
     }
 
     /// 计算良品率
-    fn count_good(&mut self) {
+    fn check_defective(&mut self) {
+        if self.task.is_none() {
+            return;
+        }
+
+        let config = get_global_config();
+        let defective_config = config.defective;
+        let verify = match self.ab {
+            AB::Apanel => config.voltage_a.verify,
+            AB::Bpanel => config.voltage_b.verify,
+        };
+
+        let list = {
+            let db = get_db().lock().unwrap();
+            match defective_config.rule {
+                mb_data::config::DefectiveRule::RealTime => {
+                    match TableVoltage::get_last(&db, self.ab.into()) {
+                        Ok(d) => vec![d],
+                        Err(_) => {
+                            return;
+                        }
+                    }
+                }
+                mb_data::config::DefectiveRule::InTime => {
+                    match TableVoltage::range_last(&db, self.ab.into(), defective_config.dur) {
+                        Ok(data) => data,
+                        Err(e) => {
+                            log::error!("老化数据读取失败: {}", e);
+                            return;
+                        }
+                    }
+                }
+            }
+        };
+        // godot_print!("list -->{:?}", list);
+
+        // godot_print!("gef-->{:?}", list);
+        let dur = match defective_config.rule {
+            mb_data::config::DefectiveRule::RealTime => 0,
+            mb_data::config::DefectiveRule::InTime => defective_config.dur,
+        };
+
+        let list = check_defective_in_secs(list, dur, &verify);
+
+        // godot_print!("def-->{:?}", list);
+
+        // 与当前的对比
+        if self.defective_data.is_empty() {
+            self.defective_data = list.clone();
+        } else {
+            list.iter().for_each(|&ch| {
+                if !self.defective_data.iter().any(|x| x.index != ch.index) {
+                    self.defective_data.push(ch);
+                }
+            });
+        }
+
+        self.count_defective = self.defective_data.len() as u64;
         // 计算良品
         self.count_good = self.count_num - self.count_defective;
 
-        // TODO 读取延时处理
-        {}
+        let mut count_good = self.get_count_good_node();
+        let mut count_defective = self.get_count_defective_node();
+        count_good.set_text(self.count_good.to_string().into());
+        count_defective.set_text(self.count_defective.to_string().into());
     }
 
     /// 保存文件
@@ -680,10 +902,22 @@ impl VoltageView {
 
         workbook.save(doc_path)?;
 
+        self.clear_old_data();
         Ok(())
     }
 
-    // 权限
+    /// 清理旧数据
+    fn clear_old_data(&mut self) {
+        let config = get_global_config();
+        {
+            let db = get_db().lock().unwrap();
+            if let Err(e) = TableVoltage::clean(&db, self.ab.into()) {
+                log::error!("清理数据错误：{e}")
+            }
+        };
+    }
+
+    /// 权限
     fn user_purview_update(&mut self) {
         let mut purview_run = self.get_purview_run_node();
         let g = MyGlobal::singleton();
