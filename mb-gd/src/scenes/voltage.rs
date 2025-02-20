@@ -820,6 +820,8 @@ impl VoltageView {
             }
         };
         // godot_print!("list -->{:?}", list);
+        // TODO 实时检查
+        // TODO 延时检查
 
         // godot_print!("gef-->{:?}", list);
         let dur = match defective_config.rule {
