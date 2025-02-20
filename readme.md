@@ -1,3 +1,4 @@
+# README
 
 - 用户管理
   - 用户
@@ -92,10 +93,7 @@
     - 倒计时
   - 平均
     - 平均温度
-    - 
-
-
-  
+ 
 ## Data
 
 - 老化柜
@@ -111,6 +109,4 @@
   - 获取电压
   - 获取电流
 
-
-
- magick icon.png -define icon:auto-resize=256,128,64,48,32,16 icon.ico
+<!-- magick icon.png -define icon:auto-resize=256,128,64,48,32,16 icon.ico -->
