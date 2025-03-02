@@ -1,9 +1,9 @@
 use godot::{
-    engine::{
-        file_dialog::{Access, FileMode},
-        window::WindowInitialPosition,
+    classes::{
         AcceptDialog, Button, CheckBox, FileDialog, IPanelContainer, Label, LineEdit, OptionButton,
         PanelContainer, RichTextLabel,
+        file_dialog::{Access, FileMode},
+        window::WindowInitialPosition,
     },
     prelude::*,
 };
@@ -63,7 +63,7 @@ impl SettingView {
         text.clone_into(&mut self.config.pro_name);
 
         let len = text.len();
-        pro_name.set_text(text.into());
+        pro_name.set_text(text);
         pro_name.set_caret_column(len as i32);
     }
 
@@ -222,7 +222,7 @@ impl SettingView {
             .clamp(u8::MIN, u8::MAX);
         self.config.voltage_a.slave_start = dur;
         let len = text.len();
-        number.set_text(text.into());
+        number.set_text(&text);
         number.set_caret_column(len as i32);
     }
 
@@ -237,7 +237,7 @@ impl SettingView {
             .clamp(u8::MIN, u8::MAX);
         self.config.voltage_a.slave_end = dur;
         let len = text.len();
-        number.set_text(text.into());
+        number.set_text(&text);
         number.set_caret_column(len as i32);
     }
 
@@ -252,7 +252,7 @@ impl SettingView {
             .clamp(u8::MIN, u8::MAX);
         self.config.voltage_b.slave_start = dur;
         let len = text.len();
-        number.set_text(text.into());
+        number.set_text(&text);
         number.set_caret_column(len as i32);
     }
 
@@ -267,7 +267,7 @@ impl SettingView {
             .clamp(u8::MIN, u8::MAX);
         self.config.voltage_b.slave_end = dur;
         let len = text.len();
-        number.set_text(text.into());
+        number.set_text(&text);
         number.set_caret_column(len as i32);
     }
 
@@ -282,7 +282,7 @@ impl SettingView {
             .clamp(u8::MIN, u8::MAX);
         self.config.temperature.slave = dur;
         let len = text.len();
-        number.set_text(text.into());
+        number.set_text(&text);
         number.set_caret_column(len as i32);
     }
 
@@ -297,7 +297,7 @@ impl SettingView {
             .clamp(u8::MIN, u8::MAX);
         self.config.relay.slave = dur;
         let len = text.len();
-        number.set_text(text.into());
+        number.set_text(&text);
         number.set_caret_column(len as i32);
     }
 
@@ -312,7 +312,7 @@ impl SettingView {
             .clamp(u8::MIN, u8::MAX);
         self.config.power_a.slave = dur;
         let len = text.len();
-        number.set_text(text.into());
+        number.set_text(&text);
         number.set_caret_column(len as i32);
     }
 
@@ -327,7 +327,7 @@ impl SettingView {
             .clamp(u8::MIN, u8::MAX);
         self.config.power_b.slave = dur;
         let len = text.len();
-        number.set_text(text.into());
+        number.set_text(&text);
         number.set_caret_column(len as i32);
     }
 
@@ -355,7 +355,7 @@ impl SettingView {
         let dur = text.parse::<u64>().unwrap_or_default();
         self.config.defective.dur = dur;
         let len = text.len();
-        number.set_text(text.into());
+        number.set_text(&text);
         number.set_caret_column(len as i32);
     }
 
@@ -367,7 +367,7 @@ impl SettingView {
         let dur = text.parse::<u32>().unwrap_or_default();
         self.config.history.log_dur = dur;
         let len = text.len();
-        number.set_text(text.into());
+        number.set_text(&text);
         number.set_caret_column(len as i32);
     }
 
@@ -379,7 +379,7 @@ impl SettingView {
         let dur = text.parse::<u32>().unwrap_or_default();
         self.config.history.defective_lazy_dur = dur;
         let len = text.len();
-        number.set_text(text.into());
+        number.set_text(&text);
         number.set_caret_column(len as i32);
     }
 
@@ -388,24 +388,24 @@ impl SettingView {
         let mut root = self.base().get_tree().unwrap().get_root().unwrap();
         let mut dialog = self.file_dialog.instantiate_as::<FileDialog>();
 
-        dialog.set_title("选择文件夹".into());
-        dialog.set_text("选择文件夹".into());
-        dialog.set_cancel_button_text("取消".into());
-        dialog.set_ok_button_text("打开".into());
+        dialog.set_title("选择文件夹");
+        dialog.set_text("选择文件夹");
+        dialog.set_cancel_button_text("取消");
+        dialog.set_ok_button_text("打开");
         dialog.set_file_mode(FileMode::OPEN_DIR);
         dialog.set_access(Access::FILESYSTEM);
         dialog.set_use_native_dialog(true);
-        dialog.set_current_dir(self.config.history.export_dir.to_godot());
+        dialog.set_current_dir(&self.config.history.export_dir);
         dialog.set_size(Vector2i::new(800, 500));
         dialog.set_initial_position(WindowInitialPosition::CENTER_PRIMARY_SCREEN);
 
         dialog.connect(
-            "dir_selected".into(),
-            self.base().callable("on_open_history_export_dir_selected"),
+            "dir_selected",
+            &self.base().callable("on_open_history_export_dir_selected"),
         );
 
         dialog.set_visible(true);
-        root.add_child(dialog.upcast());
+        root.add_child(&dialog);
     }
 
     #[func]
@@ -413,7 +413,7 @@ impl SettingView {
         // godot_print!("--dir: {}", file_name);
         // label
         let mut label = self.get_history_export_dir_node();
-        label.set_text(file_name.clone());
+        label.set_text(&file_name);
 
         self.config.history.export_dir = file_name.into();
     }
@@ -432,18 +432,18 @@ impl SettingView {
 impl SettingView {
     pub fn init_data(&mut self) {
         let mut pro_name = self.get_pro_name_node();
-        pro_name.connect("text_changed".into(), self.base().callable("on_pro_name"));
-        pro_name.set_text(self.config.pro_name.clone().into());
+        pro_name.connect("text_changed", &self.base().callable("on_pro_name"));
+        pro_name.set_text(&self.config.pro_name.clone());
         pro_name.grab_focus();
 
         // -- a b --
         let mut enable_a_panel = self.get_enable_apanel_node();
         enable_a_panel.set_pressed(self.config.enable_a_panel);
-        enable_a_panel.connect("toggled".into(), self.base().callable("on_enable_a_panel"));
+        enable_a_panel.connect("toggled", &self.base().callable("on_enable_a_panel"));
 
         let mut enable_b_panel = self.get_enable_bpanel_node();
         enable_b_panel.set_pressed(self.config.enable_b_panel);
-        enable_b_panel.connect("toggled".into(), self.base().callable("on_enable_b_panel"));
+        enable_b_panel.connect("toggled", &self.base().callable("on_enable_b_panel"));
 
         // -- port ---
 
@@ -457,12 +457,12 @@ impl SettingView {
         let ports = get_ports();
 
         for (index, port) in ports.iter().enumerate() {
-            voltage_a_port_btn.add_item(port.to_godot());
-            voltage_b_port_btn.add_item(port.to_godot());
-            temp_port_btn.add_item(port.to_godot());
-            relay_port_btn.add_item(port.to_godot());
-            power_a_port_btn.add_item(port.to_godot());
-            power_b_port_btn.add_item(port.to_godot());
+            voltage_a_port_btn.add_item(port);
+            voltage_b_port_btn.add_item(port);
+            temp_port_btn.add_item(port);
+            relay_port_btn.add_item(port);
+            power_a_port_btn.add_item(port);
+            power_b_port_btn.add_item(port);
 
             let index = index as i32;
 
@@ -507,28 +507,28 @@ impl SettingView {
         }
 
         voltage_a_port_btn.connect(
-            "item_selected".into(),
-            self.base().callable("on_voltage_a_port_item_selected"),
+            "item_selected",
+            &self.base().callable("on_voltage_a_port_item_selected"),
         );
         voltage_b_port_btn.connect(
-            "item_selected".into(),
-            self.base().callable("on_voltage_b_port_item_selected"),
+            "item_selected",
+            &self.base().callable("on_voltage_b_port_item_selected"),
         );
         temp_port_btn.connect(
-            "item_selected".into(),
-            self.base().callable("on_temp_port_item_selected"),
+            "item_selected",
+            &self.base().callable("on_temp_port_item_selected"),
         );
         relay_port_btn.connect(
-            "item_selected".into(),
-            self.base().callable("on_relay_port_item_selected"),
+            "item_selected",
+            &self.base().callable("on_relay_port_item_selected"),
         );
         power_a_port_btn.connect(
-            "item_selected".into(),
-            self.base().callable("on_power_a_port_item_selected"),
+            "item_selected",
+            &self.base().callable("on_power_a_port_item_selected"),
         );
         power_b_port_btn.connect(
-            "item_selected".into(),
-            self.base().callable("on_power_b_port_item_selected"),
+            "item_selected",
+            &self.base().callable("on_power_b_port_item_selected"),
         );
 
         // --- baudrate ---
@@ -541,12 +541,12 @@ impl SettingView {
         let mut power_b_baudrate_btn = self.get_power_b_baudrate_node();
 
         for (index, &item) in Baudrate::ALL.iter().enumerate() {
-            voltage_a_baudrate_btn.add_item(item.to_string().to_godot());
-            voltage_b_baudrate_btn.add_item(item.to_string().to_godot());
-            temp_baudrate_btn.add_item(item.to_string().to_godot());
-            relay_baudrate_btn.add_item(item.to_string().to_godot());
-            power_a_baudrate_btn.add_item(item.to_string().to_godot());
-            power_b_baudrate_btn.add_item(item.to_string().to_godot());
+            voltage_a_baudrate_btn.add_item(&item.to_string());
+            voltage_b_baudrate_btn.add_item(&item.to_string());
+            temp_baudrate_btn.add_item(&item.to_string());
+            relay_baudrate_btn.add_item(&item.to_string());
+            power_a_baudrate_btn.add_item(&item.to_string());
+            power_b_baudrate_btn.add_item(&item.to_string());
 
             let index = index as i32;
 
@@ -571,89 +571,68 @@ impl SettingView {
         }
 
         voltage_a_baudrate_btn.connect(
-            "item_selected".into(),
-            self.base().callable("on_voltage_a_baudrate_item_selected"),
+            "item_selected",
+            &self.base().callable("on_voltage_a_baudrate_item_selected"),
         );
         voltage_b_baudrate_btn.connect(
-            "item_selected".into(),
-            self.base().callable("on_voltage_b_baudrate_item_selected"),
+            "item_selected",
+            &self.base().callable("on_voltage_b_baudrate_item_selected"),
         );
         temp_baudrate_btn.connect(
-            "item_selected".into(),
-            self.base().callable("on_temp_baudrate_item_selected"),
+            "item_selected",
+            &self.base().callable("on_temp_baudrate_item_selected"),
         );
         relay_baudrate_btn.connect(
-            "item_selected".into(),
-            self.base().callable("on_relay_baudrate_item_selected"),
+            "item_selected",
+            &self.base().callable("on_relay_baudrate_item_selected"),
         );
         power_a_baudrate_btn.connect(
-            "item_selected".into(),
-            self.base().callable("on_power_a_baudrate_item_selected"),
+            "item_selected",
+            &self.base().callable("on_power_a_baudrate_item_selected"),
         );
         power_b_baudrate_btn.connect(
-            "item_selected".into(),
-            self.base().callable("on_power_b_baudrate_item_selected"),
+            "item_selected",
+            &self.base().callable("on_power_b_baudrate_item_selected"),
         );
 
         // --- slave ---
 
         let mut number_a_start = self.get_voltage_a_start_num_node();
-        number_a_start.set_text(self.config.voltage_a.slave_start.to_string().into());
-        number_a_start.connect(
-            "text_changed".into(),
-            self.base().callable("on_number_a_start"),
-        );
+        number_a_start.set_text(&self.config.voltage_a.slave_start.to_string());
+        number_a_start.connect("text_changed", &self.base().callable("on_number_a_start"));
 
         let mut number_a_end = self.get_voltage_a_end_num_node();
-        number_a_end.set_text(self.config.voltage_a.slave_end.to_string().into());
-        number_a_end.connect(
-            "text_changed".into(),
-            self.base().callable("on_number_a_end"),
-        );
+        number_a_end.set_text(&self.config.voltage_a.slave_end.to_string());
+        number_a_end.connect("text_changed", &self.base().callable("on_number_a_end"));
 
         let mut number_b_start = self.get_voltage_b_start_num_node();
-        number_b_start.set_text(self.config.voltage_b.slave_start.to_string().into());
-        number_b_start.connect(
-            "text_changed".into(),
-            self.base().callable("on_number_b_start"),
-        );
+        number_b_start.set_text(&self.config.voltage_b.slave_start.to_string());
+        number_b_start.connect("text_changed", &self.base().callable("on_number_b_start"));
 
         let mut number_b_end = self.get_voltage_b_end_num_node();
-        number_b_end.set_text(self.config.voltage_b.slave_end.to_string().into());
-        number_b_end.connect(
-            "text_changed".into(),
-            self.base().callable("on_number_b_end"),
-        );
+        number_b_end.set_text(&self.config.voltage_b.slave_end.to_string());
+        number_b_end.connect("text_changed", &self.base().callable("on_number_b_end"));
 
         let mut temp_slave = self.get_temp_slave_node();
-        temp_slave.set_text(self.config.temperature.slave.to_string().into());
-        temp_slave.connect("text_changed".into(), self.base().callable("on_temp_slave"));
+        temp_slave.set_text(&self.config.temperature.slave.to_string());
+        temp_slave.connect("text_changed", &self.base().callable("on_temp_slave"));
 
         let mut relay_slave = self.get_relay_slave_node();
-        relay_slave.set_text(self.config.relay.slave.to_string().into());
-        relay_slave.connect(
-            "text_changed".into(),
-            self.base().callable("on_relay_slave"),
-        );
+        relay_slave.set_text(&self.config.relay.slave.to_string());
+        relay_slave.connect("text_changed", &self.base().callable("on_relay_slave"));
 
         let mut power_a_slave = self.get_power_a_slave_node();
-        power_a_slave.set_text(self.config.power_a.slave.to_string().into());
-        power_a_slave.connect(
-            "text_changed".into(),
-            self.base().callable("on_power_a_slave"),
-        );
+        power_a_slave.set_text(&self.config.power_a.slave.to_string());
+        power_a_slave.connect("text_changed", &self.base().callable("on_power_a_slave"));
 
         let mut power_b_slave = self.get_power_b_slave_node();
-        power_b_slave.set_text(self.config.power_b.slave.to_string().into());
-        power_b_slave.connect(
-            "text_changed".into(),
-            self.base().callable("on_power_b_slave"),
-        );
+        power_b_slave.set_text(&self.config.power_b.slave.to_string());
+        power_b_slave.connect("text_changed", &self.base().callable("on_power_b_slave"));
 
         // --- submit ---
 
         let mut submit_btn = self.get_submit_node();
-        submit_btn.connect("pressed".into(), self.base().callable("on_submit"));
+        submit_btn.connect("pressed", &self.base().callable("on_submit"));
     }
 
     fn defective_init(&mut self) {
@@ -662,7 +641,7 @@ impl SettingView {
             .get_node_as::<OptionButton>(UniqueName::DefectiveRule.as_ref());
 
         for (index, &item) in DefectiveRule::ALL.iter().enumerate() {
-            select_box.add_item(item.title().to_godot());
+            select_box.add_item(&item.title());
 
             if item == self.config.defective.rule {
                 select_box.select(index as i32);
@@ -670,46 +649,37 @@ impl SettingView {
         }
 
         select_box.connect(
-            "item_selected".into(),
-            self.base().callable("on_defective_rule_item_selected"),
+            "item_selected",
+            &self.base().callable("on_defective_rule_item_selected"),
         );
 
         let mut dur_input = self.get_defective_dur_node();
 
-        dur_input.connect(
-            "text_changed".into(),
-            self.base().callable("on_defective_dur"),
-        );
+        dur_input.connect("text_changed", &self.base().callable("on_defective_dur"));
 
         dur_input.set_editable(self.config.defective.rule == DefectiveRule::InTime);
-        dur_input.set_text(self.config.defective.dur.to_string().into())
+        dur_input.set_text(&self.config.defective.dur.to_string())
     }
 
     fn history_init(&mut self) {
         let mut history_log_dur = self.get_history_log_dur_node();
-        history_log_dur.set_text(self.config.history.log_dur.to_string().into());
+        history_log_dur.set_text(&self.config.history.log_dur.to_string());
 
-        history_log_dur.connect(
-            "text_changed".into(),
-            self.base().callable("on_history_log_dur"),
-        );
+        history_log_dur.connect("text_changed", &self.base().callable("on_history_log_dur"));
 
         let mut history_lazy_dur = self.get_history_lazy_dur_node();
-        history_lazy_dur.set_text(self.config.history.defective_lazy_dur.to_string().into());
+        history_lazy_dur.set_text(&self.config.history.defective_lazy_dur.to_string());
 
-        history_lazy_dur.connect(
-            "text_changed".into(),
-            self.base().callable("on_history_lazy_dur"),
-        );
+        history_lazy_dur.connect("text_changed", &self.base().callable("on_history_lazy_dur"));
 
         let mut export_btn = self.get_history_export_dir_btn_node();
         export_btn.connect(
-            "pressed".into(),
-            self.base().callable("on_open_history_export_dir"),
+            "pressed",
+            &self.base().callable("on_open_history_export_dir"),
         );
 
         let mut history_export_dir = self.get_history_export_dir_node();
-        history_export_dir.set_text(self.config.history.export_dir.clone().into());
+        history_export_dir.set_text(&self.config.history.export_dir.clone());
     }
 
     fn ab_init(&mut self) {
@@ -722,9 +692,9 @@ impl SettingView {
     fn alert(&mut self, title: String, btn: String, info: String) {
         let mut alert = self.get_alert_node();
         let mut alert_info = self.get_alert_info_node();
-        alert.set_title(title.into());
-        alert.set_ok_button_text(btn.into());
-        alert_info.set_text(info.into());
+        alert.set_title(&title);
+        alert.set_ok_button_text(&btn);
+        alert_info.set_text(&info);
         alert.set_visible(true);
     }
 
@@ -738,9 +708,9 @@ impl SettingView {
             self.get_debug_panel_node().set_visible(true);
 
             self.get_path_data_node()
-                .set_text(data_dir().to_string_lossy().to_string().into());
+                .set_text(&data_dir().to_string_lossy().to_string());
             self.get_path_log_node()
-                .set_text(log_file().to_string_lossy().to_string().into());
+                .set_text(&log_file().to_string_lossy().to_string());
         };
     }
 

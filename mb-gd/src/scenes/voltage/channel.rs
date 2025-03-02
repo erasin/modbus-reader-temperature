@@ -1,5 +1,5 @@
 use godot::{
-    engine::{Control, IPanelContainer, Label, PanelContainer},
+    classes::{Control, IPanelContainer, Label, PanelContainer},
     obj::WithBaseField,
     prelude::*,
 };
@@ -67,9 +67,9 @@ impl VoltageChannelView {
             self.data.index
         } + 1;
 
-        index_label.set_text(format!("{:2}", index).into());
-        voltage_label.set_text(format!("{:2.2}V", self.data.voltage).into());
-        current_label.set_text(format!("{:2.2}A", self.data.current).into());
+        index_label.set_text(&format!("{:2}", index));
+        voltage_label.set_text(&format!("{:2.2}V", self.data.voltage));
+        current_label.set_text(&format!("{:2.2}A", self.data.current));
 
         state.set_modulate(self.color);
     }

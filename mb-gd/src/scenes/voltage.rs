@@ -2,22 +2,22 @@ use std::{ops::Add, path::PathBuf, time::Duration};
 
 use channel::VoltageChannelView;
 use godot::{
-    engine::{Button, Control, GridContainer, IPanelContainer, Label, PanelContainer, Timer},
+    classes::{Button, Control, GridContainer, IPanelContainer, Label, PanelContainer, Timer},
     obj::WithBaseField,
     prelude::*,
 };
+use mb::{Result, voltage::VoltageChannel};
 use mb::{
     relay::RelayMode,
     utils::{current_timestamp, hms_from_duration_string},
-    voltage::{VoltageData, VoltageState, VOLTAGE_CHANNEL},
+    voltage::{VOLTAGE_CHANNEL, VoltageData, VoltageState},
 };
-use mb::{voltage::VoltageChannel, Result};
 use mb_data::{
     db::{
         get_db,
         voltage::{
-            check_defective_in_secs, voltage_average_every_n_minutes, TableVoltage,
-            VoltageDataGroup,
+            TableVoltage, VoltageDataGroup, check_defective_in_secs,
+            voltage_average_every_n_minutes,
         },
     },
     dirs::doc_dir,
@@ -129,31 +129,27 @@ impl IPanelContainer for VoltageView {
 
         let mut my_global = MyGlobal::singleton();
         my_global.connect(
-            "task_updated".into(),
-            self.base().callable("on_global_task_updated"),
+            "task_updated",
+            &self.base().callable("on_global_task_updated"),
         );
 
-        let on_task_item_start = self.base().callable("on_task_item_start");
+        let on_task_item_start = &self.base().callable("on_task_item_start");
         self.base_mut()
-            .connect("task_item_start".into(), on_task_item_start);
+            .connect("task_item_start", on_task_item_start);
 
-        self.get_ab_name_node().set_text(self.ab.title().into());
+        self.get_ab_name_node().set_text(&self.ab.title());
 
-        self.get_req_timer_node().connect(
-            "timeout".into(),
-            self.base().callable("on_req_timer_timeout"),
-        );
+        self.get_req_timer_node()
+            .connect("timeout", &self.base().callable("on_req_timer_timeout"));
 
-        self.get_age_timer_node().connect(
-            "timeout".into(),
-            self.base().callable("on_age_timer_timeout"),
-        );
+        self.get_age_timer_node()
+            .connect("timeout", &self.base().callable("on_age_timer_timeout"));
 
         // 标签显示
         let mut tags_container = self.get_tags_node();
         for s in VoltageState::iter() {
             let mut tag_scene = self.tag_scene.instantiate_as::<VoltageStateTagView>();
-            tags_container.add_child(tag_scene.clone().upcast());
+            tags_container.add_child(&tag_scene);
 
             let mut tag = tag_scene.bind_mut();
             tag.set_color(s.color());
@@ -163,15 +159,15 @@ impl IPanelContainer for VoltageView {
 
         // 开启
         let mut start_btn = self.get_start_toggle_node();
-        start_btn.connect("pressed".into(), self.base().callable("on_start_toggle"));
+        start_btn.connect("pressed", &self.base().callable("on_start_toggle"));
         start_btn.set_disabled(true);
 
         let mut age_btn = self.get_ageing_toggle_node();
-        age_btn.connect("pressed".into(), self.base().callable("on_ageing_toggle"));
+        age_btn.connect("pressed", &self.base().callable("on_ageing_toggle"));
         age_btn.set_disabled(true);
 
         let mut power_btn = self.get_power_toggle_node();
-        power_btn.connect("pressed".into(), self.base().callable("on_power_toggle"));
+        power_btn.connect("pressed", &self.base().callable("on_power_toggle"));
         power_btn.set_disabled(true);
 
         let mut chart = self.get_chart_node();
@@ -296,7 +292,7 @@ impl VoltageView {
 
                 let item_index = self.task_state.item_index as u32;
                 self.base_mut()
-                    .emit_signal("task_item_start".into(), &[item_index.to_variant()]);
+                    .emit_signal("task_item_start", &[item_index.to_variant()]);
             }
             _ => {
                 req_timer.stop();
@@ -372,23 +368,26 @@ impl VoltageView {
                 start_btn.set_disabled(true);
                 age_btn.set_disabled(true);
                 power_btn.set_disabled(true);
-                pro_name_node.set_text("".into());
-                ageing_time_node.set_text("".into());
+                pro_name_node.set_text("");
+                ageing_time_node.set_text("");
                 return;
             }
         };
 
         start_btn.set_disabled(false);
-        pro_name_node.set_text(task.title.clone().into());
-        ageing_time_node.set_text(hms_from_duration_string(task.count_time).into());
+        pro_name_node.set_text(&task.title.clone());
+        ageing_time_node.set_text(&hms_from_duration_string(task.count_time));
         self.count_time = task.count_time;
         self.count_down = task.count_time;
-        power_state_node
-            .set_text(format!("{} {}V", task.power.mode.as_ref(), task.power.voltage).into());
+        power_state_node.set_text(&format!(
+            "{} {}V",
+            task.power.mode.as_ref(),
+            task.power.voltage
+        ));
 
-        product_title_node.set_text(task.product.title.clone().into());
-        product_index_node.set_text(task.product.index.clone().into());
-        count_num_node.set_text(self.count_num.to_string().into());
+        product_title_node.set_text(&task.product.title.clone());
+        product_index_node.set_text(&task.product.index.clone());
+        count_num_node.set_text(&self.count_num.to_string());
 
         age_timer.set_one_shot(true);
         age_timer.set_wait_time(task.count_time.as_secs_f64());
@@ -477,7 +476,7 @@ impl VoltageView {
         if shot_task_item {
             let item_index = self.task_state.item_index as u32;
             self.base_mut()
-                .emit_signal("task_item_start".into(), &[item_index.to_variant()]);
+                .emit_signal("task_item_start", &[item_index.to_variant()]);
         }
     }
 
@@ -506,33 +505,33 @@ impl VoltageView {
                 age_btn.set_disabled(true);
                 power_btn.set_disabled(true);
 
-                start_btn.set_text("开始".into());
-                power_btn.set_text("启动电源".into());
-                age_btn.set_text("开始老化".into());
+                start_btn.set_text("开始");
+                power_btn.set_text("启动电源");
+                age_btn.set_text("开始老化");
             }
             State::Run => {
                 start_btn.set_disabled(false);
                 power_btn.set_disabled(false);
                 age_btn.set_disabled(true);
 
-                start_btn.set_text("停止".into());
-                power_btn.set_text("启动电源".into());
-                age_btn.set_text("开始老化".into());
+                start_btn.set_text("停止");
+                power_btn.set_text("启动电源");
+                age_btn.set_text("开始老化");
             }
             State::Power => {
                 start_btn.set_disabled(true);
                 power_btn.set_disabled(false);
                 age_btn.set_disabled(false);
 
-                power_btn.set_text("关闭电源".into());
-                age_btn.set_text("开始老化".into());
+                power_btn.set_text("关闭电源");
+                age_btn.set_text("开始老化");
             }
             State::Ageing => {
                 age_btn.set_disabled(false);
                 power_btn.set_disabled(true);
                 start_btn.set_disabled(true);
 
-                age_btn.set_text("停止老化".into());
+                age_btn.set_text("停止老化");
             }
         }
     }
@@ -557,8 +556,8 @@ impl VoltageView {
             let name = format!("i{}", index).to_godot();
 
             let mut channel_scene = self.channel_scene.instantiate_as::<VoltageChannelView>();
-            container.add_child(channel_scene.clone().upcast());
-            channel_scene.set_name(name);
+            container.add_child(&channel_scene);
+            channel_scene.set_name(&name);
             channel_scene.bind_mut().set_index(index);
             channel_scene.bind_mut().update_ui();
         });
@@ -617,7 +616,7 @@ impl VoltageView {
         };
 
         let mut label_ab_name = self.get_ab_name_node();
-        label_ab_name.set_text(self.ab.title().into());
+        label_ab_name.set_text(&self.ab.title());
 
         let temperature = match get_temperature(&config.temperature, self.ab) {
             Ok(t) => t.value,
@@ -669,8 +668,8 @@ impl VoltageView {
         for (j, data) in data.iter().enumerate() {
             for (i, data) in data.data.iter().enumerate() {
                 let index = i + j * VOLTAGE_CHANNEL;
-                let name = format!("i{}", index).to_godot();
-                let mut channel = content.get_node_as::<VoltageChannelView>(name);
+                let name = format!("i{}", index);
+                let mut channel = content.get_node_as::<VoltageChannelView>(&name);
 
                 {
                     let color = data.state.color();
@@ -682,11 +681,11 @@ impl VoltageView {
                     channel.update_ui();
                 }
 
-                channel.emit_signal("update_data".into(), &[]);
+                channel.emit_signal("update_data", &[]);
             }
         }
 
-        self.base_mut().emit_signal("mb_read_over".into(), &[]);
+        self.base_mut().emit_signal("mb_read_over", &[]);
     }
 
     /// 图表数据更新
@@ -725,13 +724,13 @@ impl VoltageView {
         let mut start_time = self.get_start_time_node();
         let mut count_down_time = self.get_count_down_time_node();
 
-        start_time.set_text(time_human(time_dur_odt(self.start_at)).into());
-        count_down_time.set_text(hms_from_duration_string(self.count_down).into());
+        start_time.set_text(&time_human(time_dur_odt(self.start_at)));
+        count_down_time.set_text(&hms_from_duration_string(self.count_down));
 
         let mut count_good = self.get_count_good_node();
         let mut count_defective = self.get_count_defective_node();
-        count_good.set_text(self.count_good.to_string().into());
-        count_defective.set_text(self.count_defective.to_string().into());
+        count_good.set_text(&self.count_good.to_string());
+        count_defective.set_text(&self.count_defective.to_string());
 
         let mut state_run_node = self.get_state_run_node();
         let mut state_error_node = self.get_state_error_node();
@@ -850,8 +849,8 @@ impl VoltageView {
 
         let mut count_good = self.get_count_good_node();
         let mut count_defective = self.get_count_defective_node();
-        count_good.set_text(self.count_good.to_string().into());
-        count_defective.set_text(self.count_defective.to_string().into());
+        count_good.set_text(&self.count_good.to_string());
+        count_defective.set_text(&self.count_defective.to_string());
     }
 
     /// 保存文件

@@ -1,5 +1,5 @@
 use godot::{
-    engine::{Button, IPanelContainer, Label, LineEdit, PanelContainer},
+    classes::{Button, IPanelContainer, Label, LineEdit, PanelContainer},
     prelude::*,
 };
 use strum::AsRefStr;
@@ -29,10 +29,10 @@ impl IPanelContainer for LoginView {
         self.get_name_node().grab_focus();
 
         self.get_pwd_node()
-            .connect("text_submitted".into(), self.base().callable("on_pwd"));
+            .connect("text_submitted", &self.base().callable("on_pwd"));
 
         self.get_submit_node()
-            .connect("pressed".into(), self.base().callable("on_submit"));
+            .connect("pressed", &self.base().callable("on_submit"));
     }
 }
 
@@ -66,7 +66,7 @@ impl LoginView {
         };
 
         if user_name != user.name || !user.check_pwd(user_pwd) {
-            err_node.set_text("账户或密码错误，请重试！".into_godot());
+            err_node.set_text("账户或密码错误，请重试！");
             return;
         }
 
@@ -77,7 +77,7 @@ impl LoginView {
 
         // close
         if let Some(mut win) = self.base_mut().get_window() {
-            win.emit_signal("close_requested".into(), &[]);
+            win.emit_signal("close_requested", &[]);
         }
     }
 }

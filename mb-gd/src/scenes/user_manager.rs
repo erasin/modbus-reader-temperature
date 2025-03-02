@@ -1,5 +1,5 @@
 use godot::{
-    engine::{
+    classes::{
         AcceptDialog, BoxContainer, Button, CheckBox, IPanelContainer, ItemList, Label, LineEdit,
         PanelContainer,
     },
@@ -36,21 +36,21 @@ impl IPanelContainer for UserManagerView {
 
         UserPurview::iter().for_each(|up| {
             let mut cb = CheckBox::new_alloc();
-            cb.set_text(up.to_string().into());
-            purview_node.add_child(cb.upcast());
+            cb.set_text(&up.to_string());
+            purview_node.add_child(&cb);
         });
 
         let mut user_list_node = self.get_user_list_node();
         user_list_node.connect(
-            "item_selected".into(),
-            self.base().callable("on_user_item_selected"),
+            "item_selected",
+            &self.base().callable("on_user_item_selected"),
         );
 
         let mut submit_btn = self.get_submit_node();
-        submit_btn.connect("pressed".into(), self.base().callable("on_submit"));
+        submit_btn.connect("pressed", &self.base().callable("on_submit"));
 
         let mut delete_btn = self.get_delete_node();
-        delete_btn.connect("pressed".into(), self.base().callable("on_delete"));
+        delete_btn.connect("pressed", &self.base().callable("on_delete"));
 
         self.user_item_update();
 
@@ -79,13 +79,13 @@ impl UserManagerView {
     #[func]
     fn on_submit(&mut self) {
         let mut err_node = self.get_error_node();
-        err_node.set_text("".into());
+        err_node.set_text("");
 
         let name_node = self.get_name_node();
         let user_name = name_node.get_text().to_string().trim().to_string();
 
         if user_name.is_empty() {
-            err_node.set_text("用户名不可为空！".into());
+            err_node.set_text("用户名不可为空！");
             return;
         }
 
@@ -93,7 +93,7 @@ impl UserManagerView {
         let user_pwd = user_pwd_node.get_text().to_string().trim().to_string();
 
         if user_pwd.is_empty() {
-            err_node.set_text("密码不可为空！".into());
+            err_node.set_text("密码不可为空！");
             return;
         }
 
@@ -153,8 +153,8 @@ impl UserManagerView {
         self.user_item_update();
 
         let mut pwd = self.get_pwd_node();
-        name.set_text("".into());
-        pwd.set_text("".into());
+        name.set_text("");
+        pwd.set_text("");
 
         let purview = self.get_purview_node();
         purview
@@ -180,8 +180,8 @@ impl UserManagerView {
         let mut name = self.get_name_node();
         let mut pwd = self.get_pwd_node();
 
-        name.set_text(user.name.clone().into());
-        pwd.set_text(user.pwd.clone().into());
+        name.set_text(&user.name);
+        pwd.set_text(&user.pwd);
 
         user.purview.iter().for_each(|p| {});
 
@@ -221,21 +221,21 @@ impl UserManagerView {
 
         self.list = Array::new();
         self.users.iter().for_each(|user| {
-            self.list.push(user.name.clone().into());
+            self.list.push(&user.name);
             // FIX gdext , sub_window 冲突
             // user_list.add_item(user.name.clone().into());
         });
 
         // gdscript 中处理 add_item
-        self.base_mut().emit_signal("update_users".into(), &[]);
+        self.base_mut().emit_signal("update_users", &[]);
     }
 
     fn alert(&mut self, title: String, btn: String, info: String) {
         let mut alert = self.get_alert_node();
         let mut alert_info = self.get_alert_info_node();
-        alert.set_title(title.into());
-        alert.set_ok_button_text(btn.into());
-        alert_info.set_text(info.into());
+        alert.set_title(&title);
+        alert.set_ok_button_text(&btn);
+        alert_info.set_text(&info);
         alert.set_visible(true);
     }
 

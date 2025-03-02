@@ -1,10 +1,10 @@
 use godot::{
     builtin::StringName,
-    engine::{Engine, IObject, Object},
-    log::godot_print,
+    classes::{Engine, IObject, Object},
+    global::godot_print,
     meta::ToGodot,
     obj::{Base, Gd, WithBaseField},
-    register::{godot_api, GodotClass},
+    register::{GodotClass, godot_api},
 };
 
 use mb_data::{
@@ -78,7 +78,7 @@ impl MyGlobal {
     /// ```
     pub fn singleton() -> Gd<Self> {
         Engine::singleton()
-            .get_singleton(MyGlobal::string_name())
+            .get_singleton(&MyGlobal::string_name())
             .unwrap()
             .cast::<MyGlobal>()
     }
@@ -119,7 +119,7 @@ impl MyGlobal {
         };
 
         self.config = Some(config);
-        self.base_mut().emit_signal("config_updated".into(), &[]);
+        self.base_mut().emit_signal("config_updated", &[]);
     }
 
     pub fn get_sub_window(&self) -> u8 {
@@ -137,7 +137,7 @@ impl MyGlobal {
 
     pub fn set_login(&mut self, user: UserConfig) {
         self.user_state = Some(user);
-        self.base_mut().emit_signal("login_updated".into(), &[]);
+        self.base_mut().emit_signal("login_updated", &[]);
     }
 
     pub fn set_logout(&mut self) {
@@ -157,7 +157,7 @@ impl MyGlobal {
             AB::Bpanel => self.task_b = Some(task),
         }
         self.base_mut()
-            .emit_signal("task_updated".into(), &[ab.to_variant()]);
+            .emit_signal("task_updated", &[ab.to_variant()]);
     }
 }
 

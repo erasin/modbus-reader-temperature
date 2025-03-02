@@ -1,5 +1,5 @@
 use godot::{
-    engine::{IWindow, PanelContainer, Window},
+    classes::{IWindow, PanelContainer, Window},
     prelude::*,
 };
 use strum::AsRefStr;
@@ -34,13 +34,13 @@ impl IWindow for SubWindowView {
         self.user_manager = load("res://user/user_manager.tscn");
         self.login = load("res://user/login.tscn");
 
-        let on_close = self.base().callable("on_close_requested");
-        let on_open = self.base().callable("on_open");
+        let on_close = &self.base().callable("on_close_requested");
+        let on_open = &self.base().callable("on_open");
 
         let mut win = self.base_mut();
-        win.connect("close_requested".into(), on_close);
-        win.connect("open".into(), on_open);
-        win.set_title("系统设置".into());
+        win.connect("close_requested", on_close);
+        win.connect("open", on_open);
+        win.set_title("系统设置");
         // win.set_size(Vector2i::new(600, 600));
         // win.set_initial_position(WindowInitialPosition::CENTER_PRIMARY_SCREEN);
         win.set_visible(true);
@@ -77,7 +77,7 @@ impl SubWindowView {
             .base()
             .get_node_as::<PanelContainer>(UniqueName::Container.as_ref());
 
-        container.add_child(scene.upcast());
+        container.add_child(&scene);
         self.scene.set_open(true)
     }
 }

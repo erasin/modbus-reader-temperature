@@ -1,5 +1,5 @@
 use godot::{
-    engine::{Control, IControl, InputEvent, InputEventMouseMotion},
+    classes::{Control, IControl, InputEvent, InputEventMouseMotion},
     obj::WithBaseField,
     prelude::*,
 };
@@ -163,7 +163,7 @@ impl ChartView {
     fn draw_labels(&mut self) {
         let font = self
             .base()
-            .get_theme_font("HarmonyOS Sans SC Regular".into())
+            .get_theme_font("HarmonyOS Sans SC Regular")
             .unwrap();
 
         let size = self.base().get_size();
@@ -175,11 +175,8 @@ impl ChartView {
         // Draw x-axis labels
         for x in x_labels {
             let point = self.convert_point(Vector2::new(x, 0.0));
-            self.base_mut().draw_string(
-                font.clone(),
-                point + Vector2::new(-20., 20.),
-                x.to_string().into(),
-            );
+            self.base_mut()
+                .draw_string(&font, point + Vector2::new(-20., 20.), &x.to_string());
 
             let p2 = self.convert_point(Vector2::new(x, self.max_y));
             self.base_mut().draw_dashed_line(point, p2, x_color);
@@ -189,9 +186,9 @@ impl ChartView {
         for y in y_labels {
             let point = self.convert_point(Vector2::new(0.0, y));
             self.base_mut().draw_string(
-                font.clone(),
+                &font.clone(),
                 point + Vector2::new(-20., 20.),
-                y.to_string().into(),
+                &y.to_string(),
             );
             let p2 = self.convert_point(Vector2::new(self.max_x, y));
 
@@ -200,13 +197,11 @@ impl ChartView {
 
         let point = Vector2::new(size.x + 2., size.y + 20.);
         let label = self.x_label.clone();
-        self.base_mut()
-            .draw_string(font.clone(), point, label.into());
+        self.base_mut().draw_string(&font, point, &label);
 
         let point = Vector2::new(-15.0, 0.);
         let label = self.y_label.clone();
-        self.base_mut()
-            .draw_string(font.clone(), point, label.into());
+        self.base_mut().draw_string(&font, point, &label);
     }
 
     /// 绘制 points
@@ -244,12 +239,12 @@ impl ChartView {
 
         let font = self
             .base()
-            .get_theme_font("HarmonyOS Sans SC Regular".into())
+            .get_theme_font("HarmonyOS Sans SC Regular")
             .unwrap();
 
         let point = self.convert_point(p.0);
 
-        self.base_mut().draw_string(font.clone(), point, p.1.into());
+        self.base_mut().draw_string(&font, point, &p.1);
     }
 
     /// 转化为 rect 的坐标

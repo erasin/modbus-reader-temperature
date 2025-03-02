@@ -1,5 +1,5 @@
 use godot::{
-    engine::{Control, IPanelContainer, Label, PanelContainer},
+    classes::{Control, IPanelContainer, Label, PanelContainer},
     obj::WithBaseField,
     prelude::*,
 };
@@ -38,7 +38,7 @@ impl VoltageStateTagView {
         let mut label = self.base().get_node_as::<Label>("%Label");
         let mut state = self.base().get_node_as::<Control>("%Color");
 
-        label.set_text(self.label.clone());
+        label.set_text(&self.label);
         state.set_modulate(self.color);
     }
 }

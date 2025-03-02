@@ -1,7 +1,7 @@
 use std::time::Duration;
 
 use godot::{
-    engine::{
+    classes::{
         AcceptDialog, Button, IPanelContainer, ItemList, Label, LineEdit, OptionButton,
         PanelContainer,
     },
@@ -14,7 +14,7 @@ use strum::{AsRefStr, VariantArray};
 use mb_data::{
     config::Config,
     db::{get_db, task::TableTask},
-    task::{PowerMode, Task, TaskItem, AB},
+    task::{AB, PowerMode, Task, TaskItem},
 };
 
 use crate::{
@@ -51,10 +51,10 @@ impl IPanelContainer for ProgramsView {
         self.config = get_global_config();
 
         let mut check_a_btn = self.get_check_a_node();
-        check_a_btn.connect("pressed".into(), self.base().callable("on_check_a"));
+        check_a_btn.connect("pressed", &self.base().callable("on_check_a"));
 
         let mut check_b_btn = self.get_check_b_node();
-        check_b_btn.connect("pressed".into(), self.base().callable("on_check_b"));
+        check_b_btn.connect("pressed", &self.base().callable("on_check_b"));
 
         // read config
         if self.config.enable_a_panel {
@@ -74,116 +74,112 @@ impl IPanelContainer for ProgramsView {
         self.task.power.voltage = 220;
 
         let mut task_title_node = self.get_task_name_node();
-        task_title_node.connect("text_changed".into(), self.base().callable("on_task_name"));
+        task_title_node.connect("text_changed", &self.base().callable("on_task_name"));
         task_title_node.grab_focus();
 
-        self.get_temp_node().connect(
-            "text_changed".into(),
-            self.base().callable("on_temp_number"),
-        );
+        self.get_temp_node()
+            .connect("text_changed", &self.base().callable("on_temp_number"));
 
         self.get_voltage_top_node().connect(
-            "text_changed".into(),
-            self.base().callable("on_voltage_top_number"),
+            "text_changed",
+            &self.base().callable("on_voltage_top_number"),
         );
 
         self.get_voltage_down_node().connect(
-            "text_changed".into(),
-            self.base().callable("on_voltage_down_number"),
+            "text_changed",
+            &self.base().callable("on_voltage_down_number"),
         );
 
         self.get_current_top_node().connect(
-            "text_changed".into(),
-            self.base().callable("on_current_top_number"),
+            "text_changed",
+            &self.base().callable("on_current_top_number"),
         );
 
         self.get_current_down_node().connect(
-            "text_changed".into(),
-            self.base().callable("on_current_down_number"),
+            "text_changed",
+            &self.base().callable("on_current_down_number"),
         );
 
         self.get_power_type_node().connect(
-            "item_selected".into(),
-            self.base().callable("on_power_mode_selected"),
+            "item_selected",
+            &self.base().callable("on_power_mode_selected"),
         );
 
         self.get_power_voltage_node().connect(
-            "text_changed".into(),
-            self.base().callable("on_power_voltage_number"),
+            "text_changed",
+            &self.base().callable("on_power_voltage_number"),
         );
 
         self.get_power_current_node().connect(
-            "text_changed".into(),
-            self.base().callable("on_power_current_number"),
+            "text_changed",
+            &self.base().callable("on_power_current_number"),
         );
 
-        self.get_task_loop_node().connect(
-            "text_changed".into(),
-            self.base().callable("on_task_loop_number"),
-        );
+        self.get_task_loop_node()
+            .connect("text_changed", &self.base().callable("on_task_loop_number"));
 
         self.get_task_items_node().connect(
-            "item_selected".into(),
-            self.base().callable("on_task_item_selected"),
+            "item_selected",
+            &self.base().callable("on_task_item_selected"),
         );
 
         // ItemPowerVoltage
         self.get_item_power_voltage_node().connect(
-            "item_selected".into(),
-            self.base().callable("on_item_power_voltage_selected"),
+            "item_selected",
+            &self.base().callable("on_item_power_voltage_selected"),
         );
         self.item_power_voltage_update();
 
         self.get_item_hours_node().connect(
-            "text_changed".into(),
-            self.base().callable("on_item_hours_number"),
+            "text_changed",
+            &self.base().callable("on_item_hours_number"),
         );
 
         self.get_item_minutes_node().connect(
-            "text_changed".into(),
-            self.base().callable("on_item_minutes_number"),
+            "text_changed",
+            &self.base().callable("on_item_minutes_number"),
         );
 
         self.get_item_seconds_node().connect(
-            "text_changed".into(),
-            self.base().callable("on_item_seconds_number"),
+            "text_changed",
+            &self.base().callable("on_item_seconds_number"),
         );
 
         self.get_item_save_node()
-            .connect("pressed".into(), self.base().callable("on_item_save"));
+            .connect("pressed", &self.base().callable("on_item_save"));
 
         self.get_item_edit_node()
-            .connect("pressed".into(), self.base().callable("on_item_edit"));
+            .connect("pressed", &self.base().callable("on_item_edit"));
 
         self.get_item_delete_node()
-            .connect("pressed".into(), self.base().callable("on_item_delete"));
+            .connect("pressed", &self.base().callable("on_item_delete"));
 
         self.get_item_clear_node()
-            .connect("pressed".into(), self.base().callable("on_item_clear"));
+            .connect("pressed", &self.base().callable("on_item_clear"));
 
         self.get_product_title_node().connect(
-            "text_changed".into(),
-            self.base().callable("on_product_title_changed"),
+            "text_changed",
+            &self.base().callable("on_product_title_changed"),
         );
 
         self.get_product_index_node().connect(
-            "text_changed".into(),
-            self.base().callable("on_product_index_changed"),
+            "text_changed",
+            &self.base().callable("on_product_index_changed"),
         );
 
         self.get_task_list_node().connect(
-            "item_selected".into(),
-            self.base().callable("on_task_list_selected"),
+            "item_selected",
+            &self.base().callable("on_task_list_selected"),
         );
 
         self.get_task_save_node()
-            .connect("pressed".into(), self.base().callable("on_task_save"));
+            .connect("pressed", &self.base().callable("on_task_save"));
 
         self.get_task_delete_node()
-            .connect("pressed".into(), self.base().callable("on_task_delete"));
+            .connect("pressed", &self.base().callable("on_task_delete"));
 
         self.get_task_load_node()
-            .connect("pressed".into(), self.base().callable("on_task_load"));
+            .connect("pressed", &self.base().callable("on_task_load"));
 
         self.task_items_update();
         self.task_list_update();
@@ -242,7 +238,7 @@ impl ProgramsView {
         self.task.temperature = dur;
 
         let len = text.len();
-        number.set_text(text.into());
+        number.set_text(&text);
         number.set_caret_column(len as i32);
     }
 
@@ -259,7 +255,7 @@ impl ProgramsView {
         self.task.voltage_verify.voltage_top = dur as f32;
 
         let len = text.len();
-        number.set_text(text.into());
+        number.set_text(&text);
         number.set_caret_column(len as i32);
     }
 
@@ -276,7 +272,7 @@ impl ProgramsView {
         self.task.voltage_verify.voltage_down = dur as f32;
 
         let len = text.len();
-        number.set_text(text.into());
+        number.set_text(&text);
         number.set_caret_column(len as i32);
     }
 
@@ -293,7 +289,7 @@ impl ProgramsView {
         self.task.voltage_verify.current_top = dur as f32;
 
         let len = text.len();
-        number.set_text(text.into());
+        number.set_text(&text);
         number.set_caret_column(len as i32);
     }
 
@@ -310,7 +306,7 @@ impl ProgramsView {
         self.task.voltage_verify.current_down = dur as f32;
 
         let len = text.len();
-        number.set_text(text.into());
+        number.set_text(&text);
         number.set_caret_column(len as i32);
     }
 
@@ -334,7 +330,7 @@ impl ProgramsView {
         self.task.power.voltage = dur;
 
         let len = text.len();
-        number.set_text(text.into());
+        number.set_text(&text);
         number.set_caret_column(len as i32);
         self.item_power_voltage_update();
     }
@@ -352,7 +348,7 @@ impl ProgramsView {
         self.task.power.current = dur;
 
         let len = text.len();
-        number.set_text(text.into());
+        number.set_text(&text);
         number.set_caret_column(len as i32);
     }
 
@@ -369,7 +365,7 @@ impl ProgramsView {
         self.task.task_loop = dur;
 
         let len = text.len();
-        number.set_text(text.into());
+        number.set_text(&text);
         number.set_caret_column(len as i32);
 
         self.task_total_time();
@@ -399,12 +395,9 @@ impl ProgramsView {
 
         let (hours, minutes, seconds) = hms_from_duration(item.dur);
 
-        self.get_item_hours_node()
-            .set_text(hours.to_string().into());
-        self.get_item_minutes_node()
-            .set_text(minutes.to_string().into());
-        self.get_item_seconds_node()
-            .set_text(seconds.to_string().into());
+        self.get_item_hours_node().set_text(&hours.to_string());
+        self.get_item_minutes_node().set_text(&minutes.to_string());
+        self.get_item_seconds_node().set_text(&seconds.to_string());
     }
 
     #[func]
@@ -426,7 +419,7 @@ impl ProgramsView {
 
         let text = string_number_only(text);
         let len = text.len();
-        number.set_text(text.into());
+        number.set_text(&text);
         number.set_caret_column(len as i32);
 
         // 更新时间
@@ -439,7 +432,7 @@ impl ProgramsView {
 
         let text = string_number_only(text);
         let len = text.len();
-        number.set_text(text.into());
+        number.set_text(&text);
         number.set_caret_column(len as i32);
 
         // 更新时间
@@ -452,7 +445,7 @@ impl ProgramsView {
 
         let text = string_number_only(text);
         let len = text.len();
-        number.set_text(text.into());
+        number.set_text(&text);
         number.set_caret_column(len as i32);
 
         // 更新时间
@@ -626,28 +619,27 @@ impl ProgramsView {
             }
         };
 
-        self.get_task_name_node()
-            .set_text(self.task.title.clone().into());
+        self.get_task_name_node().set_text(&self.task.title.clone());
 
         self.get_voltage_top_node()
-            .set_text(self.task.voltage_verify.voltage_top.to_string().into());
+            .set_text(&self.task.voltage_verify.voltage_top.to_string());
         self.get_voltage_down_node()
-            .set_text(self.task.voltage_verify.voltage_down.to_string().into());
+            .set_text(&self.task.voltage_verify.voltage_down.to_string());
         self.get_current_top_node()
-            .set_text(self.task.voltage_verify.current_top.to_string().into());
+            .set_text(&self.task.voltage_verify.current_top.to_string());
         self.get_current_down_node()
-            .set_text(self.task.voltage_verify.current_down.to_string().into());
+            .set_text(&self.task.voltage_verify.current_down.to_string());
 
         self.get_power_type_node()
             .select(self.task.power.mode as i32);
 
         self.get_power_voltage_node()
-            .set_text(self.task.power.voltage.to_string().into());
+            .set_text(&self.task.power.voltage.to_string());
         self.get_power_current_node()
-            .set_text(self.task.power.current.to_string().into());
+            .set_text(&self.task.power.current.to_string());
 
         self.get_task_loop_node()
-            .set_text(self.task.task_loop.to_string().into());
+            .set_text(&self.task.task_loop.to_string());
 
         self.task_items_update();
     }
@@ -659,8 +651,8 @@ impl ProgramsView {
 
         item_power_voltage_node.clear();
         let voltage = self.task.power.voltage;
-        item_power_voltage_node.add_item("OFF".into());
-        item_power_voltage_node.add_item(format!("{voltage}V").into());
+        item_power_voltage_node.add_item("OFF");
+        item_power_voltage_node.add_item(&format!("{voltage}V"));
     }
 
     // 计算时间
@@ -707,7 +699,7 @@ impl ProgramsView {
 
         let text = hms_from_duration_string(dur);
         let mut count_time_node = self.get_count_time_node();
-        count_time_node.set_text(text.into());
+        count_time_node.set_text(&text);
     }
 
     /// 程序列表更新
@@ -726,11 +718,11 @@ impl ProgramsView {
         // godot_print!("{:?}, {:?}", self.task.ab, self.list.len());
         self.task_list_str = Array::new();
         self.list.iter().for_each(|task| {
-            self.task_list_str.push(task.title.clone().into());
+            self.task_list_str.push(&task.title.clone());
         });
 
         // gdscript 中处理 add_item
-        self.base_mut().emit_signal("update_task_list".into(), &[]);
+        self.base_mut().emit_signal("update_task_list", &[]);
     }
 
     fn task_items_update(&mut self) {
@@ -778,21 +770,20 @@ impl ProgramsView {
 
         self.task_items_str.clear();
         s.iter().for_each(|s| {
-            self.task_items_str.push(s.into());
+            self.task_items_str.push(s);
         });
 
         self.task_total_time();
 
-        self.base_mut()
-            .emit_signal("update_task_item_list".into(), &[]);
+        self.base_mut().emit_signal("update_task_item_list", &[]);
     }
 
     fn alert(&mut self, title: String, btn: String, info: String) {
         let mut alert = self.get_alert_node();
         let mut alert_info = self.get_alert_info_node();
-        alert.set_title(title.into());
-        alert.set_ok_button_text(btn.into());
-        alert_info.set_text(info.into());
+        alert.set_title(&title);
+        alert.set_ok_button_text(&btn);
+        alert_info.set_text(&info);
         alert.set_visible(true);
     }
 
