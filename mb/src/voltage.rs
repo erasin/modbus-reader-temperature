@@ -18,7 +18,6 @@ use crate::utils::current_timestamp;
 ///
 /// ```
 ///
-
 pub struct Voltage;
 pub const VOLTAGE_CHANNEL: usize = 15;
 
@@ -57,7 +56,7 @@ impl VoltageData {
 
     pub fn update_channel_index(&mut self, index: usize) {
         self.data.iter_mut().for_each(|c| {
-            c.index = c.index + index * VOLTAGE_CHANNEL;
+            c.index += index * VOLTAGE_CHANNEL;
         });
     }
 

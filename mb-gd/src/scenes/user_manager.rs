@@ -209,10 +209,7 @@ impl UserManagerView {
         // 设置用户list
         {
             let db = get_db().lock().unwrap();
-            self.users = match TableUser::list(&db) {
-                Ok(list) => list,
-                Err(_) => Vec::new(),
-            };
+            self.users = TableUser::list(&db).unwrap_or_default();
         }
 
         // let mut user_list = self

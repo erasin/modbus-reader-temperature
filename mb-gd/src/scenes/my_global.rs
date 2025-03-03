@@ -92,10 +92,7 @@ impl MyGlobal {
         // from db
         if self.config.is_none() {
             let db = get_db().lock().unwrap();
-            let mut conf = match TableGlobal::get_config(&db) {
-                Ok(c) => c,
-                Err(_) => Config::default(),
-            };
+            let mut conf = TableGlobal::get_config(&db).unwrap_or_default();
 
             // 需要开启一个面板
             if !conf.enable_a_panel && !conf.enable_b_panel {

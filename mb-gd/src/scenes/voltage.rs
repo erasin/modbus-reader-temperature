@@ -340,7 +340,6 @@ impl VoltageView {
                 Ok(data) => data,
                 Err(e) => {
                     log::error!("继电器冲击失败： {e}");
-                    return;
                 }
             };
         }
@@ -482,10 +481,9 @@ impl VoltageView {
 
     /// 电源开启后监控
     fn power_state_update(&mut self) {
-        if self.task.is_none() {
-            return;
-        }
-
+        // if self.task.is_none() {
+        //     return;
+        // }
         // TODO 检查电源
     }
 

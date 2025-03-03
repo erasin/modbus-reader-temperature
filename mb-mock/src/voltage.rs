@@ -97,7 +97,7 @@ fn generate_response_voltage() -> Vec<u16> {
 mod test {
 
     #[test]
-    fn gen() {
+    fn gen_data() {
         let r = super::generate_response_voltage();
         // assert_eq!(30, r.len());
         println!("{:?}", r);
